@@ -90,6 +90,7 @@ async function loginUser(request, response){
             logger.info(`LOGGED IN user ${username} -- loginUser`);
             // Render the home page
             response.status(201).render('home.hbs', pageData);
+            // response.redirect('/parts');
         }
         else{
             // Error data for when an error occurs
@@ -349,6 +350,7 @@ router.post("/users/login", loginUser);
 module.exports = {
     router,
     routeRoot,
-    LOGGED_IN_USER
+    LOGGED_IN_USER,
+    authenticateUser
 }
 

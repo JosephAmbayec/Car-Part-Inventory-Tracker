@@ -316,3 +316,21 @@ table {
      transition: opacity 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
    }
  }
+ /* ***************************************************** */
+
+ #show-project-flex{
+   display: grid;
+   grid-template-columns: 2fr 2fr;
+}
+#show-project-first-flex{
+  /* flex: 1.5; */
+  /* justify-content: center; */
+}
+#show-project-update-form{
+  /* display: flex;
+  flex-direction: column;
+  justify-content: center; */
+}
+#show-project-all-parts{
+  /* flex:3; */
+}

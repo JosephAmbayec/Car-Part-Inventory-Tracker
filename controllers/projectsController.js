@@ -10,6 +10,7 @@ const partsModel = require('../models/carPartModelMysql');
 const usersModel = require('../models/userModel');
 const projectModel = require('../models/projectModel');
 const { LOGGED_IN_USER } = require('./loginController');
+const loginController = require('./loginController');
 
 /**
  * POST controller method that allows the user to create projects
@@ -98,7 +99,7 @@ const { LOGGED_IN_USER } = require('./loginController');
  */
  async function showProjects(request, response){
 
-    let cookie = request.cookies;
+    let login = loginController.authenticateUser(request);
 
     // Page data 
     const pageData = {

@@ -20,45 +20,49 @@
     </div>
 {{/if}}
 
-<div>
-    <div>
-        <a href="/projects" id="add-project-btn" class="btn btn-outline-primary"
+<div id="show-project-flex">
+    {{!-- <div id="show-project-first-flex"> --}}
+        <div id="show-project-update-form">
+            <a href="/projects" id="add-project-btn" class="btn btn-outline-primary"
             style="cursor: pointer; width: 175px; height: 32px; margin: 2rem 1rem;">
-        <i class='fas fa-arrow-left' style='font-size:17px; margin-right: 4px;'></i>
-        Back to Projects
-        </a>
+            <i class='fas fa-arrow-left' style='font-size:17px; margin-right: 4px;'></i>
+            Back to Projects
+            </a>
 
-        <!--container for form-->
-        <section id="form-container">
+            <!--container for form-->
+            <section id="form-container">
 
-            <!--Form to sign up to the website-->
-            <form method="POST" action="/projects/show/update" 
-                        id="form-loginsignup" >
-                <!-- Legend title for the current form-->
-                <legend>Edit {{projectName}}</legend>
-                
-                <!--Project Name-->
-                <div class="form-group row justify-content-center">
-                    <label for="name" class="form-label">Project Name</label>
-                    <input name="name" id="name" 
-                        type="text" class="form-control" value="{{projectName}}" required/>
-                </div>
+                <!--Form to sign up to the website-->
+                <form method="POST" action="/projects/show/update" 
+                            id="form-loginsignup" >
+                    <!-- Legend title for the current form-->
+                    <legend>Edit Project: {{projectName}}</legend>
+                    
+                    <!--Project Name-->
+                    <div class="form-group row justify-content-center">
+                        <label for="name" class="form-label">Project Name</label>
+                        <input name="name" id="name" 
+                            type="text" class="form-control" value="{{projectName}}" required/>
+                    </div>
 
-                <!--Project Description-->
-                <div class="form-group row justify-content-center">
-                    <label for="description" class="form-label">Project Description</label>
-                    <input name="description" id="description" 
-                            type="text" class="form-control" value="{{projectDescription}}" required/>
-                </div>
+                    <!--Project Description-->
+                    <div class="form-group row justify-content-center">
+                        <label for="description" class="form-label">Project Description</label>
+                        <input name="description" id="description" 
+                                type="text" class="form-control" value="{{projectDescription}}" required/>
+                    </div>
 
-                <!--Submit button-->
-                <div class="row justify-content-center">
-                    <button class="btn btn-primary submit-btn" style="width:100%;" type="submit">Update Project</button>
-                </div>
-            </form>
+                    <!--Submit button-->
+                    <div class="row justify-content-center">
+                        <button class="btn btn-primary submit-btn" style="width:100%;" type="submit">Update Project</button>
+                    </div>
+                </form>
 
-        </section> 
+            </section>
+        </div> 
+    {{!-- </div> --}}
+
+    <div id="show-project-all-parts">
+        <h1>Hi</h1>
     </div>
-
-
 </div>

@@ -5,6 +5,7 @@ const router = express.Router();
 const routeRoot = '/';
 const partController = require('./carPartController');
 const logger = require('../logger');
+const loginController = require('./loginController');
 
 const cookieParser = require("cookie-parser")
 router.use(cookieParser());
@@ -19,6 +20,8 @@ function sendHome(request, response) {
     const justRegistered = request.cookies.justRegistered;
     const lang = request.cookies.language;
     let pageData;
+    let login = loginController.authenticateUser(request);
+    let signupDisplay, endpoint, logInText;
 
     // If the user just registered
     if (justRegistered == 'true') {
@@ -28,35 +31,65 @@ function sendHome(request, response) {
     }
 
     if (!lang || lang === 'en') {
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Log In";
+        }
+
         pageData = {
             Home: "Home",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Log In",
-            endpointLogInLogOut: "login",
+            logInlogOutText: logInText,
+            endpointLogInLogOut: endpoint,
             signUpText: "Sign Up",
             Current: "English",
             Add: "Add a Car part",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
             Edit: "Update a Car Part",
-            Delete: "Delete a Car Part"
+            Delete: "Delete a Car Part",
+            loggedInUser: login,
+            projects_text: "Projects",
         }
     }
     else{
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Se Déconnecter";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Connexion";
+        }
+
         pageData = {
             Home: "Accueil",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Connexion",
-            endpointLogInLogOut: "login",
+            logInlogOutText: logInText,
+            endpointLogInLogOut: endpoint,
             signUpText: "Enregistrer",
             Current: "French",
             Add: "Ajouter une Pièce Auto",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
             Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto"
+            Delete: "Supprimer une Pièce Auto",
+            loggedInUser: login,
+            projects_text: "Projets"
         }
     }
 
@@ -75,13 +108,13 @@ function showForm(request, response) {
         // Case of adding a car part
         case 'add':
             logger.info(`SWITCH CASE add -- showForm`);
-            showAddForm(response);
+            showAddForm(request, response);
             break;
 
         // Case of finding a car part
         case 'show':
             logger.info(`SWITCH CASE show (find) -- showForm`);
-            showListOneForm(response);
+            showListOneForm(request, response);
             break;
 
         // Case of getting all car parts
@@ -93,13 +126,13 @@ function showForm(request, response) {
         // Case of updating a car part
         case 'edit':
             logger.info(`SWITCH CASE update -- showForm`);
-            showEditForm(response);
+            showEditForm(request, response);
             break;
 
         // Case of deleting a car part
         case 'delete':
             logger.info(`SWITCH CASE delete -- showForm`);
-            showDeleteForm(response);
+            showDeleteForm(request, response);
             break;
 
         // Default case
@@ -112,12 +145,27 @@ function showForm(request, response) {
  * Displays the add car part form
  * @param {*} response 
  */
-function showAddForm(response) {
-    let lang = response.req.cookies.language;
+function showAddForm(request, response) {
+    let lang = request.cookies.language;
+    let login = loginController.authenticateUser(request);
+    let signupDisplay, endpoint, logInText;
 
     let pageData;
 
     if (!lang || lang === 'en') {
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Log In";
+        }
+
         pageData = {
             Home: "Home",
             showForm: true,
@@ -128,19 +176,34 @@ function showAddForm(response) {
             formfields: [{ field: "partNumber", pretty: "Part Number", type: "number", required: "required" },
             { field: "name", pretty: "Part Name", required: "required" }, { field: "condition", pretty: "Condition" }, { field: "image", pretty: "Image URL" }],
             Submit: "Submit",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Log In",
+            logInlogOutText: logInText,
             signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             Add: "Add a Car part",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
             Edit: "Update a Car Part",
-            Delete: "Delete a Car Part"
+            Delete: "Delete a Car Part",
+            loggedInUser: login,
+            projects_text: "Projects",
         }
     }
     else {
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Se Déconnecter";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Connexion";
+        }
+
         pageData = {
             Home: "Accueil",
             showForm: true,
@@ -151,16 +214,18 @@ function showAddForm(response) {
             formfields: [{ field: "partNumber", pretty: "Numéro de Pièce", type: "number", required: "required" },
             { field: "name", pretty: "Nom de la Pièce", required: "required" }, { field: "condition", pretty: "État" }, { field: "image", pretty: "URL de L'image" }],
             Submit: "Soumettre",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Connexion",
+            logInlogOutText: logInText,
             signUpText: "Enregistrer",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             Add: "Ajouter une Pièce Auto",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
             Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto"
+            Delete: "Supprimer une Pièce Auto",
+            loggedInUser: login,
+            projects_text: "Projets",
         }
     }
 
@@ -172,12 +237,27 @@ function showAddForm(response) {
  * Displays the show car part form
  * @param {*} response 
  */
-function showListOneForm(response) {
-    let lang = response.req.cookies.language;
+function showListOneForm(request, response) {
+    let lang = request.cookies.language;
+    let login = loginController.authenticateUser(request);
+    let signupDisplay, endpoint, logInText;
 
     let pageData;
 
     if (!lang || lang === 'en') {
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Log In";
+        }
+
         pageData = {
             Home: "Home",
             showForm: true,
@@ -189,19 +269,34 @@ function showListOneForm(response) {
             legend: "Please enter the part number to display: ",
             formfields: [{ field: "partNumber", pretty: "Original Part Number", type: "number" }],
             Submit: "Submit",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Log In",
+            logInlogOutText: logInText,
             signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             Add: "Add a car part",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
             Edit: "Update a Car Part",
-            Delete: "Delete a Car Part"
+            Delete: "Delete a Car Part",
+            loggedInUser: login,
+            projects_text: "Projects",
         };
     }
     else {
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Se Déconnecter";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Connexion";
+        }
+
         pageData = {
             Home: "Accueil",
             showForm: true,
@@ -213,17 +308,18 @@ function showListOneForm(response) {
             legend: "Veuillez entrer le numéro de pièce à afficher: ",
             formfields: [{ field: "partNumber", pretty: "Numéro De Pièce", type: "number" }],
             Submit: "Soumettre",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Connexion",
+            logInlogOutText: logInText,
             signUpText: "Enregistrer",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             Add: "Ajouter une Pièce Auto",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
             Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto"
+            Delete: "Supprimer une Pièce Auto",
+            loggedInUser: login,
+            projects_text: "Projets",
         };
     }
 
@@ -237,12 +333,27 @@ function showListOneForm(response) {
  * Displays the update car part form
  * @param {*} response 
  */
-function showEditForm(response) {
-    let lang = response.req.cookies.language;
+function showEditForm(request, response) {
+    let lang = request.cookies.language;
+    let login = loginController.authenticateUser(request);
+    let signupDisplay, endpoint, logInText;
 
     let pageData;
 
     if (!lang || lang === 'en') {
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Log In";
+        }
+
         pageData = {
             Home: "Home",
             showForm: true,
@@ -255,19 +366,34 @@ function showEditForm(response) {
             formfields: [{ field: "partNumber", pretty: "Original Part Number", type: "number" },
             { field: "name", pretty: "New Part Name" }],
             Submit: "Submit",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Log In",
+            logInlogOutText: logInText,
             signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             Add: "Add a car part",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
             Edit: "Update a Car Part",
-            Delete: "Delete a Car Part"
+            Delete: "Delete a Car Part",
+            loggedInUser: login,
+            projects_text: "Projects",
         };
     }
     else {
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Se Déconnecter";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Connexion";
+        }
+
         pageData = {
             Home: "Accueil",
             showForm: true,
@@ -280,16 +406,18 @@ function showEditForm(response) {
             formfields: [{ field: "partNumber", pretty: "Numéro De Pièce", type: "number" },
             { field: "name", pretty: "Nouveau Nom De Pièce" }],
             Submit: "Soumettre",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Connexion",
+            logInlogOutText: logInText,
             signUpText: "Enregistrer",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             Add: "Ajouter une Pièce Auto",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
             Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto"
+            Delete: "Supprimer une Pièce Auto",
+            loggedInUser: login,
+            projects_text: "Projets",
         };
     }
 
@@ -301,12 +429,27 @@ function showEditForm(response) {
  * Displays the delete car part form
  * @param {*} response 
  */
-function showDeleteForm(response) {
-    let lang = response.req.cookies.language;
-
+function showDeleteForm(request, response) {
+    let lang = request.cookies.language;
+    let login = loginController.authenticateUser(request);
+    let signupDisplay, endpoint, logInText;
+    
     let pageData;
 
     if (!lang || lang === 'en') {
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Log In";
+        }
+
         pageData = {
             Home: "Home",
             showForm: true,
@@ -318,19 +461,34 @@ function showDeleteForm(response) {
             legend: "Please enter the part number of the part that should be deleted:",
             formfields: [{ field: "partNumber", pretty: "Part Number", type: "number" }],
             Submit: "Submit",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Log In",
+            logInlogOutText: logInText,
             signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             Add: "Add a car part",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
             Edit: "Update a Car Part",
-            Delete: "Delete a Car Part"
+            Delete: "Delete a Car Part",
+            loggedInUser: login,
+            projects_text: "Projects",
         };
     }
     else {
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Se Déconnecter";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Connexion";
+        }
+
         pageData = {
             Home: "Accueil",
             showForm: true,
@@ -342,20 +500,20 @@ function showDeleteForm(response) {
             legend: "Veuillez entrer le numéro de pièce de la pièce à supprimer :",
             formfields: [{ field: "partNumber", pretty: "Numéro De Pièce", type: "number" }],
             Submit: "Soumettre",
-            display_signup: "block",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Connexion",
+            logInlogOutText: logInText,
             signUpText: "Enregistrer",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             Add: "Ajouter une Pièce Auto",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
             Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto"
+            Delete: "Supprimer une Pièce Auto",
+            loggedInUser: login,
+            projects_text: "Projets",
         };
     }
-
-
 
     logger.info(`RENDERING home page WITH DELETE form -- showDeleteForm`);
     response.render('home.hbs', pageData);

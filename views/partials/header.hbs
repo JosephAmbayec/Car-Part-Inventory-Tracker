@@ -14,7 +14,7 @@
       <!--If the user is logged in, show the projects tab-->
       {{#if loggedInUser}}
         <li class="nav-item active">
-          <a class="nav-link" href="/projects" id="projects-nav">Projects</a>
+          <a class="nav-link" href="/projects" id="projects-nav">{{projects_text}}</a>
         </li>
       {{/if}}
     </ul>
@@ -27,9 +27,11 @@
       <li class="nav-right" style="display:{{display_login}};">
         <a class="nav-link" href="/users/{{endpointLogInLogOut}}">{{logInlogOutText}}</a>
       </li>
-      <li class="nav-right" style="display:{{display_signup}}">
-        <a class="nav-link" href="/users/signup">{{signUpText}}</a>
-      </li>
+      {{#if signUpText}}
+        <li class="nav-right" style="display:{{display_signup}}">
+          <a class="nav-link" href="/users/signup">{{signUpText}}</a>
+        </li>
+      {{/if}}
       <!--    Made by Erik Terwan    -->
       <!--   24th of November 2015   -->
       <!--        MIT License        -->
