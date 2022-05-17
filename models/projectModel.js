@@ -106,10 +106,16 @@ async function getConnection(){
  * @returns Returns an array of projects created by the given user
  */
 async function getAllProjects(username){
-    let userId = await userModel.getUserByName(username);
-    let query = `SELECT name, description FROM Project, UsersProject as U where U.id = ${userId}`;
-    let results = await connection.query(query);
-    return results[0];
+    try {
+        let userId = await userModel.getUserByName(username);
+        let query = `SELECT DISTINCT P.projectId, name, description FROM Project as P, UsersProject as U where U.id = ${userId}`;
+        let results = await connection.query(query);
+        return results[0];
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
 }
 
 /**

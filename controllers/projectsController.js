@@ -146,9 +146,57 @@ async function showCreateForm(request, response){
     response.status(201).render('allProjects.hbs', pageData);
 }
 
+async function showSpecificProject(request, response){
+    let description = request.body.projectId;
+
+    // Page data 
+    const pageData = {
+            alertOccurred: false,
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: LOGGED_IN_USER,
+            // projectName: 
+    }
+
+    // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+    response.status(201).render('showProject.hbs', pageData);
+}
+
+async function updateProject(request, response){
+    let name = request.body.name;
+    let description = request.body.description;
+    
+    // Page data 
+    const pageData = {
+            alertOccurred: true,
+            alertMessage: "Successfully updated project!",
+            alertLevel: 'success',
+            alertLevelText: 'success',
+            alertHref: 'exclamation-triangle-fill',
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: LOGGED_IN_USER,
+    }
+
+    // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+    response.status(201).render('showProject.hbs', pageData);
+}
+
 router.post("/projects", createProject);
 router.get("/projects", showProjects);
 router.post("/projects/new", showCreateForm);
+router.get("/projects/:projectId", showSpecificProject);
+router.post("/projects/show/update", updateProject);
 
 
 module.exports = {
