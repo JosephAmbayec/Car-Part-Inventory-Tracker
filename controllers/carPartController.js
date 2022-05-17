@@ -127,7 +127,23 @@ async function getAllCarParts(request, response){
                         }
                     }
 
-                    let output = {part, showList: true};
+                    let output = {
+                        part, 
+                        showList: true,
+                        display_signup: "none",
+                        display_login: "block",
+                        logInlogOutText: "Log Out",
+                        signUpText: "Sign Up",
+                        endpointLogInLogOut: "login",
+                        Home: "Home",
+                        Add: "Add a car part",
+                        Show: "Find a Car Part",
+                        List: "Show all Car Parts",
+                        Edit: "Update a Car Part",
+                        Delete: "Delete a Car Part",
+                        Current: "English",
+                    };
+
                     logger.info(`RETRIEVED ALL car parts from database -- getAllCarParts`);
                     response.status(200).render('home.hbs', output)
                 }  

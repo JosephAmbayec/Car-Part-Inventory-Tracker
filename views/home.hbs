@@ -85,55 +85,100 @@
       <!--Creating the tables-->
       <table>
         <tr>
+          <!--Is the user is logged in, show add to project-->
+          {{#if isUserLoggedIn}}
+             <th>Add to Project</th>
+          {{/if}}
+
           <th>Part #</th>
           <th>Name</th>
           <th>Condition</th>
           <th>Image</th>
         </tr>
 
-        <!--Formatting table for each car part-->
-        {{#each part}}
-        <tr>
-          <td>{{partNumber}}</td>
-          <td>{{name}}</td>
-          <td>{{condition}}</td>
+          <!--Formatting table for each car part-->
+          {{#each part}}
+            <tr>
+              <!--Is the user is logged in, show add to project-->
+              {{#if ../isUserLoggedIn}}
+                <td><button id="add-project-btn" data-toggle="modal" data-target="#add-proj"><i class="fa fa-plus" style="font-size:17px; margin-right: 4px;"></i></button></td>
 
-          <!--If an image is specified with the car part-->
-          {{#if image}}
-          <!--Create column value for image button-->
-          <td>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{partNumber}}">
-              Show image
-            </button>
-          </td>
-        </tr>
+                <!--bootstrap for showing the image-->
+                <div class="modal fade" id="add-proj" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                  aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Add {{name}} to project</h5>
+                      </div>
+                      <!-- Add image inside the body of modal -->
+                      <div class="modal-body">
+                        {{!-- <ul>
+                          {{#each project}}
+                            <li>{{this.name}}</li>
+                          {{/each}}
+                        </ul> --}}
 
-        <!--bootstrap for showing the image-->
-        <div class="modal fade" id="{{partNumber}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-          aria-hidden="true">
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-              <!-- Add image inside the body of modal -->
-              <div class="modal-body">
-                <h1>{{name}}</h1>
-                <img class="img-responsive" id="image" src={{image}} alt="No image associated with this part." />
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                  Close
+                        <div class="dropdown">
+                          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            Add to project
+                          </button>
+                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            {{#each ../project}}
+                              <li><a class="dropdown-item" href="#">{{this.name}}</a></li>
+                            {{/each}}
+                          </ul>
+                        </div>
+
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {{/if}} 
+              
+              <td>{{partNumber}}</td>
+              <td>{{name}}</td>
+              <td>{{condition}}</td>
+
+              <!--If an image is specified with the car part-->
+              {{#if image}}
+              <!--Create column value for image button-->
+              <td>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{partNumber}}">
+                  Show image
                 </button>
+              </td>
+            </tr>
+
+            <!--bootstrap for showing the image-->
+            <div class="modal fade" id="{{partNumber}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <!-- Add image inside the body of modal -->
+                  <div class="modal-body">
+                    <h1>{{name}}</h1>
+                    <img class="img-responsive" id="image" src={{image}} alt="No image associated with this part." />
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                      Close
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        {{else}}
+            {{else}}
 
-        <td></td>
-        </tr>
-        {{/if}}
+            <td></td>
+            {{/if}}
 
-        {{/each}}
-
+          {{/each}}
       </table>
     </div>
     {{/if}}

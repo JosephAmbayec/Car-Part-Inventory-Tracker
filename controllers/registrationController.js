@@ -35,7 +35,8 @@ async function createUser(request, response){
                 showConfirmPassword: true,
                 oppositeFormAction: 'login',
                 oppositeFormName: 'Log in',
-                dontHaveAccountText: "Already have an account?"
+                dontHaveAccountText: "Already have an account?",
+                Home: "Home",
             }
         }
         else{
@@ -50,7 +51,8 @@ async function createUser(request, response){
                 showConfirmPassword: true,
                 oppositeFormAction: 'login',
                 oppositeFormName: 'Connexion',
-                dontHaveAccountText: "Vous avez déjà un compte?"
+                dontHaveAccountText: "Vous avez déjà un compte?",
+                Home: "Retournez",
             }
         }
 
@@ -86,7 +88,8 @@ async function createUser(request, response){
                     display_login: "block",
                     logInlogOutText: "Log Out",
                     endpointLogInLogOut: "login",
-                    loggedInUser: username
+                    loggedInUser: username,
+                    Home: "Home",
                 }
             }
             else{
@@ -100,7 +103,8 @@ async function createUser(request, response){
                     display_login: "block",
                     logInlogOutText: "Déconnecter",
                     endpointLogInLogOut: "login",
-                    loggedInUser: username
+                    loggedInUser: username,
+                    Home: "Home",
                 }
             }
 
@@ -128,7 +132,8 @@ async function createUser(request, response){
                     dontHaveAccountText: "Already have an account?",
                     usernameHeader: "Username",
                     passwordHeader: "Password",
-                    confirmPasswordHeader: "Confirm Password"
+                    confirmPasswordHeader: "Confirm Password",
+                    Home: "Home",
                 }
             }
             else{
@@ -146,7 +151,8 @@ async function createUser(request, response){
                     dontHaveAccountText: "Vous avez déjà un compte?",
                     usernameHeader: "Nom D'utilisateur",
                     passwordHeader: "Mot de Passe",
-                    confirmPasswordHeader: "Confirmez le Mot de Passe"
+                    confirmPasswordHeader: "Confirmez le Mot de Passe",
+                    Home: "Retournez",
                 } 
             }
 
@@ -234,7 +240,8 @@ async function showSignup(request, response){
             endpointLogInLogOut: "login",
             usernameHeader: "Username",
             passwordHeader: "Password",
-            confirmPasswordHeader: "Confirm Password"
+            confirmPasswordHeader: "Confirm Password",
+            Home: "Home",
         }
     }
     else{
@@ -253,7 +260,8 @@ async function showSignup(request, response){
             endpointLogInLogOut: "login",
             usernameHeader: "Nom D'utilisateur",
             passwordHeader: "Mot de Passe",
-            confirmPasswordHeader: "Confirmez le Mot de Passe"
+            confirmPasswordHeader: "Confirmez le Mot de Passe",
+            Home: "Retournez",
         }
     }
 

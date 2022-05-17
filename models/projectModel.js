@@ -182,5 +182,4 @@ module.exports = {
     addUserToProject,
     getConnection,
     getAllProjects
-
 }

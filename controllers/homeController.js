@@ -60,10 +60,8 @@ function sendHome(request, response) {
         }
     }
 
-
     logger.info(`RENDERING home page -- sendHome`);
     response.status(200).render('home.hbs', pageData);
-
 }
 
 /**
@@ -89,7 +87,7 @@ function showForm(request, response) {
         // Case of getting all car parts
         case 'list':
             logger.info(`SWITCH CASE list (all) -- showForm`);
-            response.redirect('/parts')
+            response.redirect('/parts');
             break;
 
         // Case of updating a car part
