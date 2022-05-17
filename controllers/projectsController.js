@@ -9,7 +9,6 @@ const validUtils = require('../validateUtils.js');
 const partsModel = require('../models/carPartModelMysql');
 const usersModel = require('../models/userModel');
 const projectModel = require('../models/projectModel');
-const { LOGGED_IN_USER } = require('./loginController');
 const loginController = require('./loginController');
 
 /**
@@ -24,7 +23,7 @@ const loginController = require('./loginController');
     let userId = await usersModel.getUserByName(request.cookies.username);
    
     // If the user id is not specified
-    if (userId == -1){
+    if (userId === -1){
         logger.error(`No user to create project -- createProject`);
         throw new sqlModel.DatabaseConnectionError("The project is not associated with a user");
     }
@@ -34,6 +33,12 @@ const loginController = require('./loginController');
         let projectId = await projectModel.addProject(name, description)
         await projectModel.addUserToProject(projectId, userId);
         let projs = await projectModel.getAllProjects(request.cookies.username);
+        let login = loginController.authenticateUser(request);
+
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+        }
 
         const pageData = {
             alertOccurred: true,
@@ -51,7 +56,7 @@ const loginController = require('./loginController');
             projects: projs,
             clickedNewProject: false,
             Home: "Home",
-            loggedInUser: LOGGED_IN_USER
+            loggedInUser: login
         }
     
         logger.info(`CREATED PROJECT (Name: ${name}, Description: ${description} -- loginUser`);
@@ -68,7 +73,7 @@ const loginController = require('./loginController');
             pathNameForActionForm: 'projects',
             projects: await projectModel.getAllProjects(),
             clickedNewProject: false,
-            loggedInUser: LOGGED_IN_USER
+            loggedInUser: login
         }
         
         // If the error is an instance of the DatabaseConnectionError error
@@ -101,6 +106,11 @@ const loginController = require('./loginController');
 
     let login = loginController.authenticateUser(request);
 
+     // Set the login to the username if response is not null
+     if(login != null) {
+        login = login.userSession.username;
+    }
+
     // Page data 
     const pageData = {
         alertOccurred: false,
@@ -111,7 +121,7 @@ const loginController = require('./loginController');
         projects: await projectModel.getAllProjects(request.cookies.username),
         Home: "Home",
         logInlogOutText: "Log Out",
-        loggedInUser: LOGGED_IN_USER
+        loggedInUser: login
     }
 
     // If there's no projects
@@ -130,6 +140,13 @@ const loginController = require('./loginController');
  * @param {*} response 
  */
 async function showCreateForm(request, response){
+    let login = loginController.authenticateUser(request);
+
+     // Set the login to the username if response is not null
+     if(login != null) {
+        login = login.userSession.username;
+    }
+
     // Page data 
     const pageData = {
         alertOccurred: false,
@@ -139,7 +156,7 @@ async function showCreateForm(request, response){
         pathNameForActionForm: 'projects',
         Home: "Home",
         logInlogOutText: "Log Out",
-        loggedInUser: LOGGED_IN_USER,
+        loggedInUser: login,
         clickedNewProject: true
     }
 
@@ -150,6 +167,12 @@ async function showCreateForm(request, response){
 async function showSpecificProject(request, response){
     let projectID = request.params.projectId;
     let theProject = await projectModel.getProjectByProjectId(projectID);
+    let login = loginController.authenticateUser(request);
+
+     // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+    }
 
     // Page data 
     const pageData = {
@@ -161,7 +184,7 @@ async function showSpecificProject(request, response){
             endpointLogInLogOut: "login",
             clickedNewProject: false,
             Home: "Home",
-            loggedInUser: LOGGED_IN_USER,
+            loggedInUser: login,
             projectName: theProject[0].name,
             projectDescription: theProject[0].description
     }
@@ -173,6 +196,12 @@ async function showSpecificProject(request, response){
 async function updateProject(request, response){
     let name = request.body.name;
     let description = request.body.description;
+    let login = loginController.authenticateUser(request);
+
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+    }
     
     // Page data 
     const pageData = {
@@ -188,7 +217,7 @@ async function updateProject(request, response){
             endpointLogInLogOut: "login",
             clickedNewProject: false,
             Home: "Home",
-            loggedInUser: LOGGED_IN_USER,
+            loggedInUser: login,
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
