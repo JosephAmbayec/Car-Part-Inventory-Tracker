@@ -102,6 +102,7 @@ async function getPartByNumber(request, response){
         }
     }
 }
+
 /**
  * GET controller method that allows the user to retrieve an array of all parts in the database
  * @param {*} request 
@@ -109,45 +110,61 @@ async function getPartByNumber(request, response){
  */
 async function getAllCarParts(request, response){
     try {
-        await sqlModel.findAllCarParts()
-            .then(part => {
+        let parts = await sqlModel.findAllCarParts();
 
-                // If no car parts were found
-                if (part.length == 0){
-                    logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
-                    response.status(404).render('home.hbs', {message: "No results"});
+        // If no car parts were found
+        if (parts.length === 0){
+
+            let output = {
+                showList: true,
+                noCarParts: true,
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Log Out",
+                signUpText: "Sign Up",
+                endpointLogInLogOut: "login",
+                Home: "Home",
+                Add: "Add a car part",
+                Show: "Find a Car Part",
+                List: "Show all Car Parts",
+                Edit: "Update a Car Part",
+                Delete: "Delete a Car Part",
+                Current: "English",
+            }
+
+            logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
+            response.status(201).render('home.hbs', output);
+        }
+        // If car parts were found
+        else{
+
+            // Deleting the car part images with no image
+            for (let i = 0; i < parts.length; i++){
+                if (parts[i].image == 'null' || parts[i].image == null || parts[i.image == '']){
+                    delete parts[i].image;
                 }
-                // If car parts were found
-                else{
+            }
 
-                    // Deleting the car part images with no image
-                    for (let i = 0; i < part.length; i++){
-                        if (part[i].image == 'null' || part[i].image == null || part[i.image == '']){
-                            delete part[i].image;
-                        }
-                    }
+            let output = {
+                part: parts, 
+                showList: true,
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Log Out",
+                signUpText: "Sign Up",
+                endpointLogInLogOut: "login",
+                Home: "Home",
+                Add: "Add a car part",
+                Show: "Find a Car Part",
+                List: "Show all Car Parts",
+                Edit: "Update a Car Part",
+                Delete: "Delete a Car Part",
+                Current: "English",
+            };
 
-                    let output = {
-                        part, 
-                        showList: true,
-                        display_signup: "none",
-                        display_login: "block",
-                        logInlogOutText: "Log Out",
-                        signUpText: "Sign Up",
-                        endpointLogInLogOut: "login",
-                        Home: "Home",
-                        Add: "Add a car part",
-                        Show: "Find a Car Part",
-                        List: "Show all Car Parts",
-                        Edit: "Update a Car Part",
-                        Delete: "Delete a Car Part",
-                        Current: "English",
-                    };
-
-                    logger.info(`RETRIEVED ALL car parts from database -- getAllCarParts`);
-                    response.status(200).render('home.hbs', output)
-                }  
-            })
+            logger.info(`RETRIEVED ALL car parts from database -- getAllCarParts`);
+            response.status(200).render('home.hbs', output)
+        }  
     }
     catch(error){
 
