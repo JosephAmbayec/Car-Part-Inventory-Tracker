@@ -1,20 +1,20 @@
-var connection;
+const model = require('../models/sessionModel');
 
-const model = require('../models/carPartModelMySql');
-const dbName = "car_testDb"; 
-const home = "http://localhost:1339/"; // or /home depending on your endpoint
+const userData = [
+    { username: 'username1', password: 'P@ssW0rd!'},
+    { username: 'username2', password: '#@ijdsAd2'},
+    { username: 'username3', password: 'T#E2ST!ss'},
+    { username: 'username4', password: 'thisisAP@ssw0Rd'},
+    { username: 'username5', password: 'testPassword#23'},
+    { username: 'username6', password: 'H3||oW0rld'},
+]
 
+test("createSession successfully returns sessionId", async () => {
+    let username = userData.at(Math.random() * 6).username;
+    let numMinutes = Math.random() * 20
 
-beforeEach(async()=> {
-    jest.setTimeout(5000)
-    await model.initialize(dbName, true);
-    // load home page and wait until it is fully loaded
-    await page.goto(home, {waitUntil: "domcontentloaded"});
-})
+    let result = await model.createSession(username, numMinutes)
 
-afterEach(async () => {
-    connection = await model.getConnection();
-    if (connection) {
-        await connection.close();
-    } 
+    expect(result.length).toEqual(36);
 });
+
