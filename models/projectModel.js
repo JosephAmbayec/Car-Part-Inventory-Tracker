@@ -182,10 +182,22 @@ async function projectExists(projectId){
 async function getProjectByProjectId(projectId){
     try {
         if(projectExists(projectId)){
-            const selectStatement = `SELECT name, description from Project where projectId = ${projectId}`;
+            const selectStatement = `SELECT name, description FROM Project WHERE projectId = ${projectId}`;
             let projectArray = await connection.query(selectStatement);
-            // if (projectArray[0].length != 0)
-            //     return true;
+            return projectArray[0];
+        }
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
+
+async function updateProject(newName, newDescription, projectId){
+    try {
+        if(projectExists(projectId)){
+            const selectStatement = `UPDATE Project SET name = '${newName}', description = '${newDescription}' WHERE projectId = '${projectId}';`;
+            let projectArray = await connection.query(selectStatement);
             return projectArray[0];
         }
     } 
@@ -202,5 +214,6 @@ module.exports = {
     addUserToProject,
     getConnection,
     getAllProjects,
-    getProjectByProjectId
+    getProjectByProjectId,
+    updateProject
 }

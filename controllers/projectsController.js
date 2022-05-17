@@ -186,7 +186,8 @@ async function showSpecificProject(request, response){
             Home: "Home",
             loggedInUser: login,
             projectName: theProject[0].name,
-            projectDescription: theProject[0].description
+            projectDescription: theProject[0].description,
+            projectId: projectID
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
@@ -196,17 +197,20 @@ async function showSpecificProject(request, response){
 async function updateProject(request, response){
     let name = request.body.name;
     let description = request.body.description;
+    let projectID = request.params.projectId;
     let login = loginController.authenticateUser(request);
 
     // Set the login to the username if response is not null
     if(login != null) {
         login = login.userSession.username;
     }
+
+    await projectModel.updateProject(name, description, projectID);
     
     // Page data 
     const pageData = {
             alertOccurred: true,
-            alertMessage: "Successfully updated project!",
+            alertMessage: `Successfully updated project ${name}!`,
             alertLevel: 'success',
             alertLevelText: 'success',
             alertHref: 'exclamation-triangle-fill',
@@ -221,6 +225,7 @@ async function updateProject(request, response){
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+    response.redirect(`/projects/${projectID}`);
     response.status(201).render('showProject.hbs', pageData);
 }
 
@@ -228,7 +233,7 @@ router.post("/projects", createProject);
 router.get("/projects", showProjects);
 router.post("/projects/new", showCreateForm);
 router.get("/projects/:projectId", showSpecificProject);
-router.post("/projects/show/update", updateProject);
+router.post("/projects/:projectId/update", updateProject);
 
 
 module.exports = {
