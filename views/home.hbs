@@ -1,138 +1,204 @@
-
 <!--Svg for error icons-->
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    <path
+      d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
   </symbol>
   <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+    <path
+      d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
   </symbol>
   <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    <path
+      d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
   </symbol>
 </svg>
 
 <!--Show an error message if an error occurs-->
 {{#if alertOccurred}}
-    <div class="alert alert-{{alertLevel}} alert-dismissible fade in show d-flex align-items-center" role="alert">
-        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="{{alertLevelText}}:"><use xlink:href="#{{alertHref}}"/></svg>
-        <div>{{alertMessage}}</div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="cursor: pointer;"></button>
-    </div>
+<div class="alert alert-{{alertLevel}} alert-dismissible fade in show d-flex align-items-center" role="alert">
+  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="{{alertLevelText}}:">
+    <use xlink:href="#{{alertHref}}" />
+  </svg>
+  <div>{{alertMessage}}</div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="cursor: pointer;"></button>
+</div>
 {{/if}}
 
+<div id="language">
+  <p id="languageText">Language:</p>
+<form action="/language" method="POST" role="form">
+  <select name="language" onchange="this.form.submit()">
+    <option value="" selected="selected" hidden="hidden">{{Current}}</option>
+    <option value="en">English</option>
+    <option value="fr">French</option>
+  </select>
+</form>
+</div>
+
+
 <div class="row d-flex justify-content-start">
-    <!--Sidebar containing all CRUD buttons-->
-    <aside class="col-2">
-      <div class="d-flex" id="wrapper">
-        <!-- Sidebar-->
-        <div class="border-end bg-white" id="sidebar-wrapper">
-          <div class="list-group list-group-flush">
-            <form action="/" method="post" role="form" enctype="application/x-www-form-urlencoded">
-              <button id="add" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3" value="add">Add a Car Part</button>
-              <button id="show" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3" value="show">Find a Car Part</button>
-              <button id="list" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3" value="list">Show all Car Parts</button>
-              <button id="update" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3" value="edit">Update a Car Part</button>
-              <button id="delete" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3" value="delete">Delete a Car Part</button>
-            </form>
-          </div>
+  <!--Sidebar containing all CRUD buttons-->
+  <aside class="col-2">
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar-->
+      <div class="border-end bg-white" id="sidebar-wrapper">
+        <div class="list-group list-group-flush">
+          <form action="/" method="post" role="form" enctype="application/x-www-form-urlencoded">
+            <button id="add" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
+              value="add">{{Add}}</button>
+            <button id="show" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
+              value="show">{{Show}}</button>
+            <button id="list" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
+              value="list">{{List}}</button>
+            <button id="update" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
+              value="edit">{{Edit}}</button>
+            <button id="delete" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
+              value="delete">{{Delete}}</button>
+          </form>
         </div>
-    </aside>
+      </div>
+  </aside>
 
-    <div class="col-8">
-      <!--Showing the specified form-->
-      {{#if showForm}}
-        <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
-                enctype="application/x-www-form-urlencoded">
-          <legend>{{legend}}</legend>
-          <input type="hidden" name="_method" value="{{methodOverride}}" required>
+  <div class="col-8">
+    <!--Showing the specified form-->
+    {{#if showForm}}
+    <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
+      enctype="application/x-www-form-urlencoded">
+      <legend>{{legend}}</legend>
+      <input type="hidden" name="_method" value="{{methodOverride}}" required>
 
-          <!--Form fields for each form-->
-          {{#each formfields}}
-            <label for="{{field}}">{{pretty}}</label><br>
-            <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
-            <br>
-          {{/each}}
+      <!--Form fields for each form-->
+      {{#each formfields}}
+      <label for="{{field}}">{{pretty}}</label><br>
+      <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
+      <br>
+      {{/each}}
 
-          <button id="submitAction" type="submit" class="btn btn-primary">Submit</button>
-        </form>
-      {{/if}}
+      <button id="submitAction" type="submit" class="btn btn-primary">{{Submit}}</button>
+    </form>
+    {{/if}}
 
-      <!--Shows the list of all car parts-->
-      {{#if showList}}
-        <div class="list-section">
-          <!--Creating the tables-->
-          <table>
+    <!--Shows the list of all car parts-->
+    {{#if showList}}
+    <div class="list-section">
+      <!--Creating the tables-->
+      <table>
+        <tr>
+          <!--Is the user is logged in, show add to project-->
+          {{#if isUserLoggedIn}}
+             <th>Add to Project</th>
+          {{/if}}
+
+          <th>Part #</th>
+          <th>Name</th>
+          <th>Condition</th>
+          <th>Image</th>
+        </tr>
+
+          <!--Formatting table for each car part-->
+          {{#each part}}
             <tr>
-              <th>Part #</th>
-              <th>Name</th>
-              <th>Condition</th>
-              <th>Image</th>
-            </tr>
+              <!--Is the user is logged in, show add to project-->
+              {{#if ../isUserLoggedIn}}
+                <td><button id="add-project-btn" data-toggle="modal" data-target="#add-proj"><i class="fa fa-plus" style="font-size:17px; margin-right: 4px;"></i></button></td>
 
-            <!--Formatting table for each car part-->
-            {{#each part}}
-              <tr>
-                <td>{{partNumber}}</td>
-                <td>{{name}}</td>
-                <td>{{condition}}</td>
-                
-                <!--If an image is specified with the car part-->
-                {{#if image}}
-                    <!--Create column value for image button-->
-                    <td>
-                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{partNumber}}">
-                        Show image
-                      </button>
-                    </td>
-                  </tr>
+                <!--bootstrap for showing the image-->
+                <div class="modal fade" id="add-proj" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                  aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Add {{name}} to project</h5>
+                      </div>
+                      <!-- Add image inside the body of modal -->
+                      <div class="modal-body">
+                        {{!-- <ul>
+                          {{#each project}}
+                            <li>{{this.name}}</li>
+                          {{/each}}
+                        </ul> --}}
 
-                  <!--bootstrap for showing the image-->
-                  <div class="modal fade" id="{{partNumber}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
-                      <div class="modal-content">
-                        <!-- Add image inside the body of modal -->
-                        <div class="modal-body">
-                          <h1>{{name}}</h1>
-                          <img class="img-responsive" id="image" src={{image}} alt="No image associated with this part." />
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            Close
+                        <div class="dropdown">
+                          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            Add to project
                           </button>
+                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            {{#each ../project}}
+                              <li><a class="dropdown-item" href="#">{{this.name}}</a></li>
+                            {{/each}}
+                          </ul>
                         </div>
+
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                          Close
+                        </button>
                       </div>
                     </div>
                   </div>
-                {{else}}
+                </div>
+              {{/if}} 
+              
+              <td>{{partNumber}}</td>
+              <td>{{name}}</td>
+              <td>{{condition}}</td>
 
-                  <td></td>
-                  </tr>
-                {{/if}}
+              <!--If an image is specified with the car part-->
+              {{#if image}}
+              <!--Create column value for image button-->
+              <td>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{partNumber}}">
+                  Show image
+                </button>
+              </td>
+            </tr>
 
-            {{/each}}
+            <!--bootstrap for showing the image-->
+            <div class="modal fade" id="{{partNumber}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <!-- Add image inside the body of modal -->
+                  <div class="modal-body">
+                    <h1>{{name}}</h1>
+                    <img class="img-responsive" id="image" src={{image}} alt="No image associated with this part." />
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {{else}}
 
-          </table>  
-        </div>
-      {{/if}}
+            <td></td>
+            {{/if}}
 
+          {{/each}}
+      </table>
     </div>
+    {{/if}}
+
+  </div>
 </div>
 
 <!--Message for a car part-->
 {{#if message}}
-  <h3 id="action-message">{{message}} {{#if part}} Part #{{partNumber}} Name:{{name}} {{/if}}</h3>
+<h3 id="action-message">{{message}} {{#if part}} Part #{{partNumber}} Name:{{name}} {{/if}}</h3>
 {{/if}}
 
 
 <!-- https://www.geeksforgeeks.org/how-to-show-images-on-click-using-html/ -->
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
-</script>
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+  </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
-</script>
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+  </script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
-</script>
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+  </script>

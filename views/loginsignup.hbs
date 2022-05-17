@@ -32,14 +32,14 @@
       
       <!--Username-->
       <div class="form-group row justify-content-center">
-          <label for="username" class="form-label">Username</label>
+          <label for="username" class="form-label">{{usernameHeader}}</label>
           <input name="username" id="username" placeholder="Enter username"
               type="text" class="form-control" required/>
       </div>
 
       <!--Password-->
       <div class="form-group row justify-content-center">
-          <label for="password" class="form-label">Password</label>
+          <label for="password" class="form-label">{{passwordHeader}}</label>
           <input name="password" id="password" placeholder="Enter password"
                 type="password" class="form-control" required/>
       </div>
@@ -48,7 +48,7 @@
       {{#if showConfirmPassword}}
           <!--Confirming password (for security purposes)-->
           <div class="form-group row justify-content-center">
-              <label for="confirmPassword" class="form-label">Confirm Password</label>
+              <label for="confirmPassword" class="form-label">{{confirmPasswordHeader}}</label>
               <input name="confirmPassword" type="password" 
                       class="form-control" placeholder="Confirm password" required/>
           </div>

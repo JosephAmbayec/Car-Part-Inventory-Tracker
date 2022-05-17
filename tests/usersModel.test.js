@@ -133,11 +133,12 @@ test("Unsuccessful login using invalid password", async () => {
     expect(result).toBe(false);
 })
 
-// test("Unsuccessful login using invalid username", async () => {
-//     let user1 = userData.at(0);
-//     await model.addUser(user1.username, user1.password);
+test("Unsuccessful login using invalid username", async () => {
+    let user1 = userData.at(0);
+    await model.addUser(user1.username, user1.password);
 
-//     let result = await model.validateLogin(user1.username+"1", user1.password)
+    let result = await model.validateLogin(user1.username+"1", user1.password)
 
-//     expect(result).toBe(null);
-// })
+    expect(result).toBe(false);
+})
+

@@ -14,35 +14,48 @@ afterEach(async () => {
 const userData = [
     { username: 'username1', password: 'P@ssW0rd!'},
     { username: 'username2', password: '#@ijdsAd2'},
-    { username: 'username3', password: 'T#E2ST!'},
+    { username: 'username3', password: 'T#E2ST!ss'},
     { username: 'username4', password: 'thisisAP@ssw0Rd'},
     { username: 'username5', password: 'testPassword#23'},
     { username: 'username6', password: 'H3||oW0rld'},
 ]
 
-test("Successful login using valid credentials", async () => {
-    let user1 = userData.at(0);
-    await model.addUser(user1.username, user1.password);
-
-    let result = await model.validateLogin(user1.username, user1.password)
-
-    expect(result).toBe(true);
+test("POST /users/login failure case, not a user", async () => {
+    let randomUser = userData.at(Math.random() * 6);
+    let testResponse = await testRequest.post('/users/login').send(randomUser);
+    expect(testResponse.status).toBe(404);
 })
 
-test("Unsuccessful login using invalid password", async () => {
-    let user1 = userData.at(0);
-    await model.addUser(user1.username, user1.password);
-
-    let result = await model.validateLogin(user1.username, user1.password+"1")
-
-    expect(result).toBe(false);
+test("POST /users/login success case", async () => {
+    let randomUser = userData.at(Math.random() * 6);
+    await model.addUser(randomUser.username, randomUser.password)
+    let testResponse = await testRequest.post('/users/login').send(randomUser);
+    expect(testResponse.status).toBe(201);
 })
 
-// test("Unsuccessful login using invalid username", async () => {
-//     let user1 = userData.at(0);
-//     await model.addUser(user1.username, user1.password);
+test("POST /users/login failure case, wrong username", async () => {
+    let randomUser = userData.at(Math.random() * 6);
+    await model.addUser(randomUser.username+"1", randomUser.password)
+    let testResponse = await testRequest.post('/users/login').send(randomUser);
+    expect(testResponse.status).toBe(404);
+})
 
-//     let result = await model.validateLogin(user1.username+"1", user1.password)
+test("POST /users/login failure case, wrong password", async () => {
+    let randomUser = userData.at(Math.random() * 6);
+    await model.addUser(randomUser.username, randomUser.password+"1")
+    let testResponse = await testRequest.post('/users/login').send(randomUser);
+    expect(testResponse.status).toBe(404);
+})
 
-//     expect(result).toBe(null);
-// })
+
+test("POST /users/login failure case due to dropped table", async () => {
+    let randomUser = userData.at(Math.random() * 6);
+    await model.addUser(randomUser.username, randomUser.password);
+    await connection.execute("DROP TABLE Users;");
+    let testResponse = await testRequest.post('/users/login').send(randomUser);
+    expect(testResponse.status).toBe(500);
+})
+
+
+
+

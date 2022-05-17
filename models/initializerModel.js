@@ -16,6 +16,7 @@ function initialize(dbname, reset, app, port){
     users.initializeUserModel(dbname, reset)
         // Then initialize the model for the users
         .then(model.initialize(dbname, reset))
+        // Then initialize the project
         .then(projects.initializeProjectModel(dbname, reset))
         // Then listen to the port
         .then(app.listen(port));

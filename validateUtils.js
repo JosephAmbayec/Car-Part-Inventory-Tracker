@@ -47,7 +47,7 @@ function isURL(string) {
     if (validator.isEmpty(string))
         return false;
     const matchpattern = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/gm;
-    logger.info(`Currently validating url ${url} -- isPartNumber`);
+    logger.info(`Currently validating url ${string} -- isPartNumber`);
     return matchpattern.test(string);
 }
 

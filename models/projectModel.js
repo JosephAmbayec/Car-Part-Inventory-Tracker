@@ -7,8 +7,8 @@ const model = require('../models/carPartModelMysql');
 const userModel = require('../models/userModel');
 const partModel = require('../models/carPartModelMysql');
 const { DatabaseConnectionError } = require('./carPartModelMysql.js');
-var connection;
-connection = model.getConnection();
+var connection = model.getConnection();
+
 /**
  * Initializes a connection to database for user model.
  * @param {*} dbname The database name.
@@ -111,6 +111,7 @@ async function getAllProjects(username){
     let results = await connection.query(query);
     return results[0];
 }
+
 /**
  * Associates a part with a project
  * @param {*} projectId 
@@ -173,6 +174,7 @@ async function projectExists(projectId){
 
 }
 
+
 module.exports = {
     initializeProjectModel,
     addProject,
@@ -180,5 +182,4 @@ module.exports = {
     addUserToProject,
     getConnection,
     getAllProjects
-
 }

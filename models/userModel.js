@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 const validUtils = require('../validateUtils.js');
 const userUtils = require('../userUtils.js');
 const logger = require('../logger');
-const { DatabaseConnectionError } = require('./carPartModelMysql.js');
+//const { DatabaseConnectionError } = require('./carPartModelMysql.js'); // Was creating circular dependency
 var connection;
 
 // docker run -p 10000:3306 --name carPartSqlDb -e MYSQL_ROOT_PASSWORD=pass -e MYSQL_DATABASE=carPart_db -d mysql:5.7
@@ -246,11 +246,12 @@ async function validateLogin(username, password){
     if (await userExists(username)){
         const queryStatement = `SELECT password FROM Users where username = '${username}'`;
         let result = await connection.query(queryStatement);
-        return userUtils.validateLogin(password, result[0])
+        return userUtils.validateLogin(password, result[0]);
     }
     else{
-        logger.warn(`User doesn't exist - Failed to validate user (${username}) input -- validateLogin`);
         // show message about username not found
+        logger.warn(`User doesn't exist - Failed to validate user (${username}) input -- validateLogin`);
+        return false;
     }
 }
 
