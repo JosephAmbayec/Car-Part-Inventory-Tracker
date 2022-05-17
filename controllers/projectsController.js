@@ -164,6 +164,11 @@ async function showCreateForm(request, response){
     response.status(201).render('allProjects.hbs', pageData);
 }
 
+/**
+ * Shows the specified project on a new page.
+ * @param {*} request 
+ * @param {*} response 
+ */
 async function showSpecificProject(request, response){
     let projectID = request.params.projectId;
     let theProject = await projectModel.getProjectByProjectId(projectID);
@@ -194,7 +199,13 @@ async function showSpecificProject(request, response){
     response.status(201).render('showProject.hbs', pageData);
 }
 
+/**
+ * Updates the project details.
+ * @param {*} request 
+ * @param {*} response 
+ */
 async function updateProject(request, response){
+    // Get the values
     let name = request.body.name;
     let description = request.body.description;
     let projectID = request.params.projectId;
