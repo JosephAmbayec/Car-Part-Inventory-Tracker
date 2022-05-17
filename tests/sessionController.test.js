@@ -1,4 +1,4 @@
-const model = require('../models/sessionModel');
+const model = require('../controllers/sessionController')
 
 const userData = [
     { username: 'username1', password: 'P@ssW0rd!'},
