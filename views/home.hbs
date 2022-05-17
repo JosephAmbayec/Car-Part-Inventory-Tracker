@@ -81,10 +81,15 @@
 
     <!--Shows the list of all car parts-->
     {{#if showList}}
+      <!--If there are no car parts-->
       {{#if noCarParts}}
         <div>
-          <h2>No car parts in the inventory at the moment!</h2>
+          <h2 style="display: flex; justify-content: center; align-items: center;">
+            Sorry! Currently there are no car parts in the inventory!</h2>
+          <h4 style="display: flex; justify-content: center; align-items: center;">
+            Come back soon to see if car parts have been added to the inventory!</h4>
         </div>
+      <!--If there are car parts-->
       {{else}}
         <div class="list-section">
           <!--Creating the tables-->
