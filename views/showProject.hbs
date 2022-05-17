@@ -35,20 +35,20 @@
             <form method="POST" action="/projects/show/update" 
                         id="form-loginsignup" >
                 <!-- Legend title for the current form-->
-                <legend>{{projectName}}</legend>
+                <legend>Edit {{projectName}}</legend>
                 
                 <!--Project Name-->
                 <div class="form-group row justify-content-center">
                     <label for="name" class="form-label">Project Name</label>
-                    <input name="name" id="name" placeholder="{{name}}"
-                        type="text" class="form-control" value="{{name}}" required/>
+                    <input name="name" id="name" 
+                        type="text" class="form-control" value="{{projectName}}" required/>
                 </div>
 
                 <!--Project Description-->
                 <div class="form-group row justify-content-center">
                     <label for="description" class="form-label">Project Description</label>
-                    <input name="description" id="description" placeholder="{{description}}"
-                            type="text" class="form-control" value="{{description}}" required/>
+                    <input name="description" id="description" 
+                            type="text" class="form-control" value="{{projectDescription}}" required/>
                 </div>
 
                 <!--Submit button-->

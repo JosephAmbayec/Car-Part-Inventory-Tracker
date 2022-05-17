@@ -177,9 +177,23 @@ async function projectExists(projectId){
         logger.error(error);
         throw new DatabaseConnectionError();
     }
-
 }
 
+async function getProjectByProjectId(projectId){
+    try {
+        if(projectExists(projectId)){
+            const selectStatement = `SELECT name, description from Project where projectId = ${projectId}`;
+            let projectArray = await connection.query(selectStatement);
+            // if (projectArray[0].length != 0)
+            //     return true;
+            return projectArray[0];
+        }
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
 
 module.exports = {
     initializeProjectModel,
@@ -187,5 +201,6 @@ module.exports = {
     addPartToProject,
     addUserToProject,
     getConnection,
-    getAllProjects
+    getAllProjects,
+    getProjectByProjectId
 }

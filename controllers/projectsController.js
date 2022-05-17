@@ -147,7 +147,8 @@ async function showCreateForm(request, response){
 }
 
 async function showSpecificProject(request, response){
-    let description = request.body.projectId;
+    let projectID = request.params.projectId;
+    let theProject = await projectModel.getProjectByProjectId(projectID);
 
     // Page data 
     const pageData = {
@@ -160,7 +161,8 @@ async function showSpecificProject(request, response){
             clickedNewProject: false,
             Home: "Home",
             loggedInUser: LOGGED_IN_USER,
-            // projectName: 
+            projectName: theProject[0].name,
+            projectDescription: theProject[0].description
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
