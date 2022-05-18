@@ -26,41 +26,51 @@ async function initializeProjectModel(dbname, reset){
             database: dbname
         })
     
+         // Dropping the tables if resetting them
         if (reset) {
             await resetTable("PartProject");
             await resetTable("UsersProject");
             await resetTable("Project");
         }
+
+        // Creating the Users table
         let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id int AUTO_INCREMENT, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
         await connection.execute(createTableStatement);
         logger.info("Users table created/exists");
 
+        // Creating the car part table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS carPart(partNumber int, name VARCHAR(100), `condition` VARCHAR(50), image VARCHAR(2000), PRIMARY KEY (partNumber))';
         await connection.execute(createTableStatement);
         logger.info("Car part table created/exists");
 
+        // Creating the project table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS Project(projectId int AUTO_INCREMENT, name VARCHAR(50), description VARCHAR(255), PRIMARY KEY (projectId))';
         await connection.execute(createTableStatement);
         logger.info("Project table created/exists");
 
+        // Creating the part project table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS PartProject(projectId int, partNumber int,  FOREIGN KEY (partNumber) REFERENCES carPart(partNumber), FOREIGN KEY (projectId) REFERENCES Project(projectId), PRIMARY KEY (projectId, partNumber))';
         await connection.execute(createTableStatement);
         logger.info("PartProject table created/exists");
 
+        // Creating the users projects table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS UsersProject(projectId int, id int,  FOREIGN KEY (id) REFERENCES Users(id), FOREIGN KEY (projectId) REFERENCES Project(projectId), PRIMARY KEY (projectId, id))';
         await connection.execute(createTableStatement);
         logger.info("UsersProject table created/exists");
 
-        
-
         return connection;
     
-    } catch (err) {
+    } 
+    catch (err) {
         logger.error(err);
         throw new DatabaseConnectionError();
     }
 }
 
+/**
+ * Gets the connection to the database.
+ * @returns The connection to the database.
+ */
 async function getConnection(){
     return connection;
 }
@@ -82,6 +92,7 @@ async function getConnection(){
         throw new DatabaseConnectionError();
     }
 }
+//#endregion
 
 /**
  * Method used to add a project
@@ -143,7 +154,7 @@ async function addPartToProject(projectId, partNumber){
         throw new DatabaseConnectionError();
     }
 }     
-//#region Project operations
+
 /**
  * Associates a user with a project
  * @param {*} projectId 
@@ -215,6 +226,7 @@ async function getProjectByProjectId(projectId){
  */
 async function updateProject(newName, newDescription, projectId){
     try {
+        // Checks if the project exists first
         if(projectExists(projectId)){
             const selectStatement = `UPDATE Project SET name = '${newName}', description = '${newDescription}' WHERE projectId = '${projectId}';`;
             let projectArray = await connection.query(selectStatement);
