@@ -199,6 +199,7 @@ async function showLogin(request, response) {
     if (!lang || lang === 'en') {
         pageData = {
             alertOccurred: false,
+            Home: 'Home',
             titleName: 'Log In',
             pathNameForActionForm: 'login',
             showConfirmPassword: false,
@@ -211,12 +212,14 @@ async function showLogin(request, response) {
             signUpText: "Sign Up",
             endpointLogInLogOut: "login",
             usernameHeader: "Username",
-            passwordHeader: "Password"
+            passwordHeader: "Password",
+            about_text: "About Us"
         }
     }
     else {
         pageData = {
             alertOccurred: false,
+            Home: 'Acceuil',
             titleName: 'Connexion',
             pathNameForActionForm: 'login',
             showConfirmPassword: false,
@@ -229,7 +232,8 @@ async function showLogin(request, response) {
             signUpText: "Enregistrer",
             endpointLogInLogOut: "login",
             usernameHeader: "Nom D'utilisateur",
-            passwordHeader: "Mot de Passe"
+            passwordHeader: "Mot de Passe",
+            about_text: "À propos de nous"
         }
     }
 
