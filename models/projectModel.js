@@ -259,7 +259,7 @@ async function updateProject(newName, newDescription, projectId){
     }
 }
 
-async function getAllCarPartsInProject(projectId) {
+async function getProjectCarParts(projectId) {
     try {
         if(projectExists(projectId)){
             let selectStatement = `SELECT * FROM PartProject WHERE projectId = ${projectId};`;
@@ -290,5 +290,5 @@ module.exports = {
     getAllProjects,
     getProjectByProjectId,
     updateProject,
-    getAllCarPartsInProject
+    getProjectCarParts
 }

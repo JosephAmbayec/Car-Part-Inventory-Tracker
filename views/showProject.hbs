@@ -30,13 +30,13 @@
             </a>
 
             <!--container for form-->
-            <section id="form-container">
+            {{!-- <section id="form-container-update"> --}}
 
                 <!--Form to sign up to the website-->
                 <form method="POST" action="/projects/{{projectId}}/update" 
-                            id="form-loginsignup" >
+                            id="form-loginsignup-update" >
                     <!-- Legend title for the current form-->
-                    <legend>Edit Project: {{projectName}}</legend>
+                    <legend>Edit '{{projectName}}'</legend>
                     
                     <!--Project Name-->
                     <div class="form-group row justify-content-center">
@@ -58,13 +58,60 @@
                     </div>
                 </form>
 
-            </section>
+            {{!-- </section> --}}
         </div> 
     {{!-- </div> --}}
 
         <div id="show-project-all-parts">
-            {{#each projectParts}}
+            <div class="row">
+                {{#each projectParts}}
+                    {{!-- <div class="card" style="width: 18rem;">
+                        {{#if image}}
+                            <img src="{{image}}" class="card-img-top">
+                        {{/if}}
 
-            {{/each}}
+                        <div class="card-body">
+                            <h5 class="card-title">{{name}}</h5>
+                            <p class="card-text">Part number: {{partNumber}}</p>
+                            <p class="card-text">Condition: {{condition}}</p>
+                        </div>
+                    </div> --}}
+                    <div class="col-sm-3">
+                        <div class="card card-show-specific">
+                            <div class="card-body">
+                                {{#if image}}
+                                    <img src="{{image}}" class="card-img-top">
+                                {{/if}}
+
+                                <h5 class="card-title">{{name}}</h5>
+                                <p class="card-text">Part number: {{partNumber}}</p>
+                                <p class="card-text">Condition: {{condition}}</p>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+                {{!-- <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{name}}</h5>
+                            <p class="card-text">Part number: {{partNumber}}</p>
+                            <p class="card-text">Condition: {{condition}}</p>
+                        </div>
+                    </div>
+                </div> --}}
+            </div>
+            {{!-- {{#each projectParts}}
+                <div class="card" style="width: 18rem;">
+                        {{#if image}}
+                            <img src="{{image}}" class="card-img-top">
+                        {{/if}}
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{name}}</h5>
+                            <p class="card-text">Part number: {{partNumber}}</p>
+                            <p class="card-text">Condition: {{condition}}</p>
+                        </div>
+                    </div>
+            {{/each}} --}}
         </div>
 </div>

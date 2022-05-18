@@ -231,9 +231,14 @@ async function addCarPart(request, response){
 async function showSpecificProject(request, response){
     let projectID = request.params.projectId;
     let theProject = await projectModel.getProjectByProjectId(projectID);
-    let allCarPartsInProject = await projectModel.getAllCarPartsInProject(projectID);
+    let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
     let login = loginController.authenticateUser(request);
+    let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
+    let showImage = false;
 
+    if(arrayOFCatPartsInProject.length === 0){
+
+    }
     // Set the login to the username if response is not null
     if(login != null) {
         login = login.userSession.username;
@@ -253,7 +258,7 @@ async function showSpecificProject(request, response){
             projectName: theProject[0].name,
             projectDescription: theProject[0].description,
             projectId: projectID,
-            projectParts: allCarPartsInProject
+            projectParts: arrayOFCatPartsInProject
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);

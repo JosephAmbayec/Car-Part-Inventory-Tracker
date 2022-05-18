@@ -319,7 +319,7 @@ table {
 
  #show-project-flex{
    display: grid;
-   grid-template-columns: 2fr 2fr;
+   grid-template-columns: 1.5fr 5fr;
 }
 #show-project-first-flex{
   /* flex: 1.5; */
@@ -329,6 +329,7 @@ table {
   /* display: flex;
   flex-direction: column;
   justify-content: center; */
+  width: 100%;
 }
 #show-project-all-parts{
   /* flex:3; */
@@ -357,4 +358,23 @@ table {
 .dropdown-toggle::after, .dropdown-toggle::before {
   display:none;
   border: none;
+}
+
+/* #form-container-update{
+  display:flex;
+ justify-content: center;
+ align-items: center;
+ flex-direction: column;
+ width: 100%;
+} */
+#form-loginsignup-update > *{
+  margin-top:1.5rem;
+}
+#form-loginsignup-update{
+  width: 100%;
+}
+
+.card-show-specific:hover{
+  cursor: pointer;
+  box-shadow: 0 0 5px 2px #0D6EFD;
 }
