@@ -90,6 +90,14 @@ async function createUser(request, response){
                     endpointLogInLogOut: "login",
                     loggedInUser: username,
                     Home: "Home",
+                    Add: "Add a Car part",
+                    Show: "Find a Car Part",
+                    List: "Show all Car Parts",
+                    Edit: "Update a Car Part",
+                    Delete: "Delete a Car Part",
+                    projects_text: "Projects",
+                    about_text: "About Us",
+                    Current: "English"
                 }
             }
             else{
@@ -105,6 +113,14 @@ async function createUser(request, response){
                     endpointLogInLogOut: "login",
                     loggedInUser: username,
                     Home: "Home",
+                    Add: "Ajouter une Pièce Auto",
+                    Show: "Trouver une Pièce Auto",
+                    List: "Afficher Toutes les Pièces de Voiture",
+                    Edit: "Mettre à Jour une Pièce Auto",
+                    Delete: "Supprimer une Pièce Auto",
+                    projects_text: "Projets",
+                    about_text: "À propos de nous",
+                    Current: "French"
                 }
             }
 
@@ -242,6 +258,7 @@ async function showSignup(request, response){
             passwordHeader: "Password",
             confirmPasswordHeader: "Confirm Password",
             Home: "Home",
+            about_text: "About Us"
         }
     }
     else{
@@ -262,6 +279,7 @@ async function showSignup(request, response){
             passwordHeader: "Mot de Passe",
             confirmPasswordHeader: "Confirmez le Mot de Passe",
             Home: "Retournez",
+            about_text: "À propos de nous"
         }
     }
 
