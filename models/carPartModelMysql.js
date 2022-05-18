@@ -235,10 +235,6 @@ async function updateCarPartName(partNumber, name){
             logger.info("Car part EXISTS - Verify that the car part exists -- verifyCarPartExists");
             return true;
         }
-        
-        // if ((await findCarPartByNumber(partNumber)).length != 0){
-        //     return true;
-        // }
     }
     catch(error){
         logger.error(error);
@@ -268,6 +264,36 @@ function checkConnection(res){
 
 //#endregion
 
+
+async function getArrayOfCarPartsInProject(allCarPartsInProject){
+    var arrayOfCarParts = [];
+
+    for (let i = 0; i < allCarPartsInProject.length; i++) {
+        try {
+            let getCurrentCarPart = await findCarPartByNumber(allCarPartsInProject[i].partNumber);
+            
+            if(getCurrentCarPart){
+                // const currentCarPartObject = {
+                //     partNumber: getCurrentCarPart[0].partNumber,
+                //     name: getCurrentCarPart[0].name,
+                //     condition: getCurrentCarPart[0].condition,
+                //     image: getCurrentCarPart[0].image
+                // }
+                
+                arrayOfCarParts.push(getCurrentCarPart[0]);
+            }
+            else
+                throw new DatabaseConnectionError();
+        } 
+        catch (error) {
+            logger.error(error);
+            throw new DatabaseConnectionError();
+        }
+    }
+
+    return arrayOfCarParts;
+}
+
 //#region Errors
 
 /**
@@ -293,5 +319,6 @@ module.exports = {
     verifyCarPartExists,
     checkConnection,
     DatabaseConnectionError,
-    InvalidInputError
+    InvalidInputError,
+    getArrayOfCarPartsInProject
 }

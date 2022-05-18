@@ -163,6 +163,65 @@ async function showCreateForm(request, response){
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
     response.status(201).render('allProjects.hbs', pageData);
 }
+/**
+ * Called when adding a car part
+ * @param {*} request 
+ * @param {*} response 
+ */
+
+async function addCarPart(request, response){
+    try{
+        let partNumber = request.body.partNumber;
+        let projectId = request.params.projectId;
+
+        await projectModel.addPartToProject(projectId, partNumber);
+
+        const pageData = {
+            alertOccurred: true,
+            alertMessage: "You have successfully added to a project!",
+            alertLevel: 'success',
+            alertLevelText: 'success',
+            alertHref: 'exclamation-triangle-fill',
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: true
+        }
+        response.status(201).render('home.hbs', pageData);
+    }
+    catch(error) {
+        const pageData = {
+            alertOccurred: true,
+            alertMessage: "",
+            alertLevel: 'danger',
+            alertLevelText: 'Danger',
+            alertHref: 'exclamation-triangle-fill',
+            loggedInUser: LOGGED_IN_USER
+        }
+
+        if (error instanceof sqlModel.DatabaseConnectionError){
+            pageData.alertMessage = "Error connecting to database.";
+            logger.error(`DatabaseConnectionError when CREATING PROJECT ${name} -- createProject`);
+            response.status(500).render('home.hbs', pageData);
+        }
+        // If the error is an instance of the InvalidInputError error
+        else if (error instanceof sqlModel.InvalidInputError){
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            logger.error(`UserLoginError when CREATING PROJECT ${name} -- createProject`);
+            response.status(404).render('home.hbs', pageData);
+        }
+        // If any other error occurs
+        else {
+            pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+            logger.error(`OTHER error when CREATING PROJECT ${name} -- createProject`);
+            response.status(500).render('home.hbs', pageData);
+        }
+    }
+}
 
 /**
  * Shows the specified project on a new page.
@@ -172,9 +231,15 @@ async function showCreateForm(request, response){
 async function showSpecificProject(request, response){
     let projectID = request.params.projectId;
     let theProject = await projectModel.getProjectByProjectId(projectID);
+    let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
     let login = loginController.authenticateUser(request);
+    let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
+    let showImage = false;
 
-     // Set the login to the username if response is not null
+    if(arrayOFCatPartsInProject.length === 0){
+
+    }
+    // Set the login to the username if response is not null
     if(login != null) {
         login = login.userSession.username;
     }
@@ -192,7 +257,8 @@ async function showSpecificProject(request, response){
             loggedInUser: login,
             projectName: theProject[0].name,
             projectDescription: theProject[0].description,
-            projectId: projectID
+            projectId: projectID,
+            projectParts: arrayOFCatPartsInProject
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
@@ -245,6 +311,8 @@ router.get("/projects", showProjects);
 router.post("/projects/new", showCreateForm);
 router.get("/projects/:projectId", showSpecificProject);
 router.post("/projects/:projectId/update", updateProject);
+
+router.post("/projects/:projectId", addCarPart)
 
 
 module.exports = {

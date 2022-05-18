@@ -7,7 +7,7 @@ const model = require('../models/carPartModelMysql');
 const userModel = require('../models/userModel');
 const partModel = require('../models/carPartModelMysql');
 const { DatabaseConnectionError } = require('./carPartModelMysql.js');
-var connection = model.getConnection();
+var connection;
 
 /**
  * Initializes a connection to database for user model.
@@ -136,15 +136,19 @@ async function getAllProjects(username){
  */
 async function addPartToProject(projectId, partNumber){
     try {
-        if (projectExists(projectId) && partModel.verifyCarPartExists(partNumber)) {
+        if (!connection){
+            connection = await model.getConnection();
+        }
+        if (await projectExists(projectId) && await partModel.verifyCarPartExists(partNumber)) {
+            if(!await partExistsInProject(projectId, partNumber)){
+                const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values (${projectId}, ${partNumber})`;
+                let results = await connection.execute(insertStatement);
 
-            const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values (${projectId}, ${partNumber})`;
-            let results = await connection.query(insertStatement);
-
-            if(results[0].length === 0){
-                return false;
-            } 
-            return true;
+                if(results[0].length === 0){
+                    return false;
+                } 
+                return true;
+            }
         }
         else
             throw new DatabaseConnectionError();
@@ -155,6 +159,20 @@ async function addPartToProject(projectId, partNumber){
     }
 }     
 
+async function partExistsInProject(projectId, partNumber){
+    try {
+        let statement = `SELECT projectId FROM PartProject where projectId = ${projectId} and partNumber = ${partNumber}`;
+        let result = await connection.query(statement);
+        if (result[0].length != 0)
+            return true;
+        return false;
+    }
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
+//#region Project operations
 /**
  * Associates a user with a project
  * @param {*} projectId 
@@ -241,6 +259,27 @@ async function updateProject(newName, newDescription, projectId){
     }
 }
 
+async function getProjectCarParts(projectId) {
+    try {
+        if(projectExists(projectId)){
+            let selectStatement = `SELECT * FROM PartProject WHERE projectId = ${projectId};`;
+            let theProject = await connection.execute(selectStatement);
+            return theProject[0];
+            
+            // if(theProject[0].length !== 0){
+            //     // selectStatement = ""
+            // }
+            // else{
+            //     logger.error(error);
+            //     throw new DatabaseConnectionError();
+            // }
+        }
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
 
 module.exports = {
     initializeProjectModel,
@@ -250,5 +289,6 @@ module.exports = {
     getConnection,
     getAllProjects,
     getProjectByProjectId,
-    updateProject
+    updateProject,
+    getProjectCarParts
 }

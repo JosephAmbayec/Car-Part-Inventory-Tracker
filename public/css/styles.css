@@ -40,6 +40,36 @@ footer {
     color:  #0D6EFD ;
 }
 
+.inventory-actions-button{
+  border-radius: 0.5rem;
+  width: 11rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+}
+.inventory-actions-button:hover{
+  cursor: pointer;
+  box-shadow: 0 0 5px 2px #06377e;
+  background-color: #0D6EFD;
+}
+#aside-sidebar{
+  display: flex;
+  flex-direction: column;
+  align-items: initial;
+  border: 0.5px solid #0D6EFD ;
+  width: 15rem;
+  border-radius: 5px;
+  justify-content: flex-end;
+  margin-left: 6rem;
+  margin-top: 3rem;
+}
+#aside-sidebar > *{
+  display: flex;
+  justify-content:center;
+  flex-direction: column;
+}
+#inventory-actions-form{
+  margin-left: 1rem;
+}
 
 #sidebar-wrapper div form button {
     background-color:  #0D6EFD;
@@ -319,7 +349,7 @@ table {
 
  #show-project-flex{
    display: grid;
-   grid-template-columns: 2fr 2fr;
+   grid-template-columns: 1.5fr 5fr;
 }
 #show-project-first-flex{
   /* flex: 1.5; */
@@ -329,6 +359,7 @@ table {
   /* display: flex;
   flex-direction: column;
   justify-content: center; */
+  width: 100%;
 }
 #show-project-all-parts{
   /* flex:3; */
@@ -352,11 +383,24 @@ table {
   border: 0.75px solid #0D6EFD;
 }
 .dropdown-menu-items:hover{
-  background-color: #6da8fd ;
+  background-color: #3d8bfd ;
 }
 .dropdown-toggle::after, .dropdown-toggle::before {
   display:none;
   border: none;
+}
+
+
+#form-loginsignup-update > *{
+  margin-top:1.5rem;
+}
+#form-loginsignup-update{
+  width: 100%;
+}
+
+.card-show-specific:hover{
+  cursor: pointer;
+  box-shadow: 0 0 5px 2px #0D6EFD;
 }
 
 #about-us{
@@ -387,3 +431,4 @@ table {
  #social-tw:hover {color: #4099FF;transition:all .001s;}
  #social-gp:hover {color: #d34836;transition:all .001s;}
  #social-em:hover {color: #f39c12;transition:all .001s;}
+
