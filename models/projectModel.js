@@ -128,7 +128,12 @@ async function addPartToProject(projectId, partNumber){
         if (projectExists(projectId) && partModel.verifyCarPartExists(partNumber)) {
 
             const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values (${projectId}, ${partNumber})`;
-            await connection.execute(insertStatement);
+            let results = await connection.query(insertStatement);
+
+            if(results[0].length === 0){
+                return false;
+            } 
+            return true;
         }
         else
             throw new DatabaseConnectionError();

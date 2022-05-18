@@ -68,7 +68,6 @@ footer {
    margin-left: -75px;
 }
 
-
 #form-loginsignup > *{
     margin-top:1.5rem;
 }
@@ -333,4 +332,25 @@ table {
 }
 #show-project-all-parts{
   /* flex:3; */
+}
+
+.dropdown-button{
+  color: #0D6EFD;
+  background-color: white;
+  border-radius: 10px;
+  border-color: #0D6EFD;
+  box-shadow: none;
+  z-index: 0;
+}
+.dropdown-button:hover, .dropdown-button:focus{
+  color: white;
+  background-color: #0D6EFD;
+  box-shadow: none;
+  border-color: white;
+}
+.dropdown-menu{
+  border: 0.75px solid #0D6EFD;
+}
+.dropdown-menu-items:hover{
+  background-color: #6da8fd ;
 }

@@ -42,7 +42,6 @@ async function loginUser(request, response){
             const lang = request.cookies.language;
             let allParts = await carPartModel.findAllCarParts();
             let allProjects = await projectModel.getAllProjects(username);
-            // $('.modal').modal('handleUpdate');
 
             if (!lang || lang === 'en'){
                 pageData = {
@@ -89,8 +88,8 @@ async function loginUser(request, response){
 
             logger.info(`LOGGED IN user ${username} -- loginUser`);
             // Render the home page
-            response.status(201).render('home.hbs', pageData);
-            // response.redirect('/parts');
+            // response.status(201).render('home.hbs', pageData);
+            response.redirect('/parts');
         }
         else{
             // Error data for when an error occurs

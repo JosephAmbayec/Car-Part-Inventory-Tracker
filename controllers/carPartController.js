@@ -6,6 +6,8 @@ const routeRoot = '/';
 const sqlModel = require('../models/carPartModelMysql.js');
 const validUtils = require('../validateUtils.js');
 const logger = require('../logger');
+const projectModel = require('../models/projectModel');
+const loginController = require('./loginController');
 
 /**
  * POST controller method that allows the user to create parts via the request body
@@ -42,7 +44,7 @@ async function createPart(request, response){
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
             logger.error("DatabaseConnectionError when CREATING part -- createPart");
-            response.status(500).render('home.hbs', {message: "Error connecting to database."});
+            response.status(500).render('error.hbs', {message: "Error connecting to database."});
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -67,21 +69,19 @@ async function getPartByNumber(request, response){
     let number = request.params.partNumber;
 
     try {
-        await sqlModel.findCarPartByNumber(number)
-            .then(part => {
+        let part = await sqlModel.findCarPartByNumber(number);
 
-                // If no part was found
-                if (part.length == 0){
-                    logger.info(`DID NOT FIND car part by number ${number} -- getPartByNumber`);
-                    response.status(404).render('home.hbs', {message: `Could not find any parts with part number \'${number}\'`});
-                }
-                // If the part was found
-                else{
-                    let output = {part, showList: true};
-                    logger.info(`FOUND car part by number ${number} -- getPartByNumber`);
-                    response.status(200).render('home.hbs', output);
-                }
-            })
+        // If no part was found
+        if (part.length == 0){
+            logger.info(`DID NOT FIND car part by number ${number} -- getPartByNumber`);
+            response.status(404).render('home.hbs', {message: `Could not find any parts with part number \'${number}\'`});
+        }
+        // If the part was found
+        else{
+            let output = {part, showList: true};
+            logger.info(`FOUND car part by number ${number} -- getPartByNumber`);
+            response.status(200).render('home.hbs', output);
+        }
     }
     catch(error){
 
@@ -138,6 +138,15 @@ async function getAllCarParts(request, response){
         // If car parts were found
         else{
 
+            const authenticatedSession = loginController.authenticateUser(request);
+            let projs;
+            let isUserLoggedIn;
+
+            if(authenticatedSession && authenticatedSession != null){
+                projs = await projectModel.getAllProjects(authenticatedSession.userSession.username);
+                isUserLoggedIn = true;
+            }
+
             // Deleting the car part images with no image
             for (let i = 0; i < parts.length; i++){
                 if (parts[i].image == 'null' || parts[i].image == null || parts[i.image == '']){
@@ -160,6 +169,8 @@ async function getAllCarParts(request, response){
                 Edit: "Update a Car Part",
                 Delete: "Delete a Car Part",
                 Current: "English",
+                project: projs,
+                isUserLoggedIn: isUserLoggedIn
             };
 
             logger.info(`RETRIEVED ALL car parts from database -- getAllCarParts`);
@@ -275,12 +286,26 @@ async function deletePart(request, response){
     }
 }
 
+async function addCarPartToProject(request, response){
+    try {
+        // Getting the values
+        let projectId = request.params.projectId;
+        
+        let result = await projectModel.addPartToProject(projectId);
+        console.log(result);
+    } 
+    catch (error) {
+        
+    }
+}
+
 router.post("/parts", createPart)
 router.get("/parts/:partNumber", getPartByNumber)
 router.get("/parts", getAllCarParts)
 router.put("/parts/:partNumber", updatePartName)
 router.delete("/parts/:partNumber", deletePart)
 router.get("/", getAllCarParts)
+router.get("/parts/addto/:projectId", addCarPartToProject);
 
 
 module.exports = {

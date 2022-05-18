@@ -63,30 +63,30 @@
   <div class="col-8">
     <!--Showing the specified form-->
     {{#if showForm}}
-    <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
-      enctype="application/x-www-form-urlencoded">
-      <legend>{{legend}}</legend>
-      <input type="hidden" name="_method" value="{{methodOverride}}" required>
+        <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
+          enctype="application/x-www-form-urlencoded">
+          <legend>{{legend}}</legend>
+          <input type="hidden" name="_method" value="{{methodOverride}}" required>
 
-      <!--Form fields for each form-->
-      {{#each formfields}}
-      <label for="{{field}}">{{pretty}}</label><br>
-      <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
-      <br>
-      {{/each}}
+          <!--Form fields for each form-->
+          {{#each formfields}}
+            <label for="{{field}}">{{pretty}}</label><br>
+            <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
+            <br>
+          {{/each}}
 
-      <button id="submitAction" type="submit" class="btn btn-primary">{{Submit}}</button>
-    </form>
+          <button id="submitAction" type="submit" class="btn btn-primary">{{Submit}}</button>
+        </form>
     {{/if}}
 
     <!--Shows the list of all car parts-->
     {{#if showList}}
       <!--If there are no car parts-->
       {{#if noCarParts}}
-        <div>
-          <h2 style="display: flex; justify-content: center; align-items: center;">
+        <div style="text-align: center;">
+          <h2 >
             Sorry! Currently there are no car parts in the inventory!</h2>
-          <h4 style="display: flex; justify-content: center; align-items: center;">
+          <h4 >
             Come back soon to see if car parts have been added to the inventory!</h4>
         </div>
       <!--If there are car parts-->
@@ -111,10 +111,34 @@
                 <tr>
                   <!--Is the user is logged in, show add to project-->
                   {{#if ../isUserLoggedIn}}
-                    <td><button id="add-project-btn" data-toggle="modal" data-target="#add-proj"><i class="fa fa-plus" style="font-size:17px; margin-right: 4px;"></i></button></td>
+                    {{!-- <td>
+                      <button id="add-project-btn" data-toggle="modal" data-target="#add-proj">
+                        <i class="fa fa-plus" style="font-size:17px; margin-right: 4px;"></i>
+                      </button>
+                    </td> --}}
+
+                    <td style="display: flex; justify-content:center;">
+                        <!-- Default dropend button -->
+                        <div class="btn-group dropend" >
+                          {{!-- <td>
+                            <button id="add-project-btn" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                              <i class="fa fa-plus" style="font-size:17px; margin-right: 4px;"></i>
+                            </button>
+                          </td> --}}
+                          <button type="button" class="btn btn-secondary dropdown-toggle dropdown-button" data-bs-toggle="dropdown" aria-expanded="false"
+                              >
+                            <i class="fa fa-plus" style="font-size:17px; margin-right: 4px;"></i>
+                          </button>
+                          <ul class="dropdown-menu">
+                            {{#each ../project}}
+                              <li class="dropdown-menu-items"><a class="dropdown-item" id="{{this.projectId}}" href="/parts/addto/{{this.projectId}}">{{this.name}}</a></li>
+                            {{/each}}
+                          </ul>
+                        </div>
+                      </td>
 
                     <!--bootstrap for showing the image-->
-                    <div class="modal fade" id="add-proj" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                    {{!-- <div class="modal fade" id="add-proj" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                       aria-hidden="true">
                       <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
                         <div class="modal-content">
@@ -123,11 +147,11 @@
                           </div>
                           <!-- Add image inside the body of modal -->
                           <div class="modal-body">
-                            {{!-- <ul>
+                            <ul>
                               {{#each project}}
                                 <li>{{this.name}}</li>
                               {{/each}}
-                            </ul> --}}
+                            </ul>
 
                             <div class="dropdown">
                               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -148,7 +172,7 @@
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </div> --}}
                   {{/if}} 
                   
                   <td>{{partNumber}}</td>
