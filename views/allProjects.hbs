@@ -92,6 +92,9 @@
             <div class="container"> --}}
                 {{!-- <div class="row hidden-md-up"> --}}
                     <div id="container-projs" class="grid-item-2">
+                        <h2 style="text-align: center; margin: 2rem 0;">
+                            Your Projects</h2>
+
                         {{#each projects}}
                             {{!-- <div class="card" style="width: 18rem; margin: 0 3rem 3rem 0;">
                                 <img class="card-img-top" src="..." alt="Card image cap">
@@ -104,11 +107,11 @@
 
 
                             <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
+                                {{!-- <img src="..." class="card-img-top" alt="..."> --}}
                                 <div class="card-body">
-                                    <h5 class="card-title">{{this.name}}</h5>
-                                    <p class="card-text">{{this.description}}</p>
-                                    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#hi">See more</a>
+                                    <h5 class="card-title" id="{{this.name}}">{{this.name}}</h5>
+                                    <p class="card-text" id="{{this.description}}">{{this.description}}</p>
+                                    <a href="/projects/{{this.projectId}}" id="{{this.projectId}}" class="btn btn-primary stretched-link">See more</a>
                                     <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
                                 </div>
                             </div>

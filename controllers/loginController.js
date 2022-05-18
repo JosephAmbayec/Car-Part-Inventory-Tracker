@@ -42,7 +42,6 @@ async function loginUser(request, response){
             const lang = request.cookies.language;
             let allParts = await carPartModel.findAllCarParts();
             let allProjects = await projectModel.getAllProjects(username);
-            // $('.modal').modal('handleUpdate');
 
             if (!lang || lang === 'en'){
                 pageData = {
@@ -89,7 +88,8 @@ async function loginUser(request, response){
 
             logger.info(`LOGGED IN user ${username} -- loginUser`);
             // Render the home page
-            response.status(201).render('home.hbs', pageData);
+            // response.status(201).render('home.hbs', pageData);
+            response.redirect('/parts');
         }
         else{
             // Error data for when an error occurs
@@ -210,7 +210,7 @@ async function logoutUser(request, response){
     }
 
     delete session.sessions[authenticatedSession.sessionId]
-    console.log("Logged out user " + authenticatedSession.userSession.username);
+    logger.info("Logged out user " + authenticatedSession.userSession.username);
     
     response.cookie("sessionId", "", { expires: new Date() }); // "erase" cookie by forcing it to expire.
 
@@ -224,7 +224,7 @@ async function logoutUser(request, response){
             alertLevel: 'success',
             alertLevelText: 'Success',
             alertHref: 'check-circle-fill',
-            display_signup: "none",
+            display_signup: "block",
             display_login: "block",
             logInlogOutText: "Log In",
             signUpText: "Sign Up",
@@ -349,6 +349,7 @@ router.post("/users/login", loginUser);
 module.exports = {
     router,
     routeRoot,
-    LOGGED_IN_USER
+    LOGGED_IN_USER,
+    authenticateUser
 }
 
