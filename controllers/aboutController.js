@@ -15,7 +15,11 @@ function showAbout(request, response) {
         display_signup: "block",
         display_login: "block",
         logInlogOutText: "Log In",
-        endpointLogInLogOut: "login"
+        endpointLogInLogOut: "login",
+        projects_text: "Projects",
+        about_text: "About Us",
+        signUpText: "Sign Up",
+        Home: "Home",
     }
 
     logger.info(`RENDERING about page -- showAbout`);

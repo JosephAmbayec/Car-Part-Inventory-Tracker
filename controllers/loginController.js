@@ -2,14 +2,12 @@
 
 const express = require('express');
 const { DatabaseConnectionError } = require('../models/carPartModelMysql');
-const carPartModel = require('../models/carPartModelMysql');
 const router = express.Router();
 const routeRoot = '/';
 const userModel = require('../models/userModel');
-const projectModel = require('../models/projectModel');
 const logger = require('../logger');
-const {sessions} = require('../models/sessionModel');
-const session = require('../models/sessionModel');
+const session = require('./sessionController');
+const sessionModel = require('../models/sessionModel');
 
 let LOGGED_IN_USER = null;
 
@@ -18,7 +16,7 @@ let LOGGED_IN_USER = null;
  * @param {*} request 
  * @param {*} response 
  */
-async function loginUser(request, response){
+async function loginUser(request, response) {
     // Getting the values
     let username = request.body.username;
     let password = request.body.password;
@@ -27,23 +25,22 @@ async function loginUser(request, response){
         let result = await userModel.validateLogin(username, password);
 
         // If the validation is successful
-        if (result === true){
+        if (result === true) {
+
             // Create a session object that will expire in 2 minutes
-            const sessionId = session.createSession(username, 2);
+            let sessionId = await session.createSession(username, 2);
 
             // Save cookie that will expire.
-            response.cookie("sessionId", sessionId, { expires: session.sessions[sessionId].expiresAt }); 
+            response.cookie("sessionId", sessionId, { expires: sessionModel.sessions[sessionId].expiresAt });
             response.cookie("userRole", await userModel.getRole(username));
             response.cookie("username", username);
-            
+
             let pageData;
 
             LOGGED_IN_USER = username;
             const lang = request.cookies.language;
-            let allParts = await carPartModel.findAllCarParts();
-            let allProjects = await projectModel.getAllProjects(username);
 
-            if (!lang || lang === 'en'){
+            if (!lang || lang === 'en') {
                 pageData = {
                     alertOccurred: true,
                     alertMessage: `${username} has successfully logged in!`,
@@ -54,22 +51,11 @@ async function loginUser(request, response){
                     display_login: "block",
                     logInlogOutText: "Log Out",
                     signUpText: "Sign Up",
-                    endpointLogInLogOut: "logout",
-                    loggedInUser: username,
-                    Home: "Home",
-                    Add: "Add a car part",
-                    Show: "Find a Car Part",
-                    List: "Show all Car Parts",
-                    Edit: "Update a Car Part",
-                    Delete: "Delete a Car Part",
-                    showList: true,
-                    Current: "English",
-                    part: allParts,
-                    isUserLoggedIn: true,
-                    project: allProjects
+                    endpointLogInLogOut: "login",
+                    loggedInUser: username
                 }
             }
-            else{
+            else {
                 pageData = {
                     alertOccurred: true,
                     alertMessage: `${username} s'est connecté avec succès!`,
@@ -80,23 +66,21 @@ async function loginUser(request, response){
                     display_login: "block",
                     logInlogOutText: "Déconnecter",
                     signUpText: "Enregistrer",
-                    endpointLogInLogOut: "logout",
-                    loggedInUser: username,
-                    Home: "Retournez",
+                    endpointLogInLogOut: "login",
+                    loggedInUser: username
                 }
             }
 
             logger.info(`LOGGED IN user ${username} -- loginUser`);
             // Render the home page
-            // response.status(201).render('home.hbs', pageData);
-            response.redirect('/parts');
+            response.status(201).render('home.hbs', pageData);
         }
-        else{
+        else {
             // Error data for when an error occurs
             let errorData;
             const lang = request.cookies.language;
 
-            if (!lang || lang === 'en'){
+            if (!lang || lang === 'en') {
                 errorData = {
                     alertOccurred: true,
                     alertMessage: "Invalid username or password.",
@@ -108,11 +92,10 @@ async function loginUser(request, response){
                     showConfirmPassword: false,
                     oppositeFormAction: 'signup',
                     oppositeFormName: 'Sign up',
-                    dontHaveAccountText: "Don't have an account?",
-                    Home: "Home",
+                    dontHaveAccountText: "Don't have an account?"
                 }
             }
-            else{
+            else {
                 errorData = {
                     alertOccurred: true,
                     alertMessage: "Nom d'utilisateur ou mot de passe invalide.",
@@ -124,8 +107,7 @@ async function loginUser(request, response){
                     showConfirmPassword: false,
                     oppositeFormAction: 'signup',
                     oppositeFormName: 'Enregistrer',
-                    dontHaveAccountText: "Vous n'avez pas de compte?",
-                    Home: "Retournez",
+                    dontHaveAccountText: "Vous n'avez pas de compte?"
                 }
             }
 
@@ -133,13 +115,13 @@ async function loginUser(request, response){
             logger.info(`DID NOT LOG IN user ${username} because of validation failure -- loginUser`);
             response.status(404).render('loginsignup.hbs', errorData);
         }
-            
-    } catch(error) {
+
+    } catch (error) {
 
         let errorData;
         const lang = request.cookies.language;
         // Error data for when an error occurs
-        if (!lang || lang === 'en'){
+        if (!lang || lang === 'en') {
             errorData = {
                 alertOccurred: true,
                 alertMessage: "",
@@ -151,11 +133,10 @@ async function loginUser(request, response){
                 showConfirmPassword: false,
                 oppositeFormAction: 'signup',
                 oppositeFormName: 'Sign up',
-                dontHaveAccountText: "Don't have an account?",
-                Home: "Home",
+                dontHaveAccountText: "Don't have an account?"
             }
         }
-        else{
+        else {
             errorData = {
                 alertOccurred: true,
                 alertMessage: "",
@@ -167,20 +148,19 @@ async function loginUser(request, response){
                 showConfirmPassword: false,
                 oppositeFormAction: 'signup',
                 oppositeFormName: 'Enregistrer',
-                dontHaveAccountText: "Vous n'avez pas de compte?",
-                Home: "Retournez",
+                dontHaveAccountText: "Vous n'avez pas de compte?"
             }
         }
 
 
         // If the error is an instance of the DatabaseConnectionError error
-        if (error instanceof DatabaseConnectionError){
+        if (error instanceof DatabaseConnectionError) {
             errorData.alertMessage = "Error while connecting to database.";
             logger.error(`DatabaseConnectionError when LOGGING IN user ${username} -- loginUser`);
-            response.status(500).render('loginsignup.hbs', {alertMessage: "Error while connecting to database."});
+            response.status(500).render('loginsignup.hbs', { alertMessage: "Error while connecting to database." });
         }
         // If the error is an instance of the UserLoginError error
-        else if (error instanceof userModel.UserLoginError){
+        else if (error instanceof userModel.UserLoginError) {
             errorData.alertMessage = error.message;
             logger.error(`UserLoginError when LOGGING IN user ${username} -- loginUser`);
             response.status(404).render('loginsignup.hbs', errorData);
@@ -188,76 +168,26 @@ async function loginUser(request, response){
         // If any other error occurs
         else {
             logger.error(`OTHER error when LOGGING IN user ${username} -- loginUser`);
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to register user: ${error.message}`});
+            response.status(500).render('error.hbs', { message: `Unexpected error while trying to register user: ${error.message}` });
         }
     }
 }
 
-/**
- * Logs out the user & deletes the session cookie.
- * @param {*} request 
- * @param {*} response 
- * @returns 
- */
-async function logoutUser(request, response){
+// Deletes the session cookie to logout the user
+async function logoutUser(request, response) {
     const authenticatedSession = authenticateUser(request);
-    const lang = request.cookies.language;
-
-    // Making sure the session is authenticated
-    if (!authenticatedSession || authenticatedSession === null) {
+    if (!authenticatedSession) {
         response.sendStatus(401); // Unauthorized access
         return;
     }
-
     delete session.sessions[authenticatedSession.sessionId]
-    logger.info("Logged out user " + authenticatedSession.userSession.username);
-    
+    console.log("Logged out user " + authenticatedSession.userSession.username);
+
     response.cookie("sessionId", "", { expires: new Date() }); // "erase" cookie by forcing it to expire.
+    response.redirect('/');
 
-    let pageData;
-    let allParts = await carPartModel.findAllCarParts();
-
-    if (!lang || lang === 'en'){
-        pageData = {
-            alertOccurred: true,
-            alertMessage: `${authenticatedSession.userSession.username} has successfully logged out!`,
-            alertLevel: 'success',
-            alertLevelText: 'Success',
-            alertHref: 'check-circle-fill',
-            display_signup: "block",
-            display_login: "block",
-            logInlogOutText: "Log In",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            Home: "Home",
-            Add: "Add a car part",
-            Show: "Find a Car Part",
-            List: "Show all Car Parts",
-            Edit: "Update a Car Part",
-            Delete: "Delete a Car Part",
-            showList: true,
-            Current: "English",
-            part: allParts,
-        }
-    }
-    else{
-        pageData = {
-            alertOccurred: true,
-            alertMessage: `${authenticatedSession.userSession.username} s'est connecté avec succès!`,
-            alertLevel: 'success',
-            alertLevelText: 'Success',
-            alertHref: 'check-circle-fill',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Déconnecter",
-            signUpText: "Enregistrer",
-            endpointLogInLogOut: "login",
-            Home: "Retournez",
-        }
-    }
-    
-    logger.info(`LOGGING OUT user ${authenticatedSession.userSession.username} -- showLogout`);
-    response.status(201).render('home.hbs', pageData);
+    logger.info(`SHOWING LOGIN information (login page) -- showLogin`);
+    response.status(201).render('loginsignup.hbs', pageData);
 }
 
 async function showLogin(request, response) {
@@ -266,7 +196,7 @@ async function showLogin(request, response) {
     // Page data 
     let pageData;
 
-    if (!lang || lang === 'en'){
+    if (!lang || lang === 'en') {
         pageData = {
             alertOccurred: false,
             titleName: 'Log In',
@@ -281,11 +211,10 @@ async function showLogin(request, response) {
             signUpText: "Sign Up",
             endpointLogInLogOut: "login",
             usernameHeader: "Username",
-            passwordHeader: "Password",
-            Home: "Home",
+            passwordHeader: "Password"
         }
     }
-    else{
+    else {
         pageData = {
             alertOccurred: false,
             titleName: 'Connexion',
@@ -300,8 +229,7 @@ async function showLogin(request, response) {
             signUpText: "Enregistrer",
             endpointLogInLogOut: "login",
             usernameHeader: "Nom D'utilisateur",
-            passwordHeader: "Mot de Passe",
-            Home: "Retournez",
+            passwordHeader: "Mot de Passe"
         }
     }
 
@@ -315,37 +243,27 @@ function authenticateUser(request) {
     if (!request.cookies) {
         return null;
     }
-
     // We can obtain the session token from the requests cookies, which come with every request
-    const sessionId = request.cookies['sessionId'];
+    const sessionId = request.cookies['sessionId']
     if (!sessionId) {
         // If the cookie is not set, return null
         return null;
     }
-
     // We then get the session of the user from our session map
-    let userSession = sessions[sessionId];
-
-    // If no user session is defined
+    let userSession = sessionModel.sessions[sessionId]
     if (!userSession) {
         return null;
-    } 
-    
-    // If the session has expired, delete the session from our map and return null
+    } // If the session has expired, delete the session from our map and return null
     if (userSession.isExpired()) {
         delete session.sessions[sessionId];
         return null;
     }
-
     return { sessionId, userSession }; // Successfully validated.
 }
 
 
-router.get('/users/login', showLogin);
-router.get('/users/logout', logoutUser);
-router.post("/users/login", loginUser);
-
-
+router.get('/users/login', showLogin)
+router.post("/users/login", loginUser)
 module.exports = {
     router,
     routeRoot,
