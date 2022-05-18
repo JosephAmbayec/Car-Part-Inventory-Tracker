@@ -411,6 +411,9 @@ table {
   justify-content: center;
   align-items: center;
 }
+.fa-trash-o{
+  margin-top: 3px;
+}
 .del-button-card:hover{
   background-color: red;
   z-index: 999;

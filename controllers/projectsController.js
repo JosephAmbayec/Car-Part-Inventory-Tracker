@@ -306,6 +306,46 @@ async function updateProject(request, response){
     response.status(201).render('showProject.hbs', pageData);
 }
 
+async function deleteProject(request, response){
+    try {
+        // Get the values
+        let projectID = request.params.projectId;
+        let login = loginController.authenticateUser(request);
+
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+        }
+
+        await projectModel.deleteProject(projectID);
+
+        // Page data 
+        const pageData = {
+            alertOccurred: true,
+            alertMessage: `Successfully deleted project ${projectID}!`,
+            alertLevel: 'success',
+            alertLevelText: 'success',
+            alertHref: 'exclamation-triangle-fill',
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: login,
+        }
+
+        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+        response.redirect(`/projects`);
+        // response.status(201).render('allProjects.hbs', pageData);
+    } 
+    catch (error) {
+        
+    }
+}
+
+
 router.post("/projects", createProject);
 router.get("/projects", showProjects);
 router.post("/projects/new", showCreateForm);
@@ -313,6 +353,7 @@ router.get("/projects/:projectId", showSpecificProject);
 router.post("/projects/:projectId/update", updateProject);
 
 router.post("/projects/:projectId", addCarPart)
+router.get("/projects/del/:projectId", deleteProject);
 
 
 module.exports = {

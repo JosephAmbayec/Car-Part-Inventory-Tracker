@@ -261,8 +261,9 @@ async function updateProject(newName, newDescription, projectId){
 
 async function getProjectCarParts(projectId) {
     try {
+        // Checks if the project exists first
         if(projectExists(projectId)){
-            let selectStatement = `SELECT * FROM PartProject WHERE projectId = ${projectId};`;
+            const selectStatement = `SELECT * FROM PartProject WHERE projectId = ${projectId};`;
             let theProject = await connection.execute(selectStatement);
             return theProject[0];
             
@@ -281,6 +282,34 @@ async function getProjectCarParts(projectId) {
     }
 }
 
+/**
+ * Deletes the specified project project.
+ * @param {*} projectId The project id of the project to be deleted.
+ */
+async function deleteProject(projectId){
+    try {
+        // Checks if the project exists first
+        if(projectExists(projectId)){
+            // Delete from the PartsProject table first (clears all parts associated with this project)
+            let selectStatement = `DELETE FROM PartProject WHERE projectId = ${projectId};`;
+            let deletedProj = await connection.execute(selectStatement);
+
+            // Delete from the UsersProject table (no foreign key constraints)
+            selectStatement = `DELETE FROM UsersProject WHERE projectId = ${projectId};`;
+            deletedProj = await connection.execute(selectStatement);
+
+            // Delete the actual Project 
+            selectStatement = `DELETE FROM Project WHERE projectId = ${projectId};`;
+            deletedProj = await connection.execute(selectStatement);
+        }
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
+
+
 module.exports = {
     initializeProjectModel,
     addProject,
@@ -290,5 +319,6 @@ module.exports = {
     getAllProjects,
     getProjectByProjectId,
     updateProject,
-    getProjectCarParts
+    getProjectCarParts,
+    deleteProject
 }
