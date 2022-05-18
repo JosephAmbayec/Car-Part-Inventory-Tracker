@@ -9,7 +9,7 @@ const validUtils = require('../validateUtils.js');
 const partsModel = require('../models/carPartModelMysql');
 const usersModel = require('../models/userModel');
 const projectModel = require('../models/projectModel');
-const { LOGGED_IN_USER } = require('./loginController');
+const loginController = require('./loginController');
 
 /**
  * POST controller method that allows the user to create projects
@@ -23,7 +23,7 @@ const { LOGGED_IN_USER } = require('./loginController');
     let userId = await usersModel.getUserByName(request.cookies.username);
    
     // If the user id is not specified
-    if (userId == -1){
+    if (userId === -1){
         logger.error(`No user to create project -- createProject`);
         throw new sqlModel.DatabaseConnectionError("The project is not associated with a user");
     }
@@ -33,6 +33,12 @@ const { LOGGED_IN_USER } = require('./loginController');
         let projectId = await projectModel.addProject(name, description)
         await projectModel.addUserToProject(projectId, userId);
         let projs = await projectModel.getAllProjects(request.cookies.username);
+        let login = loginController.authenticateUser(request);
+
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+        }
 
         const pageData = {
             alertOccurred: true,
@@ -50,7 +56,7 @@ const { LOGGED_IN_USER } = require('./loginController');
             projects: projs,
             clickedNewProject: false,
             Home: "Home",
-            loggedInUser: LOGGED_IN_USER
+            loggedInUser: login
         }
     
         logger.info(`CREATED PROJECT (Name: ${name}, Description: ${description} -- loginUser`);
@@ -67,7 +73,7 @@ const { LOGGED_IN_USER } = require('./loginController');
             pathNameForActionForm: 'projects',
             projects: await projectModel.getAllProjects(),
             clickedNewProject: false,
-            loggedInUser: LOGGED_IN_USER
+            loggedInUser: login
         }
         
         // If the error is an instance of the DatabaseConnectionError error
@@ -98,7 +104,12 @@ const { LOGGED_IN_USER } = require('./loginController');
  */
  async function showProjects(request, response){
 
-    let cookie = request.cookies;
+    let login = loginController.authenticateUser(request);
+
+     // Set the login to the username if response is not null
+     if(login != null) {
+        login = login.userSession.username;
+    }
 
     // Page data 
     const pageData = {
@@ -110,7 +121,7 @@ const { LOGGED_IN_USER } = require('./loginController');
         projects: await projectModel.getAllProjects(request.cookies.username),
         Home: "Home",
         logInlogOutText: "Log Out",
-        loggedInUser: LOGGED_IN_USER
+        loggedInUser: login
     }
 
     // If there's no projects
@@ -129,6 +140,13 @@ const { LOGGED_IN_USER } = require('./loginController');
  * @param {*} response 
  */
 async function showCreateForm(request, response){
+    let login = loginController.authenticateUser(request);
+
+     // Set the login to the username if response is not null
+     if(login != null) {
+        login = login.userSession.username;
+    }
+
     // Page data 
     const pageData = {
         alertOccurred: false,
@@ -138,7 +156,7 @@ async function showCreateForm(request, response){
         pathNameForActionForm: 'projects',
         Home: "Home",
         logInlogOutText: "Log Out",
-        loggedInUser: LOGGED_IN_USER,
+        loggedInUser: login,
         clickedNewProject: true
     }
 
@@ -146,9 +164,87 @@ async function showCreateForm(request, response){
     response.status(201).render('allProjects.hbs', pageData);
 }
 
+/**
+ * Shows the specified project on a new page.
+ * @param {*} request 
+ * @param {*} response 
+ */
+async function showSpecificProject(request, response){
+    let projectID = request.params.projectId;
+    let theProject = await projectModel.getProjectByProjectId(projectID);
+    let login = loginController.authenticateUser(request);
+
+     // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+    }
+
+    // Page data 
+    const pageData = {
+            alertOccurred: false,
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: login,
+            projectName: theProject[0].name,
+            projectDescription: theProject[0].description,
+            projectId: projectID
+    }
+
+    // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+    response.status(201).render('showProject.hbs', pageData);
+}
+
+/**
+ * Updates the project details.
+ * @param {*} request 
+ * @param {*} response 
+ */
+async function updateProject(request, response){
+    // Get the values
+    let name = request.body.name;
+    let description = request.body.description;
+    let projectID = request.params.projectId;
+    let login = loginController.authenticateUser(request);
+
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+    }
+
+    await projectModel.updateProject(name, description, projectID);
+    
+    // Page data 
+    const pageData = {
+            alertOccurred: true,
+            alertMessage: `Successfully updated project ${name}!`,
+            alertLevel: 'success',
+            alertLevelText: 'success',
+            alertHref: 'exclamation-triangle-fill',
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: login,
+    }
+
+    // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+    response.redirect(`/projects/${projectID}`);
+    response.status(201).render('showProject.hbs', pageData);
+}
+
 router.post("/projects", createProject);
 router.get("/projects", showProjects);
 router.post("/projects/new", showCreateForm);
+router.get("/projects/:projectId", showSpecificProject);
+router.post("/projects/:projectId/update", updateProject);
 
 
 module.exports = {

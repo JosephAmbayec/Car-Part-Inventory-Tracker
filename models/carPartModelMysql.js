@@ -131,7 +131,7 @@ async function findCarPartByNumber(partNumber){
 
     try {
         const queryStatement = `SELECT * FROM carPart WHERE partNumber= '${partNumber}';`;
-        let carPartArray = await connection.query(queryStatement);
+        let carPartArray = await connection.execute(queryStatement);
         logger.info(`FOUND the car part (${partNumber}) in the database.`);
 
         return carPartArray[0];
