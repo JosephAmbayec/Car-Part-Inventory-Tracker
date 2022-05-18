@@ -184,13 +184,21 @@ async function projectExists(projectId){
     }
 }
 
+/**
+ * Gets the project associated with the specified project id.
+ * @param {*} projectId The project id of the project.
+ * @returns The project associated with the specified project id.
+ */
 async function getProjectByProjectId(projectId){
     try {
+        // Checks if the project exists first
         if(projectExists(projectId)){
             const selectStatement = `SELECT name, description FROM Project WHERE projectId = ${projectId}`;
             let projectArray = await connection.query(selectStatement);
             return projectArray[0];
         }
+        else
+            throw new DatabaseConnectionError();
     } 
     catch (error) {
         logger.error(error);
@@ -198,6 +206,13 @@ async function getProjectByProjectId(projectId){
     }
 }
 
+/**
+ * Updates the project with the new specified information.
+ * @param {*} newName The new name of the project.
+ * @param {*} newDescription The new description of the project.
+ * @param {*} projectId The project if of the project to update.
+ * @returns The updated project.
+ */
 async function updateProject(newName, newDescription, projectId){
     try {
         if(projectExists(projectId)){
@@ -205,12 +220,15 @@ async function updateProject(newName, newDescription, projectId){
             let projectArray = await connection.query(selectStatement);
             return projectArray[0];
         }
+        else
+            throw new DatabaseConnectionError();
     } 
     catch (error) {
         logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
+
 
 module.exports = {
     initializeProjectModel,
