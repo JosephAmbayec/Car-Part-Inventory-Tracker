@@ -40,6 +40,36 @@ footer {
     color:  #0D6EFD ;
 }
 
+.inventory-actions-button{
+  border-radius: 0.5rem;
+  width: 11rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+}
+.inventory-actions-button:hover{
+  cursor: pointer;
+  box-shadow: 0 0 5px 2px #06377e;
+  background-color: #0D6EFD;
+}
+#aside-sidebar{
+  display: flex;
+  flex-direction: column;
+  align-items: initial;
+  border: 0.5px solid #0D6EFD ;
+  width: 15rem;
+  border-radius: 5px;
+  justify-content: flex-end;
+  margin-left: 6rem;
+  margin-top: 3rem;
+}
+#aside-sidebar > *{
+  display: flex;
+  justify-content:center;
+  flex-direction: column;
+}
+#inventory-actions-form{
+  margin-left: 1rem;
+}
 
 #sidebar-wrapper div form button {
     background-color:  #0D6EFD;
@@ -353,20 +383,13 @@ table {
   border: 0.75px solid #0D6EFD;
 }
 .dropdown-menu-items:hover{
-  background-color: #6da8fd ;
+  background-color: #3d8bfd ;
 }
 .dropdown-toggle::after, .dropdown-toggle::before {
   display:none;
   border: none;
 }
 
-/* #form-container-update{
-  display:flex;
- justify-content: center;
- align-items: center;
- flex-direction: column;
- width: 100%;
-} */
 #form-loginsignup-update > *{
   margin-top:1.5rem;
 }

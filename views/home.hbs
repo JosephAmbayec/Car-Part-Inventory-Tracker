@@ -38,28 +38,60 @@
 
 <div class="row d-flex justify-content-start">
   <!--Sidebar containing all CRUD buttons-->
-  <aside class="col-2">
-    <div class="d-flex" id="wrapper">
-      <!-- Sidebar-->
-      <div class="border-end bg-white" id="sidebar-wrapper">
-        <div class="list-group list-group-flush">
-          <form action="/" method="post" role="form" enctype="application/x-www-form-urlencoded">
-            <button id="add" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
-              value="add">{{Add}}</button>
-            <button id="show" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
-              value="show">{{Show}}</button>
-            <button id="list" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
-              value="list">{{List}}</button>
-            <button id="update" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
-              value="edit">{{Edit}}</button>
-            <button id="delete" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
-              value="delete">{{Delete}}</button>
-          </form>
-        </div>
-      </div>
-  </aside>
+  <div id="aside-sidebar" class="col-2 ">
+    <h4 style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.5rem">Inventory Actions</h4>
 
-  <div class="col-8">
+    {{!-- <aside class="col-2 "> --}}
+    <div class="d-flex " id="wrapper ">
+      <!-- Sidebar-->
+      {{!-- <div class="border-end bg-white" id="sidebar-wrapper"> --}}
+        <div class="list-group list-group-flush " id="inventory-actions-form">
+          <form action="/" method="post" role="form" enctype="application/x-www-form-urlencoded" >
+            {{#if Add}}
+              <button id="show" name="choice" class="btn btn-primary inventory-actions-button"
+                value="add">{{Add}}
+              </button>
+            {{/if}}
+             {{#if Show}}
+              <button id="show" name="choice" class="btn btn-primary inventory-actions-button"
+              value="show">{{Show}}
+            </button>
+            {{/if}}
+             {{#if List}}
+              <button id="list" name="choice" class="btn btn-primary inventory-actions-button"
+              value="list">{{List}}
+              </button>
+            {{/if}}
+             {{#if Edit}}
+              <button id="update" name="choice" class="btn btn-primary inventory-actions-button"
+              value="edit">{{Edit}}
+              </button>
+            {{/if}}
+             {{#if Delete}}
+               <button id="delete" name="choice" class="btn btn-primary inventory-actions-button"
+              value="delete">{{Delete}}
+              </button>
+            {{/if}}
+            {{!-- <button id="show" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
+              value="show">{{Show}}
+            </button>
+            <button id="list" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
+              value="list">{{List}}
+            </button>
+            <button id="update" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
+              value="edit">{{Edit}}
+            </button>
+            <button id="delete" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
+              value="delete">{{Delete}}
+            </button> --}}
+          </form>
+        {{!-- </div> --}}
+      </div>
+    </div>
+  {{!-- </aside> --}}
+  </div>
+
+  <div class="col-7">
     <!--Showing the specified form-->
     {{#if showForm}}
         <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
