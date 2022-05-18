@@ -242,6 +242,7 @@ async function showSignup(request, response){
             passwordHeader: "Password",
             confirmPasswordHeader: "Confirm Password",
             Home: "Home",
+            about_text: "About Us"
         }
     }
     else{
@@ -262,6 +263,7 @@ async function showSignup(request, response){
             passwordHeader: "Mot de Passe",
             confirmPasswordHeader: "Confirmez le Mot de Passe",
             Home: "Retournez",
+            about_text: "À propos de nous"
         }
     }
 
