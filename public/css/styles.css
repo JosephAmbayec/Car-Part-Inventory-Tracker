@@ -336,11 +336,11 @@ table {
 
 .dropdown-button{
   color: #0D6EFD;
-  background-color: white;
+  background-color: #ffffff;
   border-radius: 10px;
   border-color: #0D6EFD;
   box-shadow: none;
-  z-index: 0;
+  /* z-index: 0; */
 }
 .dropdown-button:hover, .dropdown-button:focus{
   color: white;
@@ -353,4 +353,8 @@ table {
 }
 .dropdown-menu-items:hover{
   background-color: #6da8fd ;
+}
+.dropdown-toggle::after, .dropdown-toggle::before {
+  display:none;
+  border: none;
 }
