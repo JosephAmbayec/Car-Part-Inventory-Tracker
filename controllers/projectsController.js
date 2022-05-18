@@ -178,7 +178,7 @@ async function addCarPart(request, response){
 
         const pageData = {
             alertOccurred: true,
-            alertMessage: "You have successfully added a project!",
+            alertMessage: "You have successfully added to a project!",
             alertLevel: 'success',
             alertLevelText: 'success',
             alertHref: 'exclamation-triangle-fill',
@@ -234,7 +234,7 @@ async function showSpecificProject(request, response){
     let allCarPartsInProject = await projectModel.getAllCarPartsInProject(projectID);
     let login = loginController.authenticateUser(request);
 
-     // Set the login to the username if response is not null
+    // Set the login to the username if response is not null
     if(login != null) {
         login = login.userSession.username;
     }
@@ -252,7 +252,8 @@ async function showSpecificProject(request, response){
             loggedInUser: login,
             projectName: theProject[0].name,
             projectDescription: theProject[0].description,
-            projectId: projectID
+            projectId: projectID,
+            projectParts: allCarPartsInProject
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);

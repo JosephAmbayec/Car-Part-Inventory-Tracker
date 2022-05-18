@@ -235,10 +235,6 @@ async function updateCarPartName(partNumber, name){
             logger.info("Car part EXISTS - Verify that the car part exists -- verifyCarPartExists");
             return true;
         }
-        
-        // if ((await findCarPartByNumber(partNumber)).length != 0){
-        //     return true;
-        // }
     }
     catch(error){
         logger.error(error);
