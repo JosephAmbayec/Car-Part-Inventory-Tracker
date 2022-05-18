@@ -13,7 +13,6 @@
       d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
   </symbol>
 </svg>
-
 <!--Show an error message if an error occurs-->
 {{#if alertOccurred}}
 <div class="alert alert-{{alertLevel}} alert-dismissible fade in show d-flex align-items-center" role="alert">
@@ -27,13 +26,13 @@
 
 <div id="language">
   <p id="languageText">Language:</p>
-<form action="/language" method="POST" role="form">
-  <select name="language" onchange="this.form.submit()">
-    <option value="" selected="selected" hidden="hidden">{{Current}}</option>
-    <option value="en">English</option>
-    <option value="fr">French</option>
-  </select>
-</form>
+  <form action="/language" method="POST" role="form">
+    <select name="language" onchange="this.form.submit()">
+      <option value="" selected="selected" hidden="hidden">{{Current}}</option>
+      <option value="en">English</option>
+      <option value="fr">French</option>
+    </select>
+  </form>
 </div>
 
 
@@ -122,7 +121,15 @@
                           <ul class="dropdown-menu">
                             <!--Add project option to dropdown-->
                             {{#each ../project}}
-                              <li class="dropdown-menu-items"><a class="dropdown-item" id="{{this.projectId}}" href="/parts/addto/{{this.projectId}}">{{this.name}}</a></li>
+                              <!--Create form from dropdown option-->
+                              <form action="/projects/{{this.projectId}}" method="POST" onsubmit="this.action = this.action + '/'+ this.projectId.value" role="form" enctype="application/x-www-form-urlencoded">
+                                <!--To keep track of the partNumber-->
+                                <input type="hidden" name="partNumber" value="{{../partNumber}}"/>
+                                <!--Sub,it button for dropdown option-->
+                                <li class="dropdown-menu-items" value="{{this.projectId}}" >
+                                  <button type="submit" class="dropdown-item" id="{{this.projectId}}" >{{this.name}}</button> <!---href="/parts/addto/{{this.projectId}}"-->
+                                </li>
+                              </form>
                             {{/each}}
                           </ul>
                         </div>
@@ -190,4 +197,24 @@
   </script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
   integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+  </script>
+
+  <script>
+    var exampleModal = document.getElementById('exampleModal')
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+      // Button that triggered the modal
+      var button = event.relatedTarget
+      // Extract info from data-bs-* attributes
+      var part = button.getAttribute('data-bs-whatever')
+      var partNumber = button.getAttribute('data-bs-partNumber')
+      // If necessary, you could initiate an AJAX request here
+      // and then do the updating in a callback.
+      //
+      // Update the modal's content.
+      var modalTitle = exampleModal.querySelector('.modal-title')
+      var modalBodyInput = exampleModal.querySelector('.modal-body input')
+
+      modalTitle.textContent = `Add ${part} to Project`;
+      modalBodyInput.value = partNumber
+    })
   </script>
