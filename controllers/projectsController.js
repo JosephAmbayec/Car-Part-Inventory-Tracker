@@ -205,19 +205,19 @@ async function addCarPart(request, response){
 
         if (error instanceof sqlModel.DatabaseConnectionError){
             pageData.alertMessage = "Error connecting to database.";
-            logger.error(`DatabaseConnectionError when CREATING PROJECT ${name} -- createProject`);
+            logger.error(`DatabaseConnectionError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
             response.status(500).render('home.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-            logger.error(`UserLoginError when CREATING PROJECT ${name} -- createProject`);
+            logger.error(`UserLoginError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
             response.status(404).render('home.hbs', pageData);
         }
         // If any other error occurs
         else {
             pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
-            logger.error(`OTHER error when CREATING PROJECT ${name} -- createProject`);
+            logger.error(`OTHER error when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
             response.status(500).render('home.hbs', pageData);
         }
     }

@@ -109,10 +109,19 @@
                             <div class="card">
                                 {{!-- <img src="..." class="card-img-top" alt="..."> --}}
                                 <div class="card-body">
-                                    <h5 class="card-title" id="{{this.name}}">{{this.name}}</h5>
-                                    <p class="card-text" id="{{this.description}}">{{this.description}}</p>
-                                    <a href="/projects/{{this.projectId}}" id="{{this.projectId}}" class="btn btn-primary stretched-link">See more</a>
-                                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                    <div class="card-grid">
+                                        <div style="display:flex; flex-direction:column; ">
+                                            <h5 class="card-title" id="{{this.name}}">{{this.name}}</h5>
+                                            <p class="card-text" id="{{this.description}}">{{this.description}}</p>
+                                            <a href="/projects/{{this.projectId}}" id="{{this.projectId}}" class="btn btn-primary stretched-link see-more-projects">See more</a>
+                                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                        </div>
+                                        <div class="text-center">
+                                            <button class="btn btn-primary del-button-card">
+                                                <i class="fa fa-trash-o" style="font-size:26px"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
