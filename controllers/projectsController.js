@@ -189,7 +189,15 @@ async function addCarPart(request, response){
             endpointLogInLogOut: "login",
             clickedNewProject: false,
             Home: "Home",
-            loggedInUser: true
+            loggedInUser: true,
+            Add: "Add a Car part",
+            Show: "Find a Car Part",
+            List: "Show all Car Parts",
+            Edit: "Update a Car Part",
+            Delete: "Delete a Car Part",
+            projects_text: "Projects",
+            about_text: "About Us",
+            Current: "English"
         }
         response.status(201).render('home.hbs', pageData);
     }

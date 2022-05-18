@@ -52,7 +52,15 @@ async function loginUser(request, response) {
                     logInlogOutText: "Log Out",
                     signUpText: "Sign Up",
                     endpointLogInLogOut: "login",
-                    loggedInUser: username
+                    loggedInUser: username,
+                    Add: "Add a Car part",
+                    Show: "Find a Car Part",
+                    List: "Show all Car Parts",
+                    Edit: "Update a Car Part",
+                    Delete: "Delete a Car Part",
+                    projects_text: "Projects",
+                    about_text: "About Us",
+                    Current: "English"
                 }
             }
             else {
@@ -67,7 +75,15 @@ async function loginUser(request, response) {
                     logInlogOutText: "Déconnecter",
                     signUpText: "Enregistrer",
                     endpointLogInLogOut: "login",
-                    loggedInUser: username
+                    loggedInUser: username,
+                    Add: "Ajouter une Pièce Auto",
+                    Show: "Trouver une Pièce Auto",
+                    List: "Afficher Toutes les Pièces de Voiture",
+                    Edit: "Mettre à Jour une Pièce Auto",
+                    Delete: "Supprimer une Pièce Auto",
+                    projects_text: "Projets",
+                    about_text: "À propos de nous",
+                    Current: "French"
                 }
             }
 
