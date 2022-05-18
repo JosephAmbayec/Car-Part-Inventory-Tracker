@@ -107,7 +107,7 @@ async function getConnection(){
  */
 async function getAllProjects(username){
     let userId = await userModel.getUserByName(username);
-    let query = `SELECT name, description FROM Project, UsersProject as U where U.id = ${userId}`;
+    let query = `SELECT U.projectId, name, description FROM Project, UsersProject as U where U.id = ${userId}`;
     let results = await connection.query(query);
     return results[0];
 }

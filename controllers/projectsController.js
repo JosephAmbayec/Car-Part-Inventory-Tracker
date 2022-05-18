@@ -145,10 +145,25 @@ async function showCreateForm(request, response){
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
     response.status(201).render('allProjects.hbs', pageData);
 }
+/**
+ * Called when adding a car part
+ * @param {*} request 
+ * @param {*} response 
+ */
+
+async function addCarPart(request, response){
+    try{
+        let projectId = request.body.projectId;
+    }
+    catch {
+
+    }
+}
 
 router.post("/projects", createProject);
 router.get("/projects", showProjects);
 router.post("/projects/new", showCreateForm);
+router.put("/projects/:id", addCarPart)
 
 
 module.exports = {

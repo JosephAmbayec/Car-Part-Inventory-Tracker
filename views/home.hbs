@@ -13,7 +13,6 @@
       d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
   </symbol>
 </svg>
-
 <!--Show an error message if an error occurs-->
 {{#if alertOccurred}}
 <div class="alert alert-{{alertLevel}} alert-dismissible fade in show d-flex align-items-center" role="alert">
@@ -27,13 +26,13 @@
 
 <div id="language">
   <p id="languageText">Language:</p>
-<form action="/language" method="POST" role="form">
-  <select name="language" onchange="this.form.submit()">
-    <option value="" selected="selected" hidden="hidden">{{Current}}</option>
-    <option value="en">English</option>
-    <option value="fr">French</option>
-  </select>
-</form>
+  <form action="/language" method="POST" role="form">
+    <select name="language" onchange="this.form.submit()">
+      <option value="" selected="selected" hidden="hidden">{{Current}}</option>
+      <option value="en">English</option>
+      <option value="fr">French</option>
+    </select>
+  </form>
 </div>
 
 
@@ -87,7 +86,7 @@
         <tr>
           <!--Is the user is logged in, show add to project-->
           {{#if isUserLoggedIn}}
-             <th>Add to Project</th>
+          <th>Add to Project</th>
           {{/if}}
 
           <th>Part #</th>
@@ -96,89 +95,81 @@
           <th>Image</th>
         </tr>
 
-          <!--Formatting table for each car part-->
-          {{#each part}}
-            <tr>
-              <!--Is the user is logged in, show add to project-->
-              {{#if ../isUserLoggedIn}}
-                <td><button id="add-project-btn" data-toggle="modal" data-target="#add-proj"><i class="fa fa-plus" style="font-size:17px; margin-right: 4px;"></i></button></td>
+        <!--Formatting table for each car part-->
+        {{#each part}}
+        <tr>
+          <!--Is the user is logged in, show add to project-->
+          {{#if ../isUserLoggedIn}}
+          <td><button id="add-project-btn" data-target="#add-proj"  data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="{{name}}"><i class="fa fa-plus"
+                style="font-size:17px; margin-right: 4px;"></i></button></td>
 
-                <!--bootstrap for showing the image-->
-                <div class="modal fade" id="add-proj" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                  aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Add {{name}} to project</h5>
-                      </div>
-                      <!-- Add image inside the body of modal -->
-                      <div class="modal-body">
-                        {{!-- <ul>
-                          {{#each project}}
-                            <li>{{this.name}}</li>
-                          {{/each}}
-                        </ul> --}}
-
-                        <div class="dropdown">
-                          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                            Add to project
-                          </button>
-                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            {{#each ../project}}
-                              <li><a class="dropdown-item" href="#">{{this.name}}</a></li>
-                            {{/each}}
-                          </ul>
-                        </div>
-
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                          Close
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Add part to Project</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-              {{/if}} 
-              
-              <td>{{partNumber}}</td>
-              <td>{{name}}</td>
-              <td>{{condition}}</td>
-
-              <!--If an image is specified with the car part-->
-              {{#if image}}
-              <!--Create column value for image button-->
-              <td>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{partNumber}}">
-                  Show image
-                </button>
-              </td>
-            </tr>
-
-            <!--bootstrap for showing the image-->
-            <div class="modal fade" id="{{partNumber}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-              aria-hidden="true">
-              <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                  <!-- Add image inside the body of modal -->
-                  <div class="modal-body">
-                    <h1>{{name}}</h1>
-                    <img class="img-responsive" id="image" src={{image}} alt="No image associated with this part." />
+                <div class="modal-body">
+                <form action="/projects/1" method="post" onsubmit="this.action = this.action + '/'+ this.partNumber.value" role="form" enctype="application/x-www-form-urlencoded">
+                <input type="hidden" name="_method" value="PUT" required>
+                    <select class="form-select" aria-label="Add to Project">
+                      {{#each ../project}}
+                        <option value="{{this.projectId}}" name="projectId"><a class="dropdown-item" >{{this.name}}</a></option>
+                      {{/each}}
+                    </select>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <button id="submitAction" type="submit" class="btn btn-primary">Add</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                       Close
                     </button>
                   </div>
-                </div>
+                </form>
+                
               </div>
             </div>
-            {{else}}
+          </div>
+          {{/if}}
 
-            <td></td>
-            {{/if}}
+          <td>{{partNumber}}</td>
+          <td>{{name}}</td>
+          <td>{{condition}}</td>
 
-          {{/each}}
+          <!--If an image is specified with the car part-->
+          {{#if image}}
+          <!--Create column value for image button-->
+          <td>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{partNumber}}">
+              Show image
+            </button>
+          </td>
+        </tr>
+
+        <!--bootstrap for showing the image-->
+        <div class="modal fade" id="{{partNumber}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <!-- Add image inside the body of modal -->
+              <div class="modal-body">
+                <h1>{{name}}</h1>
+                <img class="img-responsive" id="image" src={{image}} alt="No image associated with this part." />
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{else}}
+
+        <td></td>
+        {{/if}}
+
+        {{/each}}
       </table>
     </div>
     {{/if}}
@@ -201,4 +192,23 @@
   </script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
   integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+  </script>
+
+  <script>
+    var exampleModal = document.getElementById('exampleModal')
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+      // Button that triggered the modal
+      var button = event.relatedTarget
+      // Extract info from data-bs-* attributes
+      var part = button.getAttribute('data-bs-whatever')
+      // If necessary, you could initiate an AJAX request here
+      // and then do the updating in a callback.
+      //
+      // Update the modal's content.
+      var modalTitle = exampleModal.querySelector('.modal-title')
+      var modalBodyInput = exampleModal.querySelector('.modal-body input')
+
+      modalTitle.textContent = `Add ${part} to Project`;
+      modalBodyInput.value = part
+    })
   </script>
