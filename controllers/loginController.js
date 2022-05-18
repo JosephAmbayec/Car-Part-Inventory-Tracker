@@ -40,10 +40,6 @@ async function loginUser(request, response) {
             LOGGED_IN_USER = username;
             const lang = request.cookies.language;
 
-            let allParts = await carPartModel.findAllCarParts();
-            let allProjects = await projectModel.getAllProjects(username);
-
-
             if (!lang || lang === 'en') {
                 pageData = {
                     alertOccurred: true,
@@ -77,8 +73,7 @@ async function loginUser(request, response) {
 
             logger.info(`LOGGED IN user ${username} -- loginUser`);
             // Render the home page
-            // response.status(201).render('home.hbs', pageData);
-            response.redirect('/parts');
+            response.status(201).render('home.hbs', pageData);
         }
         else {
             // Error data for when an error occurs
@@ -186,60 +181,13 @@ async function logoutUser(request, response) {
         return;
     }
     delete session.sessions[authenticatedSession.sessionId]
-
-    logger.info("Logged out user " + authenticatedSession.userSession.username);
-    
-    response.cookie("sessionId", "", { expires: new Date() }); // "erase" cookie by forcing it to expire.
+    console.log("Logged out user " + authenticatedSession.userSession.username);
 
     response.cookie("sessionId", "", { expires: new Date() }); // "erase" cookie by forcing it to expire.
     response.redirect('/');
 
-
-    if (!lang || lang === 'en'){
-        pageData = {
-            alertOccurred: true,
-            alertMessage: `${authenticatedSession.userSession.username} has successfully logged out!`,
-            alertLevel: 'success',
-            alertLevelText: 'Success',
-            alertHref: 'check-circle-fill',
-            display_signup: "block",
-            display_login: "block",
-            logInlogOutText: "Log In",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            Home: "Home",
-            Add: "Add a car part",
-            Show: "Find a Car Part",
-            List: "Show all Car Parts",
-            Edit: "Update a Car Part",
-            Delete: "Delete a Car Part",
-            showList: true,
-            Current: "English",
-            part: allParts,
-        }
-    }
-    else{
-        pageData = {
-            alertOccurred: true,
-            alertMessage: `${authenticatedSession.userSession.username} s'est connecté avec succès!`,
-            alertLevel: 'success',
-            alertLevelText: 'Success',
-            alertHref: 'check-circle-fill',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Déconnecter",
-            signUpText: "Enregistrer",
-            endpointLogInLogOut: "login",
-            Home: "Retournez",
-        }
-    }
-    
-    logger.info(`LOGGING OUT user ${authenticatedSession.userSession.username} -- showLogout`);
-    response.status(201).render('home.hbs', pageData);
-
     logger.info(`SHOWING LOGIN information (login page) -- showLogin`);
     response.status(201).render('loginsignup.hbs', pageData);
-
 }
 
 async function showLogin(request, response) {
@@ -302,7 +250,7 @@ function authenticateUser(request) {
         return null;
     }
     // We then get the session of the user from our session map
-    userSession = session.sessions[sessionId]
+    let userSession = sessionModel.sessions[sessionId]
     if (!userSession) {
         return null;
     } // If the session has expired, delete the session from our map and return null

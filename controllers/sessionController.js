@@ -3,7 +3,6 @@ const model = require('../models/sessionModel');
 const { DatabaseConnectionError } = require('../models/carPartModelMysql');
 const express = require('express')();
 const app = express;
-const logger = require('../logger');
 
 /**
  * Creates a new session with the given information.

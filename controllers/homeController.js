@@ -59,6 +59,7 @@ function sendHome(request, response) {
             Delete: "Delete a Car Part",
             loggedInUser: login,
             projects_text: "Projects",
+            about_text: "About Us"
         }
     }
     else{
@@ -89,7 +90,8 @@ function sendHome(request, response) {
             Edit: "Mettre à Jour une Pièce Auto",
             Delete: "Supprimer une Pièce Auto",
             loggedInUser: login,
-            projects_text: "Projets"
+            projects_text: "Projets",
+            about_text: "À propos de nous"
         }
     }
 
@@ -188,6 +190,7 @@ function showAddForm(request, response) {
             Delete: "Delete a Car Part",
             loggedInUser: login,
             projects_text: "Projects",
+            about_text: "About Us"
         }
     }
     else {
@@ -226,6 +229,7 @@ function showAddForm(request, response) {
             Delete: "Supprimer une Pièce Auto",
             loggedInUser: login,
             projects_text: "Projets",
+            about_text: "À propos de nous"
         }
     }
 
@@ -281,6 +285,7 @@ function showListOneForm(request, response) {
             Delete: "Delete a Car Part",
             loggedInUser: login,
             projects_text: "Projects",
+            about_text: "About Us"
         };
     }
     else {
@@ -320,6 +325,7 @@ function showListOneForm(request, response) {
             Delete: "Supprimer une Pièce Auto",
             loggedInUser: login,
             projects_text: "Projets",
+            about_text: "À propos de nous"
         };
     }
 
@@ -378,6 +384,7 @@ function showEditForm(request, response) {
             Delete: "Delete a Car Part",
             loggedInUser: login,
             projects_text: "Projects",
+            about_text: "About Us"
         };
     }
     else {
@@ -418,6 +425,7 @@ function showEditForm(request, response) {
             Delete: "Supprimer une Pièce Auto",
             loggedInUser: login,
             projects_text: "Projets",
+            about_text: "À propos de nous"
         };
     }
 
@@ -473,6 +481,7 @@ function showDeleteForm(request, response) {
             Delete: "Delete a Car Part",
             loggedInUser: login,
             projects_text: "Projects",
+            about_text: "About Us"
         };
     }
     else {
@@ -512,6 +521,7 @@ function showDeleteForm(request, response) {
             Delete: "Supprimer une Pièce Auto",
             loggedInUser: login,
             projects_text: "Projets",
+            about_text: "À propos de nous"
         };
     }
 
