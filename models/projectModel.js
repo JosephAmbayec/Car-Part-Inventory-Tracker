@@ -7,7 +7,7 @@ const model = require('../models/carPartModelMysql');
 const userModel = require('../models/userModel');
 const partModel = require('../models/carPartModelMysql');
 const { DatabaseConnectionError } = require('./carPartModelMysql.js');
-var connection = model.getConnection();
+var connection;
 
 /**
  * Initializes a connection to database for user model.
@@ -107,7 +107,7 @@ async function getConnection(){
  */
 async function getAllProjects(username){
     let userId = await userModel.getUserByName(username);
-    let query = `SELECT U.projectId, name, description FROM Project, UsersProject as U where U.id = ${userId}`;
+    let query = `SELECT P.projectId, name, description FROM Project as P, UsersProject as U where U.id = ${userId}`;
     let results = await connection.query(query);
     return results[0];
 }
@@ -119,10 +119,14 @@ async function getAllProjects(username){
  */
 async function addPartToProject(projectId, partNumber){
     try {
-        if (projectExists(projectId) && partModel.verifyCarPartExists(partNumber)) {
-
-            const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values (${projectId}, ${partNumber})`;
-            await connection.execute(insertStatement);
+        if (!connection){
+            connection = await model.getConnection();
+        }
+        if (await projectExists(projectId) && await partModel.verifyCarPartExists(partNumber)) {
+            if(!await partExistsInProject(projectId, partNumber)){
+                const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values (${projectId}, ${partNumber})`;
+                await connection.execute(insertStatement);
+            }
         }
         else
             throw new DatabaseConnectionError();
@@ -131,7 +135,21 @@ async function addPartToProject(projectId, partNumber){
         logger.error(error);
         throw new DatabaseConnectionError();
     }
-}     
+} 
+
+async function partExistsInProject(projectId, partNumber){
+    try {
+        let statement = `SELECT projectId FROM PartProject where projectId = ${projectId} and partNumber = ${partNumber}`;
+        let result = await connection.query(statement);
+        if (result[0].length != 0)
+            return true;
+        return false;
+    }
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
 //#region Project operations
 /**
  * Associates a user with a project

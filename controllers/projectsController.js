@@ -153,17 +153,60 @@ async function showCreateForm(request, response){
 
 async function addCarPart(request, response){
     try{
+        let partNumber = request.body.partNumber;
         let projectId = request.body.projectId;
+        await projectModel.addPartToProject(projectId, partNumber);
+        const pageData = {
+            alertOccurred: true,
+            alertMessage: "You have successfully added a project!",
+            alertLevel: 'success',
+            alertLevelText: 'success',
+            alertHref: 'exclamation-triangle-fill',
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: LOGGED_IN_USER
+        }
+        response.status(201).render('home.hbs', pageData);
     }
-    catch {
+    catch(error) {
+        const pageData = {
+            alertOccurred: true,
+            alertMessage: "",
+            alertLevel: 'danger',
+            alertLevelText: 'Danger',
+            alertHref: 'exclamation-triangle-fill',
+            loggedInUser: LOGGED_IN_USER
+        }
 
+        if (error instanceof sqlModel.DatabaseConnectionError){
+            pageData.alertMessage = "Error connecting to database.";
+            logger.error(`DatabaseConnectionError when CREATING PROJECT ${name} -- createProject`);
+            response.status(500).render('home.hbs', pageData);
+        }
+        // If the error is an instance of the InvalidInputError error
+        else if (error instanceof sqlModel.InvalidInputError){
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            logger.error(`UserLoginError when CREATING PROJECT ${name} -- createProject`);
+            response.status(404).render('home.hbs', pageData);
+        }
+        // If any other error occurs
+        else {
+            pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+            logger.error(`OTHER error when CREATING PROJECT ${name} -- createProject`);
+            response.status(500).render('home.hbs', pageData);
+        }
     }
 }
 
 router.post("/projects", createProject);
 router.get("/projects", showProjects);
 router.post("/projects/new", showCreateForm);
-router.put("/projects/:id", addCarPart)
+router.post("/projects/:id", addCarPart)
 
 
 module.exports = {

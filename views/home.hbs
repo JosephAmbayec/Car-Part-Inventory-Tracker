@@ -100,7 +100,7 @@
         <tr>
           <!--Is the user is logged in, show add to project-->
           {{#if ../isUserLoggedIn}}
-          <td><button id="add-project-btn" data-target="#add-proj"  data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="{{name}}"><i class="fa fa-plus"
+          <td><button id="add-project-btn" data-target="#add-proj"  data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="{{name}}" data-bs-partNumber="{{partNumber}}"><i class="fa fa-plus"
                 style="font-size:17px; margin-right: 4px;"></i></button></td>
 
           <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -111,11 +111,11 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                <form action="/projects/1" method="post" onsubmit="this.action = this.action + '/'+ this.partNumber.value" role="form" enctype="application/x-www-form-urlencoded">
-                <input type="hidden" name="_method" value="PUT" required>
-                    <select class="form-select" aria-label="Add to Project">
+                <form action="/projects" method="POST" onsubmit="this.action = this.action + '/'+ this.projectId.value" role="form" enctype="application/x-www-form-urlencoded">
+                    <input type="hidden" name="partNumber" value={{partNumber}} />
+                    <select class="form-select" name="projectId" aria-label="Add to Project" id="projects">
                       {{#each ../project}}
-                        <option value="{{this.projectId}}" name="projectId"><a class="dropdown-item" >{{this.name}}</a></option>
+                        <option value="{{this.projectId}}"><a class="dropdown-item" >{{this.name}}</a></option>
                       {{/each}}
                     </select>
                   </div>
@@ -201,6 +201,7 @@
       var button = event.relatedTarget
       // Extract info from data-bs-* attributes
       var part = button.getAttribute('data-bs-whatever')
+      var partNumber = button.getAttribute('data-bs-partNumber')
       // If necessary, you could initiate an AJAX request here
       // and then do the updating in a callback.
       //
@@ -209,6 +210,6 @@
       var modalBodyInput = exampleModal.querySelector('.modal-body input')
 
       modalTitle.textContent = `Add ${part} to Project`;
-      modalBodyInput.value = part
+      modalBodyInput.value = partNumber
     })
   </script>
