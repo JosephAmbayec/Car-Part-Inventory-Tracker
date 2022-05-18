@@ -3,14 +3,26 @@ const supertest = require("supertest");
 const testRequest = supertest(app); 
 const dbName = "car_testDb";
 const model = require("../models/userModel.js");
+const partModel = require("../models/carPartModelMysql.js")
+const projectModel = require("../models/projectModel.js")
 
 var connection;
-beforeEach(async () => { connection = await model.initializeUserModel(dbName, true);});
+var partConnection;
+var projectConnection;
+beforeEach(async () => { 
+    connection = await model.initializeUserModel(dbName, true); 
+    partConnection = await partModel.initialize(dbName, true); 
+    projectConnection = await projectModel.initializeProjectModel(dbName, true) 
+})
+
 afterEach(async () => {
     if (connection)
         await connection.end();
+    if (partConnection)
+        await partConnection.end();
+    if (projectConnection)
+        await projectConnection.end();
 })
-
 const userData = [
     { username: 'username1', password: 'P@ssW0rd!'},
     { username: 'username2', password: '#@ijdsAd2'},
@@ -30,7 +42,7 @@ test("POST /users/login success case", async () => {
     let randomUser = userData.at(Math.random() * 6);
     await model.addUser(randomUser.username, randomUser.password)
     let testResponse = await testRequest.post('/users/login').send(randomUser);
-    expect(testResponse.status).toBe(201);
+    expect(testResponse.status).toBe(302);
 })
 
 test("POST /users/login failure case, wrong username", async () => {
@@ -51,6 +63,7 @@ test("POST /users/login failure case, wrong password", async () => {
 test("POST /users/login failure case due to dropped table", async () => {
     let randomUser = userData.at(Math.random() * 6);
     await model.addUser(randomUser.username, randomUser.password);
+    await connection.execute("DROP TABLE UsersProject;");
     await connection.execute("DROP TABLE Users;");
     let testResponse = await testRequest.post('/users/login').send(randomUser);
     expect(testResponse.status).toBe(500);
