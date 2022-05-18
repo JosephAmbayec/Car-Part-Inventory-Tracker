@@ -111,18 +111,35 @@ async function getPartByNumber(request, response){
 async function getAllCarParts(request, response){
     try {
         let parts = await sqlModel.findAllCarParts();
+        let login = loginController.authenticateUser(request);
+        let lang = request.cookies.language;
+        let signupDisplay, endpoint, logInText;
+        let output;
 
         // If no car parts were found
         if (parts.length === 0){
 
-            let output = {
+            // Set the login to the username if response is not null
+            if(login != null) {
+                login = login.userSession.username;
+                signupDisplay = "none";
+                endpoint = "logout";
+                logInText = "Log Out";
+            }
+            else{
+                signupDisplay = "block";
+                endpoint = "login";
+                logInText = "Log In";
+            }
+
+            output = {
                 showList: true,
                 noCarParts: true,
-                display_signup: "none",
+                display_signup: signupDisplay,
                 display_login: "block",
-                logInlogOutText: "Log Out",
+                logInlogOutText: logInText,
                 signUpText: "Sign Up",
-                endpointLogInLogOut: "login",
+                endpointLogInLogOut: endpoint,
                 Home: "Home",
                 Add: "Add a car part",
                 Show: "Find a Car Part",
@@ -130,6 +147,7 @@ async function getAllCarParts(request, response){
                 Edit: "Update a Car Part",
                 Delete: "Delete a Car Part",
                 Current: "English",
+                loggedInUser: login
             }
 
             logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
@@ -138,14 +156,20 @@ async function getAllCarParts(request, response){
         // If car parts were found
         else{
 
-            const authenticatedSession = loginController.authenticateUser(request);
-            let projs;
-            let isUserLoggedIn;
-
-            if(authenticatedSession && authenticatedSession != null){
-                projs = await projectModel.getAllProjects(authenticatedSession.userSession.username);
-                isUserLoggedIn = true;
+            // Set the login to the username if response is not null
+            if(login != null) {
+                login = login.userSession.username;
+                signupDisplay = "none";
+                endpoint = "logout";
+                logInText = "Log Out";
             }
+            else{
+                signupDisplay = "block";
+                endpoint = "login";
+                logInText = "Log In";
+            }
+
+            let projs = await projectModel.getAllProjects(login);
 
             // Deleting the car part images with no image
             for (let i = 0; i < parts.length; i++){
@@ -154,14 +178,14 @@ async function getAllCarParts(request, response){
                 }
             }
 
-            let output = {
+            output = {
                 part: parts, 
                 showList: true,
-                display_signup: "none",
+                display_signup: signupDisplay,
                 display_login: "block",
-                logInlogOutText: "Log Out",
+                logInlogOutText: logInText,
                 signUpText: "Sign Up",
-                endpointLogInLogOut: "login",
+                endpointLogInLogOut: endpoint,
                 Home: "Home",
                 Add: "Add a car part",
                 Show: "Find a Car Part",
@@ -170,8 +194,32 @@ async function getAllCarParts(request, response){
                 Delete: "Delete a Car Part",
                 Current: "English",
                 project: projs,
-                isUserLoggedIn: isUserLoggedIn
+                loggedInUser: login
             };
+
+            if (!lang || lang === 'en') {
+                output.signUpText = "Sign Up";
+                output.Add = "Add a car part";
+                output.Show = "Find a Car Part";
+                output.List = "Show all Car Parts";
+                output.Edit = "Update a Car Part";
+                output.Delete = "Delete a Car Part";
+            }
+            else{
+                output.signUpText = "Enregistrer";
+                output.Add = "Ajouter une Pièce Auto";
+                output.Show = "Trouver une Pièce Auto";
+                output.List = "Afficher Toutes les Pièces de Voiture";
+                output.Edit = "Mettre à Jour une Pièce Auto";
+                output.Delete = "Supprimer une Pièce Auto";
+
+                if(logInText === "Log In"){
+                    output.logInlogOutText = "Connexion";
+                }
+                else if(logInText === "Log Out"){
+                    output.logInlogOutText = "Se déconnecter";
+                }
+            }
 
             logger.info(`RETRIEVED ALL car parts from database -- getAllCarParts`);
             response.status(200).render('home.hbs', output)
