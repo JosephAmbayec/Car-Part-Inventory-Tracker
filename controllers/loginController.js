@@ -88,8 +88,7 @@ async function loginUser(request, response) {
             }
 
             logger.info(`LOGGED IN user ${username} -- loginUser`);
-            // Render the home page
-            response.status(201).render('home.hbs', pageData);
+            response.status(201).redirect('/parts');
         }
         else {
             // Error data for when an error occurs

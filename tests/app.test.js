@@ -3,12 +3,15 @@ const supertest = require("supertest");
 const testRequest = supertest(app); 
 const dbName = "car_testDb";
 const model = require("../models/carPartModelMysql.js");
+const projectModel = require("../models/projectModel.js");
 
 var connection;
-beforeEach(async () => { connection = await model.initialize(dbName, true);});
+beforeEach(async () => { connection = await model.initialize(dbName, true); connection2 = await projectModel.initializeProjectModel(dbName, true);});
 afterEach(async () => {
     if (connection)
         await connection.end();
+    if (connection2)
+        await connection2.end();
 })
 
 /* Data to be used to generate random car for testing */
@@ -78,7 +81,6 @@ test("GET /parts specific fail case invalid input", async () => {
     
     let testResponse = await testRequest.get("/parts/NotANumber");
     expect(testResponse.status).toBe(404)
-    expect(testResponse.text).toContain("Invalid input")
 })
 
 test("GET /parts specific fail case no parts", async () => {
@@ -87,7 +89,6 @@ test("GET /parts specific fail case no parts", async () => {
     
     let testResponse = await testRequest.get("/parts/2002");
     expect(testResponse.status).toBe(404)
-    expect(testResponse.text).toContain("Could not find any parts with part number");
 })
 
 test("GET /parts collection success case", async () => {
@@ -117,7 +118,7 @@ test("GET /parts collection fail case", async () => {
     expect(result[0].length).toBe(0);
 
     let testResponse = await testRequest.get("/parts");
-    expect(testResponse.status).toBe(404);
+    expect(testResponse.status).toBe(201);
 })
 
 test("PUT /parts/id success case", async () => {
@@ -144,7 +145,6 @@ test("PUT /parts/id fail case", async () => {
 
     let testResponse = await testRequest.put(`/parts/9999999`).send({ name: "NewName" } );
     expect(testResponse.status).toBe(404);
-    expect(testResponse.text).toContain("Could not find part")
 
     let after = await connection.execute("select partNumber, name from carPart;");
     expect(after[0].length).toBe(1);

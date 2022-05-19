@@ -3,6 +3,8 @@ const logger = require('../logger.js');
 const model = require('../models/projectModel.js');
 const users = require('../models/userModel');
 const initializer = require('../models/initializerModel')
+const partModel = require("../models/carPartModelMysql.js")
+
 
 var connection;
 
@@ -15,20 +17,24 @@ const projectData = [
     { name: 'Sixth Project', description: 'Test Description' },
 ]
 
-
-/* Make sure the database is empty before each test.  This runs before each test.  See https://jestjs.io/docs/api */
-beforeEach(async () => {
-    try {
-        connection = await model.initializeProjectModel("car_testDb", true) // Passing true means it'll use the test table
-    } catch (err) {  console.error(err) }
-});
-
-afterEach(async () => {
-    connection = await model.getConnection();
-    if (connection) {
+const dbName = "car_testDb";
+var connection;
+var partConnection;
+var projectConnection;
+beforeEach(async () => { 
+    if (connection)
         await connection.close();
-    } 
-});
+    if (partConnection)
+        await partConnection.close();
+    if (projectConnection)
+        await projectConnection.close();
+
+    connection = await users.initializeUserModel(dbName, true); 
+    partConnection = await partModel.initialize(dbName, true); 
+    projectConnection = await model.initializeProjectModel(dbName, true) 
+})
+
+
 /** addCar tests */
 /* #region   */
 test("addProject successfully wrote to table", async () => {
