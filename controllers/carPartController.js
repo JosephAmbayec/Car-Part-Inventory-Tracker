@@ -20,7 +20,7 @@ async function createPart(request, response){
     let number = request.body.partNumber;
     let partName = request.body.name;
     let image = request.body.image;
-    let condition = request.body.condition;
+    let condition = request.body.addingForm;
 
     // If the image is not a valid url, set image to null
     if (!validUtils.isURL(image)){
@@ -264,6 +264,7 @@ async function getAllCarParts(request, response){
 
             }
 
+            // If the language is english
             if (!lang || lang === 'en') {
                 output.signUpText = "Sign Up";
                 output.Add = role === 1 ? "Add a car part" : "";
@@ -272,6 +273,7 @@ async function getAllCarParts(request, response){
                 output.Edit = role === 1 ? "Update a Car Part" : "";
                 output.Delete = role === 1 ? "Delete a Car Part" : "";
             }
+            // If the language is french
             else{
                 output.signUpText = "Enregistrer";
                 output.Add = "Ajouter une Pièce Auto";
@@ -356,6 +358,214 @@ async function updatePartName(request, response){
         }
     }   
 }
+
+async function deleteSpecificCarPart(request, response){
+    try {
+        let parts = await sqlModel.findAllCarParts();
+        let login = loginController.authenticateUser(request);
+        let lang = request.cookies.language;
+        let signupDisplay, endpoint, logInText;
+        let output, role;
+        let accessProject = request.cookies.lastAccessedProject;
+        let AccessProject;
+        let AccessProjectName;
+        if (accessProject && accessProject != '-1'){
+            AccessProject = true;
+            AccessProjectName = await projectModel.getProjectByProjectId(accessProject)
+            AccessProjectName = AccessProjectName[0].name;
+        }
+        else
+            AccessProject = false
+        // If no car parts were found
+        if (parts.length === 0){
+
+            // Set the login to the username if response is not null
+            if(login != null) {
+                login = login.userSession.username;
+                signupDisplay = "none";
+                endpoint = "logout";
+                logInText = "Log Out";
+            }
+            else{
+                signupDisplay = "block";
+                endpoint = "login";
+                logInText = "Log In";
+                AccessProject = false;
+            }
+
+            role = await userModel.determineRole(login);
+
+            output = {
+                showList: true,
+                noCarParts: true,
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                signUpText: "Sign Up",
+                endpointLogInLogOut: endpoint,
+                Home: "Home",
+                Add: role === 1 ? "Add a car part" : "",
+                Show: "Find a Car Part",
+                List: "Show all Car Parts",
+                Edit: role === 1 ? "Update a Car Part" : "",
+                Delete: role === 1 ? "Delete a Car Part" : "",
+                Current: "English",
+                loggedInUser: login,
+                projects_text: "Projects",
+            }
+
+            if (AccessProject){
+                output = {                
+                    showList: true,
+                    noCarParts: true,
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    signUpText: "Sign Up",
+                    endpointLogInLogOut: endpoint,
+                    Home: "Home",
+                    Add: role === 1 ? "Add a car part" : "",
+                    Show: "Find a Car Part",
+                    List: "Show all Car Parts",
+                    Edit: role === 1 ? "Update a Car Part" : "",
+                    Delete: role === 1 ? "Delete a Car Part" : "",
+                    Current: "English",
+                    loggedInUser: login,
+                    accessProject: true,
+                    accessProjectId: accessProject,
+                    accessProjectName: AccessProjectName
+                }
+
+            }
+
+            logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
+            response.status(201).render('home.hbs', output);
+        }
+        // If car parts were found
+        else{
+
+            // Set the login to the username if response is not null
+            if(login != null) {
+                login = login.userSession.username;
+                signupDisplay = "none";
+                endpoint = "logout";
+                logInText = "Log Out";
+            }
+            else{
+                signupDisplay = "block";
+                endpoint = "login";
+                logInText = "Log In";
+                AccessProject = false;
+            }
+
+            let projs = await projectModel.getAllProjects(login);
+
+            // Deleting the car part images with no image
+            for (let i = 0; i < parts.length; i++){
+                if (parts[i].image == 'null' || parts[i].image == null || parts[i.image == '']){
+                    delete parts[i].image;
+                }
+            }
+
+            role = await userModel.determineRole(login);
+
+            output = {
+                part: parts, 
+                showList: true,
+                isDelete: true,
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                signUpText: "Sign Up",
+                endpointLogInLogOut: endpoint,
+                Home: "Home",
+                Add: "Add a car part",
+                Show: "Find a Car Part",
+                List: "Show all Car Parts",
+                Edit: "Update a Car Part",
+                Delete: "Delete a Car Part",
+                Current: "English",
+                project: projs,
+                loggedInUser: login,
+                about_text: "About Us"
+            };
+
+            if (AccessProject){
+                output = {                
+                    part: parts, 
+                    showList: true,
+                    isDelete: true,
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    signUpText: "Sign Up",
+                    endpointLogInLogOut: endpoint,
+                    Home: "Home",
+                    Add: "Add a car part",
+                    Show: "Find a Car Part",
+                    List: "Show all Car Parts",
+                    Edit: "Update a Car Part",
+                    Delete: "Delete a Car Part",
+                    Current: "English",
+                    project: projs,
+                    loggedInUser: login,
+                    accessProject: true,
+                    accessProjectId: accessProject,
+                    accessProjectName: AccessProjectName
+                }
+
+            }
+
+            // If the language is english
+            if (!lang || lang === 'en') {
+                output.signUpText = "Sign Up";
+                output.Add = role === 1 ? "Add a car part" : "";
+                output.Show = "Find a Car Part";
+                output.List = "Show all Car Parts";
+                output.Edit = role === 1 ? "Update a Car Part" : "";
+                output.Delete = role === 1 ? "Delete a Car Part" : "";
+            }
+            // If the language is french
+            else{
+                output.signUpText = "Enregistrer";
+                output.Add = "Ajouter une Pièce Auto";
+                output.Show = "Trouver une Pièce Auto";
+                output.List = "Afficher Toutes les Pièces de Voiture";
+                output.Edit = "Mettre à Jour une Pièce Auto";
+                output.Delete = "Supprimer une Pièce Auto";
+
+                if(logInText === "Log In"){
+                    output.logInlogOutText = "Connexion";
+                }
+                else if(logInText === "Log Out"){
+                    output.logInlogOutText = "Se déconnecter";
+                }
+            }
+
+            logger.info(`RETRIEVED ALL car parts from database -- getAllCarParts`);
+            response.status(200).render('home.hbs', output)
+        }  
+    }
+    catch(error){
+
+        // If the error is an instance of the DatabaseConnectionError error
+        if (error instanceof sqlModel.DatabaseConnectionError){
+            logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
+            response.status(500).render('home.hbs', {message: "Error connecting to database."});
+        }
+        // If the error is an instance of the InvalidInputError error
+        else if (error instanceof sqlModel.InvalidInputError){
+            logger.error("InvalidInputError when RETRIEVING all car parts -- getAllCarParts");
+            response.status(404).render('home.hbs', {message: "Invalid input, check that all fields are alpha numeric where applicable."});
+        }
+        // If any other error
+        else {
+            logger.error("OTHER error when RETRIEVING all car parts -- getAllCarParts");
+            response.status(500).render('error.hbs', {message: `Unexpected error while trying to show part: ${error.message}`});
+        }
+    }
+}
+
 /**
  * DELETE controller method that allows the user to delete a specific part given it's part number
  * @param {*} request 
@@ -414,14 +624,45 @@ async function addCarPartToProject(request, response){
     }
 }
 
+/**
+ * Deletes the specified car part from the database.
+ * @param {*} request 
+ * @param {*} response 
+ */
+async function deleteRowCarPart(request, response){
+    try {
+        // Getting the values
+        let thePartNumber = request.params.partNumber;
+
+        // Delete from any project first
+        let deletedPartProject = await projectModel.deletePartFromProjectWithNumber(partNumber);
+        // Then delete the car part
+        let deletedPart = await sqlModel.deleteCarPart(thePartNumber);
+
+        if(deletedPartProject && deletedPart){
+            response.status(200);
+        }
+        else{
+            response.status(404);
+        }
+
+        response.redirect('/parts/table/delete');
+    } 
+    catch (error) {
+        
+    }
+}
+
+
 router.post("/parts", createPart)
 router.get("/parts/:partNumber", getPartByNumber)
 router.get("/parts", getAllCarParts)
+router.get("/parts/table/delete", deleteSpecificCarPart);
 router.put("/parts/:partNumber", updatePartName)
-router.delete("/parts/:partNumber", deletePart)
+router.post("/parts/delete/:partNumber", deleteRowCarPart)
 router.get("/", getAllCarParts)
-
 router.get("/parts/addto/:projectId", addCarPartToProject);
+
 
 
 module.exports = {

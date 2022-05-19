@@ -1,1 +1,21 @@
-<h2>{{this.message}}</h2>
+
+
+<div id="error-container">
+    <div style="display: flex; flex-direction: row; align-items: center;">
+        <img src="/images/gear-error.png" alt="Gear error icon" style="width:45px;">
+        <h1 style="margin-left: 0.75rem;">{{errorCode}} Error</h2>
+    </div>
+
+    <div id="text-container-error">
+        <h4>Sorry for the inconvenience!</h4>
+        <h4>There was a slight error...</h4>
+    </div>
+
+    <div id="error-container-going-back-home">
+        <p>Would you like to go back to the home page?</p>
+        <a href="/" id="error-button-back-home">
+            <i class='fas fa-arrow-left' style='font-size:17px; margin-right: 4px;'></i>
+            Home Page
+        </a>
+    </div>
+</div>

@@ -6,7 +6,7 @@ const logger = require('../logger');
 const model = require('../models/carPartModelMysql');
 const userModel = require('../models/userModel');
 const partModel = require('../models/carPartModelMysql');
-const { DatabaseConnectionError } = require('../models/carPartModelMysql.js');
+//const { DatabaseConnectionError } = require('../models/carPartModelMysql.js');
 var connection;
 
 /**
@@ -136,9 +136,6 @@ async function getAllProjects(username){
  */
 async function addPartToProject(projectId, partNumber){
     try {
-        if (!connection){
-            connection = await model.getConnection();
-        }
         if (await projectExists(projectId) && await partModel.verifyCarPartExists(partNumber)) {
             if(!await partExistsInProject(projectId, partNumber)){
                 const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values (${projectId}, ${partNumber})`;
@@ -245,7 +242,7 @@ async function getProjectByProjectId(projectId){
 async function updateProject(newName, newDescription, projectId){
     try {
         // Checks if the project exists first
-        if(projectExists(projectId)){
+        if(await projectExists(projectId)){
             const selectStatement = `UPDATE Project SET name = '${newName}', description = '${newDescription}' WHERE projectId = '${projectId}';`;
             let projectArray = await connection.query(selectStatement);
             return projectArray[0];
@@ -315,7 +312,12 @@ async function deletePartFromProject(projectId, partNumber){
         if(projectExists(projectId)){
             // Delete from the PartsProject table first (clears all parts associated with this project)
             let selectStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
-            await connection.execute(selectStatement);
+            let results = await connection.execute(selectStatement);
+
+            if(results[0].rowsAffected === 0){
+                return false;
+            }
+            return true;
         }
     } 
     catch (error) {
@@ -324,6 +326,28 @@ async function deletePartFromProject(projectId, partNumber){
     }
 }
 
+async function deletePartFromProjectWithNumber(partNumber){
+    try {
+        // Delete from the PartsProject table first (clears all parts associated with this project)
+        let selectStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
+        let results = await connection.execute(selectStatement);
+
+        if(results[0].rowsAffected === 0){
+            return false;
+        }
+        return true;
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
+
+
+/**
+ * Error representing a databases connection error.
+ */
+ class DatabaseConnectionError extends Error {}
 
 module.exports = {
     initializeProjectModel,
@@ -336,5 +360,6 @@ module.exports = {
     updateProject,
     getProjectCarParts,
     deleteProject,
-    deletePartFromProject
+    deletePartFromProject,
+    deletePartFromProjectWithNumber
 }

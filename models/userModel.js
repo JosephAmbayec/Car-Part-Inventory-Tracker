@@ -48,11 +48,11 @@ async function initializeUserModel(dbname, reset){
  */
 async function resetTables(connection){
     // Dropping the tables
-    resetTable("PartProject");
-    resetTable("UsersProject");
-    resetTable("Project");
-    resetTable("Users");
-    resetTable("Roles");
+    await resetTable("PartProject");
+    await resetTable("UsersProject");
+    await resetTable("Project");
+    await resetTable("Users");
+    await resetTable("Roles");
 }
 
 /**
@@ -137,6 +137,9 @@ async function addUser(username, password, role) {
         logger.error("User NOT ADDED due to already existing in database");
         throw new UserLoginError("Username already exists.");
     }
+
+    if (role == undefined)
+        role = 2;
     // Checks for valid username
     if (userUtils.isValidUsername(username)) {
 
@@ -291,6 +294,12 @@ async function validateLogin(username, password){
  * Error representing a user login error.
  */
 class UserLoginError extends Error {}
+
+
+/**
+ * Error representing a databases connection error.
+ */
+ class DatabaseConnectionError extends Error {}
 
 //#endregion
 

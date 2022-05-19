@@ -33,8 +33,16 @@ footer {
     border: 1px solid #dddddd;
     text-align: left;
     padding: 8px;
+    text-align: center;
   }
 
+  .trash-del{
+    color:  #0D6EFD ;
+  }
+  .trash-del:hover{
+    transition: all 0.2s ease-in;
+    transform: scale(1.2);
+  }
 .title { 
     color:  #0D6EFD ;
     text-decoration: none;
@@ -42,6 +50,10 @@ footer {
 }
 .title:hover{
     color:  #0D6EFD ;
+}
+#select-inventory-action-text{
+  text-align: center;
+  margin-top: 5rem;
 }
 
 .inventory-actions-button{
@@ -61,9 +73,10 @@ footer {
 #aside-sidebar{
   display: flex;
   flex-direction: column;
-  align-items: initial;
+  /* align-items: inherit; */
   border: 0.5px solid #0D6EFD ;
   width: 17rem;
+  height:min-content;
   border-radius: 5px;
   justify-content: flex-end;
   margin-left: 6rem;
@@ -167,12 +180,14 @@ table {
 }
 
 #add-project-btn{
-    /* border: 1px solid #0D6EFD; */
     border-radius: 0.85rem;
-    /* color: black; */
-    /* background: none; */
+    cursor: pointer;
     padding: 3px 5px;
-    margin: 0 auto;
+    /* margin: 0 auto; */
+    text-align: center;
+    width: 175px;
+    height: 32px; 
+    margin-top: 2rem;
 }
 
 .grid-container-projects{
@@ -366,7 +381,8 @@ table {
 
  #show-project-flex{
    display: grid;
-   grid-template-columns: 1.5fr 5fr;
+   grid-template-columns: 2fr 5fr;
+   gap: 1em;
 }
 #show-project-first-flex{
   /* flex: 1.5; */
@@ -376,10 +392,12 @@ table {
   /* display: flex;
   flex-direction: column;
   justify-content: center; */
-  width: 100%;
+  width: 75%;
+  margin-left: auto;
+  margin-right:auto;
 }
 #show-project-all-parts{
-  /* flex:3; */
+  padding: 0 1rem 0 1.5rem;
 }
 
 .dropdown-button{
@@ -417,6 +435,7 @@ table {
 
 .card-show-specific{
   width: 100%;
+  margin-top: 1.5rem;
 }
 .card-show-specific:hover{
   cursor: pointer;
@@ -482,6 +501,45 @@ table {
 
  /* #endregion */
 
+/* #region error page*/
 
+#error-container{
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  text-align: center;
+  margin-top:3rem;
+}
+#error-button-back-home{
+  cursor: pointer; 
+  background-color: #0D6EFD;
+  color:white;
+  width:200px;
+  height: 50px;
+  border-radius: 10px;
+  padding: 0.35rem 0.75rem;
+  transition: 200ms ease-in-out;
+}
+#error-button-back-home:hover{
+  border: 1px solid #0D6EFD;
+  background-color: white;;
+  color: #0D6EFD;
+}
+#text-container-error{
+  margin-top: 2rem;
+  text-align: center;
+}
+#text-container-error > *{
+  margin-top: 15px;
+  text-align: center;
+  font-size:30px;
+}
+#error-container p{
+  font-size:18.5px;
+}
+#error-container-going-back-home{
+  margin-top: 4rem;
+}
 
- 
+/* #endregion*/
