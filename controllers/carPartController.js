@@ -147,7 +147,8 @@ async function getAllCarParts(request, response){
                 Edit: "Update a Car Part",
                 Delete: "Delete a Car Part",
                 Current: "English",
-                loggedInUser: login
+                loggedInUser: login,
+                projects_text: "Projects",
             }
 
             logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
@@ -194,7 +195,8 @@ async function getAllCarParts(request, response){
                 Delete: "Delete a Car Part",
                 Current: "English",
                 project: projs,
-                loggedInUser: login
+                loggedInUser: login,
+                about_text: "About Us"
             };
 
             if (!lang || lang === 'en') {
