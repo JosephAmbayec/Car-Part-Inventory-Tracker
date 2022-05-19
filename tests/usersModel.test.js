@@ -25,7 +25,7 @@ beforeEach(async () => {
 afterEach(async () => {
     connection = await model.getConnection();
     if (connection) {
-        await connection.close();
+        await connection.end();
     } 
 });
 
