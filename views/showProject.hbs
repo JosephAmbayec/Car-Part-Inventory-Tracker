@@ -62,6 +62,9 @@
         </div> 
     {{!-- </div> --}}
 
+    {{#if noParts}}
+        <h2>No car parts added in this project</h2>
+    {{else}}
         <div id="show-project-all-parts">
             <div class="row">
                 {{#each projectParts}}
@@ -85,9 +88,9 @@
                                         </div>
                                         <!--Delete project button-->
                                         <div class="text-center">
-                                            <a class="btn btn-primary del-button-card" title="Delete from project">
+                                            <button type="submit" class="btn btn-primary del-button-card" title="Delete from project">
                                                 <i class="fa fa-trash-o" style="font-size:26px;"></i>
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </form>
@@ -119,4 +122,5 @@
                     </div>
             {{/each}} --}}
         </div>
+    {{/if}}
 </div>

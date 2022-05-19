@@ -242,10 +242,15 @@ async function showSpecificProject(request, response){
     let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
     let login = loginController.authenticateUser(request);
     let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
-    let showImage = false;
+    let noPartsFound, name, description;
 
     if(arrayOFCatPartsInProject.length === 0){
-
+        noPartsFound = true;
+    }
+    else{
+        name = theProject[0].name;
+        theProject[0].description;
+        projectId = projectID;
     }
     // Set the login to the username if response is not null
     if(login != null) {
@@ -263,10 +268,11 @@ async function showSpecificProject(request, response){
             clickedNewProject: false,
             Home: "Home",
             loggedInUser: login,
-            projectName: theProject[0].name,
-            projectDescription: theProject[0].description,
+            projectName:name,
+            projectDescription: description,
             projectId: projectID,
-            projectParts: arrayOFCatPartsInProject
+            projectParts: arrayOFCatPartsInProject,
+            noParts: noPartsFound
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
@@ -402,7 +408,7 @@ router.post("/projects/:projectId/update", updateProject);
 
 router.post("/projects/:projectId", addCarPart)
 router.get("/projects/del/:projectId", deleteProject);
-router.post("/projects/del/part/:partNumber", deletePartFromProject);
+router.post("/projects/del/part/:projectId", deletePartFromProject);
 
 
 module.exports = {
