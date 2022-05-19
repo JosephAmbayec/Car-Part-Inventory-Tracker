@@ -159,8 +159,7 @@ function showForm(request, response) {
         // Case of deleting a car part
         case 'delete':
             logger.info(`SWITCH CASE delete -- showForm`);
-            // showDeleteForm(request, response);
-            response.redirect('/parts/table/delete');
+            showDeleteForm(request, response);
             break;
 
         // Default case
@@ -204,16 +203,8 @@ async function showAddForm(request, response) {
             method: "post",
             Current: "English",
             legend: "Please enter details for new car part: ",
-            formfields: [
-                { field: "partNumber", pretty: "Part Number", type: "number", required: "required" },
-                { field: "name", pretty: "Part Name", required: "required" }, 
-                { isCondition: true, field: "condition", pretty: "Condition", required: "required",
-                    conditions: [
-                       "New",
-                        "Used"
-                    ]}, 
-                { field: "image", pretty: "Image URL" }
-            ],
+            formfields: [{ field: "partNumber", pretty: "Part Number", type: "number", required: "required" },
+            { field: "name", pretty: "Part Name", required: "required" }, { field: "condition", pretty: "Condition" }, { field: "image", pretty: "Image URL" }],
             Submit: "Submit",
             display_signup: signupDisplay,
             display_login: "block",
@@ -253,16 +244,8 @@ async function showAddForm(request, response) {
             method: "post",
             Current: "French",
             legend: "Veuillez entrer les détails de la nouvelle pièce de voiture: ",
-            formfields: [
-                { field: "partNumber", pretty: "Numéro de Pièce", type: "number", required: "required" },
-                { field: "name", pretty: "Nom de la Pièce", required: "required" }, 
-                { isCondition: true, field: "condition", pretty: "État" ,
-                    conditions: [
-                        "Nouveau",
-                        "Utilisé"
-                    ]},  
-                { field: "image", pretty: "URL de L'image" }
-            ],
+            formfields: [{ field: "partNumber", pretty: "Numéro de Pièce", type: "number", required: "required" },
+            { field: "name", pretty: "Nom de la Pièce", required: "required" }, { field: "condition", pretty: "État" }, { field: "image", pretty: "URL de L'image" }],
             Submit: "Soumettre",
             display_signup: signupDisplay,
             display_login: "block",

@@ -54,7 +54,6 @@
             </div>
         </div>
 {{/if}}
-
 <div class="row d-flex justify-content-start">
   <!--Sidebar containing all CRUD buttons-->
   <div id="aside-sidebar" class="col-2 ">
@@ -116,7 +115,7 @@
 
         <section id="form-container-home">
           <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
-            enctype="application/x-www-form-urlencoded" id="addingForm">
+            enctype="application/x-www-form-urlencoded">
 
             <input type="hidden" name="_method" value="{{methodOverride}}" required>
 
@@ -124,22 +123,7 @@
             {{#each formfields}}
               <div class="form-group row justify-content-center">
                 <label for="{{field}}">{{pretty}}</label><br>
-                
-                <!--If the form field is the condition (to use the select)s-->
-                {{#if isCondition}}
-                  <select id="{{field}}" name="addingForm" form="addingForm" {{required}}
-                    style="padding: 2px 0;">
-
-                    <!--Adding each condition to the dropdown-->
-                    {{#each conditions}}
-                      <option>{{this}}</option>
-                    {{/each}}
-
-                  </select>
-                <!--If it's a normal input field-->
-                {{else}}
-                  <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
-                {{/if}}
+                <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
               </div>
               <br>
             {{/each}}
@@ -185,20 +169,13 @@
             <tr>
               <!--Is the user is logged in, show add to project-->
               {{#if loggedInUser}}
-                {{#if isDelete}}
-                {{else}}
-                  <th>Add to Project</th>
-                {{/if}}
+                <th>Add to Project</th>
               {{/if}}
 
               <th>Part #</th>
               <th>Name</th>
               <th>Condition</th>
               <th>Image</th>
-
-              {{#if isDelete}}
-                <th>Delete</th>
-              {{/if}}
             </tr>
 
               <!--Formatting table for each car part-->
@@ -206,34 +183,30 @@
                 <tr>
                   <!--Is the user is logged in, show add to project-->
                   {{#if ../loggedInUser}}
-                    {{#if ../isDelete}}
-                    {{else}}
-                      <td style="display: flex; justify-content:center;">
-                          <!-- Default dropend button -->
-                          <div class="btn-group dropend" >
-                            <!--Add button-->
-                            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-button" data-bs-toggle="dropdown" 
-                                aria-expanded="false" style="display: flex; align-items: center; justify-content: space-between; padding: 7.5px 14px;">
-                              <i class="fa fa-plus" style="font-size:17px; display: flex; align-items: center; margin-right: 0.5rem;"></i>
-                            </button>
-                            
-                            <ul class="dropdown-menu">
-                              <!--Add project option to dropdown-->
-                              {{#each ../project}}
-                                <!--Create form from dropdown option-->
-                                <form action="/projects/{{this.projectId}}" method="POST" onsubmit="this.action = this.action + '/'+ this.projectId.value" role="form" enctype="application/x-www-form-urlencoded">
-                                  <!--To keep track of the partNumber-->
-                                  <input type="hidden" name="partNumber" value="{{../partNumber}}"/>
-                                  <!--Sub,it button for dropdown option-->
-                                  <li class="dropdown-menu-items" value="{{this.projectId}}" >
-                                    <button type="submit" class="dropdown-item" id="{{this.projectId}}" >{{this.name}}</button> <!---href="/parts/addto/{{this.projectId}}"-->
-                                  </li>
-                                </form>
-                              {{/each}}
-                            </ul>
-                          </div>
-                        </td>
-                    {{/if}}
+                    <td style="display: flex; justify-content:center;">
+                        <!-- Default dropend button -->
+                        <div class="btn-group dropend" >
+                          <!--Add button-->
+                          <button type="button" class="btn btn-secondary dropdown-toggle dropdown-button" data-bs-toggle="dropdown" 
+                              aria-expanded="false" style="display: flex; align-items: center; justify-content: space-between; padding: 7.5px 14px;">
+                            <i class="fa fa-plus" style="font-size:17px; display: flex; align-items: center; margin-right: 0.5rem;"></i>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <!--Add project option to dropdown-->
+                            {{#each ../project}}
+                              <!--Create form from dropdown option-->
+                              <form action="/projects/{{this.projectId}}" method="POST" onsubmit="this.action = this.action + '/'+ this.projectId.value" role="form" enctype="application/x-www-form-urlencoded">
+                                <!--To keep track of the partNumber-->
+                                <input type="hidden" name="partNumber" value="{{../partNumber}}"/>
+                                <!--Sub,it button for dropdown option-->
+                                <li class="dropdown-menu-items" value="{{this.projectId}}" >
+                                  <button type="submit" class="dropdown-item" id="{{this.projectId}}" >{{this.name}}</button> <!---href="/parts/addto/{{this.projectId}}"-->
+                                </li>
+                              </form>
+                            {{/each}}
+                          </ul>
+                        </div>
+                      </td>
                   {{/if}} 
                   
                   <td>{{partNumber}}</td>
@@ -248,6 +221,7 @@
                         Show image
                       </button>
                     </td>
+                </tr>
 
                     <!--bootstrap for showing the image-->
                     <div class="modal fade" id="{{partNumber}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -267,23 +241,11 @@
                         </div>
                       </div>
                     </div>
-                  {{else}}
-                    <td></td>
-                  {{/if}}
+                {{else}}
 
-                  <!--If delete-->
-                  {{#if ../isDelete}}
-                    <td>
-                      <form action="/parts/delete/{{partNumber}}" method="post">
-                          <!--The delete button for the current row-->
-                          <button type="submit" name="choice" value="delete row" class="trash-delete" 
-                                          style="font-size:27px; background-color: transparent; border: none;">
-                              <i class="fa fa-trash-o trash-del"></i>
-                          </button>
-                      </form>
-                    </td>
-                  {{/if}}
-                </tr>
+                <td></td>
+                {{/if}}
+
               {{/each}}
           </table>
         </div>
