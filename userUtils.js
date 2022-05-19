@@ -77,7 +77,6 @@ function isValidPassword(password){
  * @returns The hashed password.
  */
 async function hashPassword(password){
-    console.log("test2")
     let hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     logger.info(`Hashed password: ${hashedPassword} -- hashPassword`);
     return hashedPassword;

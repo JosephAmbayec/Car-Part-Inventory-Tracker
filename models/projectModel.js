@@ -6,7 +6,7 @@ const logger = require('../logger');
 const model = require('../models/carPartModelMysql');
 const userModel = require('../models/userModel');
 const partModel = require('../models/carPartModelMysql');
-const { DatabaseConnectionError } = require('../models/carPartModelMysql.js');
+//const { DatabaseConnectionError } = require('../models/carPartModelMysql.js');
 var connection;
 
 /**
@@ -324,6 +324,11 @@ async function deletePartFromProject(projectId, partNumber){
     }
 }
 
+
+/**
+ * Error representing a databases connection error.
+ */
+ class DatabaseConnectionError extends Error {}
 
 module.exports = {
     initializeProjectModel,
