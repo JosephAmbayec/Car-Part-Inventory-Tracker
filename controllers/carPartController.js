@@ -142,6 +142,7 @@ async function getAllCarParts(request, response){
         }
         else
             AccessProject = false
+
         // If no car parts were found
         if (parts.length === 0){
 
@@ -199,7 +200,8 @@ async function getAllCarParts(request, response){
                     loggedInUser: login,
                     accessProject: true,
                     accessProjectId: accessProject,
-                    accessProjectName: AccessProjectName
+                    accessProjectName: AccessProjectName,
+                    projects_text: "Projects",
                 }
 
             }
@@ -252,7 +254,8 @@ async function getAllCarParts(request, response){
                 Current: "English",
                 project: projs,
                 loggedInUser: login,
-                about_text: "About Us"
+                about_text: "About Us",
+                projects_text: "Projects",
             };
 
             if (AccessProject){
@@ -275,7 +278,8 @@ async function getAllCarParts(request, response){
                     loggedInUser: login,
                     accessProject: true,
                     accessProjectId: accessProject,
-                    accessProjectName: AccessProjectName
+                    accessProjectName: AccessProjectName,
+                    projects_text: "Projects",
                 }
 
             }
@@ -288,6 +292,7 @@ async function getAllCarParts(request, response){
                 output.List = "Show all Car Parts";
                 output.Edit = role === 1 ? "Update a Car Part" : "";
                 output.Delete = role === 1 ? "Delete a Car Part" : "";
+                output.projects_text = "Projects";
             }
             // If the language is french
             else{
@@ -297,6 +302,7 @@ async function getAllCarParts(request, response){
                 output.List = "Afficher Toutes les Pièces de Voiture";
                 output.Edit = "Mettre à Jour une Pièce Auto";
                 output.Delete = "Supprimer une Pièce Auto";
+                output.projects_text = "Projets";
 
                 if(logInText === "Log In"){
                     output.logInlogOutText = "Connexion";
