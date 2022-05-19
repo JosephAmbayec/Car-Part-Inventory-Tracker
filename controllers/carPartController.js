@@ -115,7 +115,16 @@ async function getAllCarParts(request, response){
         let lang = request.cookies.language;
         let signupDisplay, endpoint, logInText;
         let output;
-
+        let accessProject = request.cookies.lastAccessedProject;
+        let AccessProject;
+        let AccessProjectName;
+        if (accessProject && accessProject != '-1'){
+            AccessProject = true;
+            AccessProjectName = await projectModel.getProjectByProjectId(accessProject)
+            AccessProjectName = AccessProjectName[0].name;
+        }
+        else
+            AccessProject = false
         // If no car parts were found
         if (parts.length === 0){
 
@@ -148,6 +157,30 @@ async function getAllCarParts(request, response){
                 Delete: "Delete a Car Part",
                 Current: "English",
                 loggedInUser: login
+            }
+
+            if (AccessProject){
+                output = {                
+                    showList: true,
+                    noCarParts: true,
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    signUpText: "Sign Up",
+                    endpointLogInLogOut: endpoint,
+                    Home: "Home",
+                    Add: "Add a car part",
+                    Show: "Find a Car Part",
+                    List: "Show all Car Parts",
+                    Edit: "Update a Car Part",
+                    Delete: "Delete a Car Part",
+                    Current: "English",
+                    loggedInUser: login,
+                    accessProject: true,
+                    accessProjectId: accessProject,
+                    accessProjectName: AccessProjectName
+                }
+
             }
 
             logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
@@ -196,6 +229,31 @@ async function getAllCarParts(request, response){
                 project: projs,
                 loggedInUser: login
             };
+
+            if (AccessProject){
+                output = {                
+                    part: parts, 
+                    showList: true,
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    signUpText: "Sign Up",
+                    endpointLogInLogOut: endpoint,
+                    Home: "Home",
+                    Add: "Add a car part",
+                    Show: "Find a Car Part",
+                    List: "Show all Car Parts",
+                    Edit: "Update a Car Part",
+                    Delete: "Delete a Car Part",
+                    Current: "English",
+                    project: projs,
+                    loggedInUser: login,
+                    accessProject: true,
+                    accessProjectId: accessProject,
+                    accessProjectName: AccessProjectName
+                }
+
+            }
 
             if (!lang || lang === 'en') {
                 output.signUpText = "Sign Up";
