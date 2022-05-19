@@ -312,8 +312,30 @@ async function deletePartFromProject(projectId, partNumber){
         if(projectExists(projectId)){
             // Delete from the PartsProject table first (clears all parts associated with this project)
             let selectStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
-            await connection.execute(selectStatement);
+            let results = await connection.execute(selectStatement);
+
+            if(results[0].rowsAffected === 0){
+                return false;
+            }
+            return true;
         }
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
+
+async function deletePartFromProjectWithNumber(partNumber){
+    try {
+        // Delete from the PartsProject table first (clears all parts associated with this project)
+        let selectStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
+        let results = await connection.execute(selectStatement);
+
+        if(results[0].rowsAffected === 0){
+            return false;
+        }
+        return true;
     } 
     catch (error) {
         logger.error(error);
@@ -338,5 +360,6 @@ module.exports = {
     updateProject,
     getProjectCarParts,
     deleteProject,
-    deletePartFromProject
+    deletePartFromProject,
+    deletePartFromProjectWithNumber
 }

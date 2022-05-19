@@ -384,10 +384,12 @@ table {
    grid-template-columns: 2fr 5fr;
    gap: 1em;
 }
-#show-project-first-flex{
-  /* flex: 1.5; */
-  /* justify-content: center; */
-}
+
+/* #show-project-first-flex{
+  flex: 1.5; 
+  justify-content: center;
+} */
+
 #show-project-update-form{
   /* display: flex;
   flex-direction: column;
@@ -501,6 +503,45 @@ table {
 
  /* #endregion */
 
+/* #region error page*/
 
+#error-container{
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  text-align: center;
+  margin-top:3rem;
+}
+#error-button-back-home{
+  cursor: pointer; 
+  background-color: #0D6EFD;
+  color:white;
+  width:200px;
+  height: 50px;
+  border-radius: 10px;
+  padding: 0.35rem 0.75rem;
+  transition: 200ms ease-in-out;
+}
+#error-button-back-home:hover{
+  border: 1px solid #0D6EFD;
+  background-color: white;;
+  color: #0D6EFD;
+}
+#text-container-error{
+  margin-top: 2rem;
+  text-align: center;
+}
+#text-container-error > *{
+  margin-top: 15px;
+  text-align: center;
+  font-size:30px;
+}
+#error-container p{
+  font-size:18.5px;
+}
+#error-container-going-back-home{
+  margin-top: 4rem;
+}
 
- 
+/* #endregion*/

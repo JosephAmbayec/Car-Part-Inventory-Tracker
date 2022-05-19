@@ -52,7 +52,7 @@ async function createUser(request, response){
                 oppositeFormAction: 'login',
                 oppositeFormName: 'Connexion',
                 dontHaveAccountText: "Vous avez déjà un compte?",
-                Home: "Retournez",
+                Home: "Accueil",
             }
         }
 
@@ -123,7 +123,7 @@ async function createUser(request, response){
                     logInlogOutText: "Déconnecter",
                     endpointLogInLogOut: "login",
                     loggedInUser: username,
-                    Home: "Acceuil",
+                    Home: "Accueil",
                     Add: "Ajouter une Pièce Auto",
                     Show: "Trouver une Pièce Auto",
                     List: "Afficher Toutes les Pièces de Voiture",
@@ -179,7 +179,7 @@ async function createUser(request, response){
                     usernameHeader: "Nom D'utilisateur",
                     passwordHeader: "Mot de Passe",
                     confirmPasswordHeader: "Confirmez le Mot de Passe",
-                    Home: "Retournez",
+                    Home: "Accueil",
                 } 
             }
 
@@ -289,7 +289,7 @@ async function showSignup(request, response){
             usernameHeader: "Nom D'utilisateur",
             passwordHeader: "Mot de Passe",
             confirmPasswordHeader: "Confirmez le Mot de Passe",
-            Home: "Retournez",
+            Home: "Accueil",
             about_text: "À propos de nous"
         }
     }
