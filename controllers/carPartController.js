@@ -139,6 +139,7 @@ async function getAllCarParts(request, response){
                 signupDisplay = "block";
                 endpoint = "login";
                 logInText = "Log In";
+                AccessProject = false;
             }
 
             output = {
@@ -200,6 +201,7 @@ async function getAllCarParts(request, response){
                 signupDisplay = "block";
                 endpoint = "login";
                 logInText = "Log In";
+                AccessProject = false;
             }
 
             let projs = await projectModel.getAllProjects(login);
