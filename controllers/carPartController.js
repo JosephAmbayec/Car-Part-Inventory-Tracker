@@ -624,13 +624,16 @@ async function addCarPartToProject(request, response){
     }
 }
 
+/**
+ * Deletes the specified car part from the database.
+ * @param {*} request 
+ * @param {*} response 
+ */
 async function deleteRowCarPart(request, response){
     try {
         // Getting the values
         let thePartNumber = request.params.partNumber;
-        
-        let result = await sqlModel.deleteCarPart(thePartNumber);
-        
+        await sqlModel.deleteCarPart(thePartNumber);
         response.redirect('/parts/table/delete');
     } 
     catch (error) {
