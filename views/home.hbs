@@ -94,20 +94,32 @@
   <div class="col-7">
     <!--Showing the specified form-->
     {{#if showForm}}
-        <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
-          enctype="application/x-www-form-urlencoded">
-          <legend>{{legend}}</legend>
-          <input type="hidden" name="_method" value="{{methodOverride}}" required>
+        <div style="text-align: center; margin-right: auto; margin-left: auto; width: 70%;">
+          <legend style="width: 100%;">{{legend}}</legend>
+        </div>
 
-          <!--Form fields for each form-->
-          {{#each formfields}}
-            <label for="{{field}}">{{pretty}}</label><br>
-            <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
-            <br>
-          {{/each}}
+        <section id="form-container-home">
+          <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
+            enctype="application/x-www-form-urlencoded">
 
-          <button id="submitAction" type="submit" class="btn btn-primary">{{Submit}}</button>
-        </form>
+            <input type="hidden" name="_method" value="{{methodOverride}}" required>
+
+            <!--Form fields for each form-->
+            {{#each formfields}}
+              <div class="form-group row justify-content-center">
+                <label for="{{field}}">{{pretty}}</label><br>
+                <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
+              </div>
+              <br>
+            {{/each}}
+
+            <div class="row justify-content-center">
+              <button id="submitAction" type="submit" class="btn btn-primary" style="width: 100%;">
+                {{Submit}}
+              </button>
+            </div>
+          </form>
+        </section>
     {{/if}}
 
     <!--Shows the list of all car parts-->

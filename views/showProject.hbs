@@ -71,11 +71,10 @@
                     <div class="col-sm-4">
                         <div class="card card-show-specific">
                             <div class="card-body">
-                                <form action="/projects/del/part/{{this.projectId}}" method="post" enctype="multipart/form-data">
-                                    <div class="card-grid">
-                                    
-                                        <input type="hidden" name="_method" value="{{partNumber}}" required>
+                                <form action="/projects/del/part/{{../projectId}}/{{partNumber}}" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="_method" value="{{partNumber}}" required>
 
+                                    <div class="card-grid">
                                         <!--Car part information-->
                                         <div style="display:flex; flex-direction:column; ">
                                             {{#if image}}

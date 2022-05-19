@@ -231,6 +231,8 @@ async function addCarPart(request, response){
     }
 }
 
+let theProjectId;
+
 /**
  * Shows the specified project on a new page.
  * @param {*} request 
@@ -243,6 +245,7 @@ async function showSpecificProject(request, response){
     let login = loginController.authenticateUser(request);
     let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
     let noPartsFound, name, description;
+    // console.log(this.);
 
     if(arrayOFCatPartsInProject.length === 0){
         noPartsFound = true;
@@ -250,7 +253,9 @@ async function showSpecificProject(request, response){
     else{
         name = theProject[0].name;
         theProject[0].description;
-        projectId = projectID;
+    }
+    if(projectID != 'null'){
+        theProjectId = projectID;
     }
     // Set the login to the username if response is not null
     if(login != null) {
@@ -270,7 +275,7 @@ async function showSpecificProject(request, response){
             loggedInUser: login,
             projectName:name,
             projectDescription: description,
-            projectId: projectID,
+            projectId: parseInt(theProjectId),
             projectParts: arrayOFCatPartsInProject,
             noParts: noPartsFound
     }
@@ -363,7 +368,7 @@ async function deletePartFromProject(request, response){
     try {
         // Get the values
         let projectID = request.params.projectId;
-        let partNumber = request.body.partNumber;
+        let partNumber = request.params.partNumber;
         let login = loginController.authenticateUser(request);
 
         // Set the login to the username if response is not null
@@ -408,7 +413,7 @@ router.post("/projects/:projectId/update", updateProject);
 
 router.post("/projects/:projectId", addCarPart)
 router.get("/projects/del/:projectId", deleteProject);
-router.post("/projects/del/part/:projectId", deletePartFromProject);
+router.post("/projects/del/part/:projectId/:partNumber", deletePartFromProject);
 
 
 module.exports = {
