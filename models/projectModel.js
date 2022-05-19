@@ -136,9 +136,6 @@ async function getAllProjects(username){
  */
 async function addPartToProject(projectId, partNumber){
     try {
-        if (!connection){
-            connection = await model.getConnection();
-        }
         if (await projectExists(projectId) && await partModel.verifyCarPartExists(partNumber)) {
             if(!await partExistsInProject(projectId, partNumber)){
                 const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values (${projectId}, ${partNumber})`;
@@ -245,7 +242,7 @@ async function getProjectByProjectId(projectId){
 async function updateProject(newName, newDescription, projectId){
     try {
         // Checks if the project exists first
-        if(projectExists(projectId)){
+        if(await projectExists(projectId)){
             const selectStatement = `UPDATE Project SET name = '${newName}', description = '${newDescription}' WHERE projectId = '${projectId}';`;
             let projectArray = await connection.query(selectStatement);
             return projectArray[0];
