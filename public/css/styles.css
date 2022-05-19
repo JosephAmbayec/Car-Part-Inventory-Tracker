@@ -420,10 +420,12 @@ table {
    grid-template-columns: 2fr 5fr;
    gap: 1em;
 }
-#show-project-first-flex{
-  /* flex: 1.5; */
-  /* justify-content: center; */
-}
+
+/* #show-project-first-flex{
+  flex: 1.5; 
+  justify-content: center;
+} */
+
 #show-project-update-form{
   /* display: flex;
   flex-direction: column;

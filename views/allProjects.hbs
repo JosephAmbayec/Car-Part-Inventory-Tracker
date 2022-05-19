@@ -34,7 +34,7 @@
         <a href="/projects" id="add-project-btn" class="btn btn-outline-primary"
             style="cursor: pointer; width: 175px; height: 32px; margin: 2rem 1rem;">
             <i class='fas fa-arrow-left' style='font-size:17px; margin-right: 4px;'></i>
-            Back to Projects
+            {{back_button}}
         </a>
 
         <!--container for form-->
@@ -48,16 +48,16 @@
                 
                 <!--Project Name-->
                 <div class="form-group row justify-content-center">
-                    <label for="name" class="form-label">Project Name</label>
-                    <input name="name" id="name" placeholder="Enter project name"
+                    <label for="name" class="form-label">{{project_name}}</label>
+                    <input name="name" id="name" placeholder="{{name_field}}"
                         type="text" class="form-control" required/>
                 </div>
 
                 <!--Project Description-->
                 <div class="form-group row justify-content-center">
-                    <label for="description" class="form-label">Project Description</label>
-                    <input name="description" id="description" placeholder="Enter a description"
-                            type="text" class="form-control" required/>
+                    <label for="description" class="form-label">{{project_description}}</label>
+                    <input name="description" id="description" placeholder="{{description_field}}"
+                        type="text" class="form-control" required/>
                 </div>
 
                 <!--Submit button-->
@@ -74,7 +74,7 @@
             <form id="new-project-form" action="/projects/new" method="post">
                 <button id="add-project-btn" class="btn btn-outline-primary">
                     <i class="fa fa-plus" style="font-size:17px; margin-right: 4px;"></i> 
-                    New Project
+                    {{new_project}}
                 </button>
             </form>
         </div>
@@ -93,7 +93,7 @@
                 {{!-- <div class="row hidden-md-up"> --}}
                     <div id="container-projs" class="grid-item-2">
                         <h2 style="text-align: center; margin-top: 2rem; margin-bottom: 2.5rem">
-                            Your Projects</h2>
+                            {{your_projects}}</h2>
 
                         {{#each projects}}
                             <div class="card">
@@ -105,8 +105,8 @@
                                             <h5 class="card-title" id="{{this.name}}">{{this.name}}</h5>
                                             <p class="card-text" id="{{this.description}}">{{this.description}}</p>
                                             <a href="/projects/{{this.projectId}}" id="{{this.projectId}}" class="btn btn-primary stretched-link see-more-projects"
-                                                title="See more about this project">See more</a>
-                                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                                title="See more about this project">{{../see_more}}</a>
+                                            <p class="card-text"><small class="text-muted">{{../last_updated}}</small></p>
                                         </div>
                                         <!--Delete project button-->
                                         <div class="text-center">

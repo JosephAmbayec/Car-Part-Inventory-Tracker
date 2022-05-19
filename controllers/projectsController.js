@@ -153,17 +153,17 @@ async function createProject(request, response) {
  */
 async function showProjects(request, response) {
 
-    try {
-        let login = loginController.authenticateUser(request);
-    
-        // Set the login to the username if response is not null
-        if (login != null) {
-            login = login.userSession.username;
-        }
-    
-        const lang = request.cookies.language;
-        let pageData;
-    
+    let login = loginController.authenticateUser(request);
+
+    // Set the login to the username if response is not null
+    if (login != null) {
+        login = login.userSession.username;
+    }
+
+    const lang = request.cookies.language;
+    let pageData;
+
+    try{
         if (!lang || lang === 'en') {
             pageData = {
                 alertOccurred: false,
@@ -174,7 +174,11 @@ async function showProjects(request, response) {
                 projects: await projectModel.getAllProjects(request.cookies.username),
                 Home: "Home",
                 logInlogOutText: "Log Out",
-                loggedInUser: login
+                loggedInUser: login,
+                new_project: "New Project",
+                your_projects: "Your Projects",
+                see_more: "See more",
+                last_updated: "Last updated 3 minutes ago"
             }
         }
         else {
@@ -187,19 +191,23 @@ async function showProjects(request, response) {
                 projects: await projectModel.getAllProjects(request.cookies.username),
                 Home: "Accueil",
                 logInlogOutText: "Déconnecter",
-                loggedInUser: login
+                loggedInUser: login,
+                new_project: "Nouveau Projet",
+                your_projects: "Vos Projets",
+                see_more: "Voir plus",
+                last_updated: "Dernière mise à jour il y a 3 minutes"
             }
-        }
+        } 
 
         // If there's no projects
         if (pageData.projects.length == 0) {
             logger.info(`CANNOT SHOW PROJECTS TABLE due to there being no projects created -- showProjects`);
             pageData.showTable = false;
         }
-    
+
         logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
         response.status(201).render('allProjects.hbs', pageData);
-    } 
+    }
     catch (error) {
         let pageData;
 
@@ -278,7 +286,13 @@ async function showCreateForm(request, response) {
             Home: "Home",
             logInlogOutText: "Log Out",
             loggedInUser: login,
-            clickedNewProject: true
+            clickedNewProject: true,
+            project_name: "Project Name",
+            name_field: "Enter a project name",
+            project_description: "Project Description",
+            description_field: "Enter a description",
+            back_button: "Return"
+
         }
     }
     else {
@@ -292,7 +306,12 @@ async function showCreateForm(request, response) {
             Home: "Accueil",
             logInlogOutText: "Déconnecter",
             loggedInUser: login,
-            clickedNewProject: true
+            clickedNewProject: true,
+            project_name: "Nom du Projet",
+            name_field: "Entrez un nom de Projet",
+            project_description: "Description du Projet",
+            description_field: "Entrez une description",
+            back_button: "Retournez"
         }
     }
 
@@ -415,21 +434,22 @@ let theProjectId;
  * @param {*} response 
  */
 async function showSpecificProject(request, response) {
+    let pageData;
+
     try {
         let projectID = request.params.projectId;
         let theProject = await projectModel.getProjectByProjectId(projectID);
         let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
         let login = loginController.authenticateUser(request);
         let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
-        let noPartsFound, name, description;
-        // console.log(this.);
-    
+        let noPartsFound;
+        const lang = request.cookies.language;
+
+        let description = theProject[0].description;
+        let name = theProject[0].name;
+
         if (arrayOFCatPartsInProject.length === 0) {
             noPartsFound = true;
-        }
-        else {
-            name = theProject[0].name;
-            theProject[0].description;
         }
         if (projectID != 'null') {
             theProjectId = projectID;
@@ -438,10 +458,7 @@ async function showSpecificProject(request, response) {
         if (login != null) {
             login = login.userSession.username;
         }
-    
-        const lang = request.cookies.language;
-        let pageData;
-    
+
         if (!lang || lang === 'en') {
             //Page data
             pageData = {
@@ -458,7 +475,16 @@ async function showSpecificProject(request, response) {
                 projectDescription: description,
                 projectId: parseInt(theProjectId),
                 projectParts: arrayOFCatPartsInProject,
-                noParts: noPartsFound
+                noParts: noPartsFound,
+                back_button: "Return",
+                edit: "Edit",
+                project_name_label: "Project Name",
+                project_description_label: "Project Description",
+                update_button: "Update Project",
+                noparts_message: "No car parts added in this project",
+                parts_in_project_label: "Car Parts in Project",
+                partNumberLabel: "Part Number",
+                partConditionLabel: "Condition"
             }
         }
         else {
@@ -476,7 +502,16 @@ async function showSpecificProject(request, response) {
                 projectDescription: description,
                 projectId: parseInt(theProjectId),
                 projectParts: arrayOFCatPartsInProject,
-                noParts: noPartsFound
+                noParts: noPartsFound,
+                back_button: "Retournez",
+                edit: "Modifier",
+                project_name_label: "Nom du Projet",
+                project_description_label: "Description du Projet",
+                update_button: "Mettre à Jour le Projet",
+                noparts_message: "Aucune pièce de voiture ajoutée dans ce projet",
+                parts_in_project_label: "Pièces dans le Projet",
+                partNumberLabel: "Numéro de Pièce",
+                partConditionLabel: "Condition"
             }
         }
     
@@ -484,7 +519,7 @@ async function showSpecificProject(request, response) {
         response.status(201).render('showProject.hbs', pageData);
     } 
     catch (error) {
-        let pageData = {
+        pageData = {
             alertOccurred: true,
             alertMessage: "",
             alertLevel: 'danger',
@@ -556,7 +591,7 @@ async function updateProject(request, response) {
                 endpointLogInLogOut: "login",
                 clickedNewProject: false,
                 Home: "Home",
-                loggedInUser: login,
+                loggedInUser: login
             }
         }
         else {
@@ -600,7 +635,7 @@ async function updateProject(request, response) {
             endpointLogInLogOut: "login",
             clickedNewProject: false,
             Home: "Accueil",
-            loggedInUser: login,
+            loggedInUser: login
         }
 
         // If the error is an instance of the DatabaseConnectionError error
