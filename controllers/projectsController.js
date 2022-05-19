@@ -435,6 +435,7 @@ let theProjectId;
  */
 async function showSpecificProject(request, response) {
     let pageData;
+    const lang = request.cookies.language;
 
     try {
         let projectID = request.params.projectId;
@@ -443,7 +444,6 @@ async function showSpecificProject(request, response) {
         let login = loginController.authenticateUser(request);
         let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
         let noPartsFound;
-        const lang = request.cookies.language;
 
         let description = theProject[0].description;
         let name = theProject[0].name;
@@ -564,6 +564,8 @@ async function updateProject(request, response) {
     let description = request.body.description;
     let projectID = request.params.projectId;
     let login = loginController.authenticateUser(request);
+    const lang = request.cookies.language;
+    let pageData;
 
     try {    
         // Set the login to the username if response is not null
@@ -572,9 +574,6 @@ async function updateProject(request, response) {
         }
     
         await projectModel.updateProject(name, description, projectID);
-    
-        const lang = request.cookies.language;
-        let pageData;
     
         if (!lang || lang === 'en') {
             // Page data 
@@ -613,14 +612,13 @@ async function updateProject(request, response) {
             }
         }
     
-    
         // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
         response.cookie("lastAccessedProject", projectID);
         response.redirect(`/projects/${projectID}`);
-        response.status(201).render('showProject.hbs', pageData);
+        // response.status(201).render('showProject.hbs', pageData);
     } 
     catch (error) {
-        let pageData = {
+        pageData = {
             alertOccurred: true,
             alertMessage: "",
             alertLevel: 'danger',
