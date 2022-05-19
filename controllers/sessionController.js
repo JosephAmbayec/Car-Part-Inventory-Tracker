@@ -18,7 +18,7 @@ async function createSession(username, numMinutes) {
     }
     catch(error){
         const data = {
-            message: `Unexpected error while trying to create sessionId for user: ${error.message}`,
+            alertMessage: `Unexpected error while trying to create sessionId for user: ${error.message}`,
             errorCode: 500
         }
         errorData.alertMessage = data.message;

@@ -48,8 +48,6 @@ function showAbout(request, response) {
         }
     }
 
-
-
     logger.info(`RENDERING about page -- showAbout`);
     response.status(200).render('about.hbs', pageData);
 }

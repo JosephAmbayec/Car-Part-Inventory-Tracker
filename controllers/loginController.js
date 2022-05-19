@@ -146,7 +146,9 @@ async function loginUser(request, response) {
                 showConfirmPassword: false,
                 oppositeFormAction: 'signup',
                 oppositeFormName: 'Sign up',
-                dontHaveAccountText: "Don't have an account?"
+                dontHaveAccountText: "Don't have an account?",
+                alertMessage: "",
+                errorCode: ""
             }
         }
         else {
@@ -161,20 +163,17 @@ async function loginUser(request, response) {
                 showConfirmPassword: false,
                 oppositeFormAction: 'signup',
                 oppositeFormName: 'Enregistrer',
-                dontHaveAccountText: "Vous n'avez pas de compte?"
+                dontHaveAccountText: "Vous n'avez pas de compte?",
+                alertMessage: "",
+                errorCode: ""
             }
         }
 
-
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof DatabaseConnectionError) {
-            const data = {
-                message: "There was an error connecting to the database.",
-                errorCode: 500
-            }
-            errorData.alertMessage = data.message;
+            errorData.alertMessage = "There was an error connecting to the database."
             logger.error(`DatabaseConnectionError when LOGGING IN user ${username} -- loginUser`);
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', errorData);
         }
         // If the error is an instance of the UserLoginError error
         else if (error instanceof userModel.UserLoginError) {
@@ -184,13 +183,10 @@ async function loginUser(request, response) {
         }
         // If any other error occurs
         else {
-            const data = {
-                message: `Unexpected error while trying to log in user: ${error.message}`,
-                errorCode: 500
-            }
-            errorData.alertMessage = data.message;
+            errorData.alertMessage = `Unexpected error while trying to log in user: ${error.message}`,
+            errorData.errorCode = 500;
             logger.error(`OTHER error when LOGGING IN user ${username} -- loginUser`);
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', errorData);
         }
     }
 }

@@ -189,7 +189,6 @@ function showForm(request, response) {
         // Case of deleting a car part
         case 'delete':
             logger.info(`SWITCH CASE delete -- showForm`);
-            // showDeleteForm(request, response);
             response.redirect('/parts/table/delete');
             break;
 
@@ -517,107 +516,6 @@ async function showEditForm(request, response) {
     }
 
     logger.info(`RENDERING home page WITH UPDATE form -- showEditForm`);
-    response.render('home.hbs', pageData);
-}
-
-/**
- * Displays the delete car part form
- * @param {*} response 
- */
-async function showDeleteForm(request, response) {
-    let lang = request.cookies.language;
-    let login = loginController.authenticateUser(request);
-    let signupDisplay, endpoint, logInText;
-    let role;
-    
-    let pageData;
-
-    if (!lang || lang === 'en') {
-        // Set the login to the username if response is not null
-        if(login != null) {
-            login = login.userSession.username;
-            signupDisplay = "none";
-            endpoint = "logout";
-            logInText = "Log Out";
-        }
-        else{
-            signupDisplay = "block";
-            endpoint = "login";
-            logInText = "Log In";
-        }
-
-        role = await userModel.determineRole(login);
-
-        pageData = {
-            Home: "Home",
-            showForm: true,
-            endpoint: "/parts",
-            submitfn: "this.action = this.action + '/'+ this.partNumber.value",
-            method: "post",
-            methodOverride: "DELETE",
-            Current: "English",
-            legend: "Please enter the part number of the part that should be deleted:",
-            formfields: [{ field: "partNumber", pretty: "Part Number", type: "number" }],
-            Submit: "Submit",
-            display_signup: signupDisplay,
-            display_login: "block",
-            logInlogOutText: logInText,
-            signUpText: "Sign Up",
-            endpointLogInLogOut: endpoint,
-            Add: role === 1 ? "Add a car part" : "",
-            Show: "Find a Car Part",
-            List: "Show all Car Parts",
-            Edit: role === 1 ? "Update a Car Part" : "",
-            Delete: role === 1 ? "Delete a Car Part" : "",
-            loggedInUser: login,
-            projects_text: "Projects",
-            about_text: "About Us"
-        };
-    }
-    else {
-        // Set the login to the username if response is not null
-        if(login != null) {
-            login = login.userSession.username;
-            signupDisplay = "none";
-            endpoint = "logout";
-            logInText = "Se Déconnecter";
-        }
-        else{
-            signupDisplay = "block";
-            endpoint = "login";
-            logInText = "Connexion";
-        }
-
-        role = await userModel.determineRole(login);
-
-        pageData = {
-            Home: "Accueil",
-            showForm: true,
-            endpoint: "/parts",
-            submitfn: "this.action = this.action + '/'+ this.partNumber.value",
-            method: "post",
-            methodOverride: "DELETE",
-            Current: "French",
-            legend: "Veuillez entrer le numéro de pièce de la pièce à supprimer :",
-            formfields: [{ field: "partNumber", pretty: "Numéro De Pièce", type: "number" }],
-            Submit: "Soumettre",
-            display_signup: signupDisplay,
-            display_login: "block",
-            logInlogOutText: logInText,
-            signUpText: "Enregistrer",
-            endpointLogInLogOut: endpoint,
-            Add: role === 1 ? "Ajouter une Pièce Auto" : "",
-            Show: "Trouver une Pièce Auto",
-            List: "Afficher Toutes les Pièces de Voiture",
-            Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
-            Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
-            loggedInUser: login,
-            projects_text: "Projets",
-            about_text: "À propos de nous"
-        };
-    }
-
-    logger.info(`RENDERING home page WITH DELETE form -- showDeleteForm`);
     response.render('home.hbs', pageData);
 }
 

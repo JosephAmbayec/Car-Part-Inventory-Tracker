@@ -133,7 +133,7 @@ async function createProject(request, response) {
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError) {
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-            logger.error(`UserLoginError when CREATING PROJECT ${name} -- createProject`);
+            logger.error(`InvalidInputError when CREATING PROJECT ${name} -- createProject`);
             response.status(404).render('allProjects.hbs', pageData);
         }
         // If any other error occurs
@@ -394,7 +394,7 @@ async function addCarPart(request, response) {
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError) {
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-            logger.error(`UserLoginError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
+            logger.error(`InvalidInputError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
             response.status(404).render('home.hbs', pageData);
         }
         // If any other error occurs

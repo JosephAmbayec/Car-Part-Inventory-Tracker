@@ -38,7 +38,7 @@ async function createPart(request, response){
         await sqlModel.addCarPart(number, partName, condition, image);
         logger.info(`CREATED car part (Part #${number}, ${partName}, Condition: ${condition}) -- createPart`);
 
-        response.status(201).render('home.hbs', {message: `Created part: Part #${number}, ${partName}, Condition: ${condition}`});
+        response.status(201).render('home.hbs', {alertOccurred: true, alertMessage: `Created part: Part #${number}, ${partName}, Condition: ${condition}`});
 
     } 
     catch(error) {
@@ -46,7 +46,7 @@ async function createPart(request, response){
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
             const data = {
-                message: "There was an error connecting to the database.",
+                alertMessage: "There was an error connecting to the database.",
                 errorCode: 500
             }
             logger.error("DatabaseConnectionError when CREATING part -- createPart");
@@ -631,8 +631,12 @@ async function addCarPartToProject(request, response){
         }
         // If any other error
         else {
+            const data = {
+                message: `Unexpected error while trying to show part: ${error.message}`,
+                errorCode: 500
+            }
             logger.error(`OTHER error when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to show part: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }
 }
@@ -690,8 +694,12 @@ async function deletePart(request, response){
         }
         // If any other error
         else {
+            const data = {
+                message: `Unexpected error while trying to show part: ${error.message}`,
+                errorCode: 500
+            }
             logger.error(`OTHER error when DELETING car part ${partNumber} -- deletePart`);
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to show part: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }
 }
