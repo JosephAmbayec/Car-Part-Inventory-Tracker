@@ -68,26 +68,31 @@
       {{!-- <div class="border-end bg-white" id="sidebar-wrapper"> --}}
         <div class="list-group list-group-flush " id="inventory-actions-form">
           <form action="/" method="post" role="form" enctype="application/x-www-form-urlencoded" >
+            <!--If add-->
             {{#if Add}}
               <button id="show" name="choice" class="btn btn-primary inventory-actions-button"
                 value="add">{{Add}}
               </button>
             {{/if}}
+            <!--If show-->
              {{#if Show}}
               <button id="show" name="choice" class="btn btn-primary inventory-actions-button"
               value="show">{{Show}}
             </button>
             {{/if}}
+            <!--If list-->
              {{#if List}}
               <button id="list" name="choice" class="btn btn-primary inventory-actions-button"
               value="list">{{List}}
               </button>
             {{/if}}
+            <!--If update-->
              {{#if Edit}}
               <button id="update" name="choice" class="btn btn-primary inventory-actions-button"
               value="edit">{{Edit}}
               </button>
             {{/if}}
+            <!--If delete-->
              {{#if Delete}}
                <button id="delete" name="choice" class="btn btn-primary inventory-actions-button"
               value="delete">{{Delete}}

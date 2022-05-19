@@ -127,7 +127,7 @@ async function getUserByName(username){
  * @param {string} username The username of the user.
  * @param {string} password The password of the user.
  */
-async function addUser(username, password) {
+async function addUser(username, password, role) {
 
     // Checks if the user already exists in the database
     if (await userExists(username)){
@@ -141,7 +141,7 @@ async function addUser(username, password) {
         if (userUtils.isValidPassword(password)){
             try {
                 let hashedPassword = await userUtils.hashPassword(password);
-                let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', '2');`
+                let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', '${role}');`
 
                 await connection.execute(insertQuery);
                 logger.info("User added successfully to the database");
