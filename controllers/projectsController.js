@@ -60,6 +60,7 @@ const loginController = require('./loginController');
         }
     
         logger.info(`CREATED PROJECT (Name: ${name}, Description: ${description} -- loginUser`);
+        response.cookie("lastAccessedProject", projectId);
         response.status(201).render('allProjects.hbs', pageData);
 
     } catch(error) {
@@ -199,6 +200,7 @@ async function addCarPart(request, response){
             about_text: "About Us",
             Current: "English"
         }
+        response.cookie("lastAccessedProject", projectId);
         response.status(201).render('home.hbs', pageData);
     }
     catch(error) {
@@ -311,7 +313,7 @@ async function updateProject(request, response){
             alertLevelText: 'success',
             alertHref: 'exclamation-triangle-fill',
             display_signup: "none",
-            display_login: "block",
+            display_login: "block", 
             logInlogOutText: "Log Out",
             signUpText: "Sign Up",
             endpointLogInLogOut: "login",
@@ -321,6 +323,7 @@ async function updateProject(request, response){
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+    response.cookie("lastAccessedProject", projectID);
     response.redirect(`/projects/${projectID}`);
     response.status(201).render('showProject.hbs', pageData);
 }

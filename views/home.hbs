@@ -35,7 +35,25 @@
   </form>
 </div>
 
-
+{{#if accessProject}}
+<div class="modal" id="myModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Go to where you left off?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.cookie = 'lastAccessedProject=-1;'"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>You were previously working on a Project called {{accessProjectName}}. Would you like to go back to your work?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.cookie = 'lastAccessedProject=-1;'">No thanks!</a>
+                        <a href="/projects/{{accessProjectId}}" class="btn btn-primary">Sure!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+{{/if}}
 <div class="row d-flex justify-content-start">
   <!--Sidebar containing all CRUD buttons-->
   <div id="aside-sidebar" class="col-2 ">
@@ -239,8 +257,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
   integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
   </script>
-
-  <script>
+  <script defer>
     var exampleModal = document.getElementById('exampleModal')
     exampleModal.addEventListener('show.bs.modal', function (event) {
       // Button that triggered the modal

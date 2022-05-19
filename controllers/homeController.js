@@ -6,6 +6,7 @@ const routeRoot = '/';
 const partController = require('./carPartController');
 const logger = require('../logger');
 const loginController = require('./loginController');
+const projectModel = require('../models/projectModel')
 
 const cookieParser = require("cookie-parser")
 router.use(cookieParser());
@@ -15,13 +16,21 @@ router.use(cookieParser());
  * @param {*} request 
  * @param {*} response 
  */
-function sendHome(request, response) {
+async function sendHome(request, response) {
     // Getting the values
     const justRegistered = request.cookies.justRegistered;
     const lang = request.cookies.language;
     let pageData;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let accessProject = request.cookies.lastAccessedProject;
+    let AccessProject;
+    let AccessProjectName;
+    if (accessProject && accessProject != '-1'){
+        AccessProject = true;
+        AccessProjectName = await projectModel.getProjectByProjectId(accessProject)
+        AccessProjectName = AccessProjectName[0].name;
+    }
 
     // If the user just registered
     if (justRegistered == 'true') {
@@ -42,6 +51,7 @@ function sendHome(request, response) {
             signupDisplay = "block";
             endpoint = "login";
             logInText = "Log In";
+            AccessProject = false;
         }
 
         pageData = {
@@ -59,7 +69,10 @@ function sendHome(request, response) {
             Delete: "Delete a Car Part",
             loggedInUser: login,
             projects_text: "Projects",
-            about_text: "About Us"
+            about_text: "About Us",
+            accessProject: AccessProject,
+            accessProjectId: accessProject,
+            accessProjectName: AccessProjectName
         }
     }
     else{
@@ -74,6 +87,7 @@ function sendHome(request, response) {
             signupDisplay = "block";
             endpoint = "login";
             logInText = "Connexion";
+            AccessProject = false;
         }
 
         pageData = {
@@ -91,7 +105,10 @@ function sendHome(request, response) {
             Delete: "Supprimer une Pièce Auto",
             loggedInUser: login,
             projects_text: "Projets",
-            about_text: "À propos de nous"
+            about_text: "À propos de nous",
+            accessProject: AccessProject,
+            accessProjectId: accessProject,
+            accessProjectName: AccessProjectName
         }
     }
 

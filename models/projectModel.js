@@ -63,7 +63,7 @@ async function initializeProjectModel(dbname, reset){
     } 
     catch (err) {
         logger.error(err);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -89,7 +89,7 @@ async function getConnection(){
 
     } catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 //#endregion
@@ -108,7 +108,7 @@ async function getConnection(){
     }    
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 /**
@@ -125,7 +125,7 @@ async function getAllProjects(username){
     } 
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -151,11 +151,11 @@ async function addPartToProject(projectId, partNumber){
             }
         }
         else
-            throw new model.DatabaseConnectionError();
+            throw new DatabaseConnectionError();
     }
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }     
 
@@ -169,7 +169,7 @@ async function partExistsInProject(projectId, partNumber){
     }
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 //#region Project operations
@@ -186,11 +186,11 @@ async function addUserToProject(projectId, id) {
             await connection.execute(insertStatement);
         }
         else
-            throw new model.DatabaseConnectionError();
+            throw new DatabaseConnectionError();
     }
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -209,7 +209,7 @@ async function projectExists(projectId){
     }
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -227,11 +227,11 @@ async function getProjectByProjectId(projectId){
             return projectArray[0];
         }
         else
-            throw new model.DatabaseConnectionError();
+            throw new DatabaseConnectionError();
     } 
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -251,11 +251,11 @@ async function updateProject(newName, newDescription, projectId){
             return projectArray[0];
         }
         else
-            throw new model.DatabaseConnectionError();
+            throw new DatabaseConnectionError();
     } 
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -272,13 +272,13 @@ async function getProjectCarParts(projectId) {
             // }
             // else{
             //     logger.error(error);
-            //     throw new model.DatabaseConnectionError();
+            //     throw new DatabaseConnectionError();
             // }
         }
     } 
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
