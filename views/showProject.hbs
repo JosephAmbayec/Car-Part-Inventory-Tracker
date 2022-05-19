@@ -27,7 +27,7 @@
             <a href="/projects" id="add-project-btn" class="btn btn-outline-primary"
                     >
                 <i class='fas fa-arrow-left' style='font-size:17px; margin-right: 4px;'></i>
-                Back to Projects
+                {{back_button}}
             </a>
 
             <!--container for form-->
@@ -37,25 +37,25 @@
                 <form method="POST" action="/projects/{{projectId}}/update" 
                             id="form-loginsignup-update" >
                     <!-- Legend title for the current form-->
-                    <legend>Edit '{{projectName}}'</legend>
+                    <legend>{{edit}} '{{projectName}}'</legend>
                     
                     <!--Project Name-->
                     <div class="form-group row justify-content-center">
-                        <label for="name" class="form-label">Project Name</label>
+                        <label for="name" class="form-label">{{project_name_label}}</label>
                         <input name="name" id="name" 
                             type="text" class="form-control" value="{{projectName}}" required/>
                     </div>
 
                     <!--Project Description-->
                     <div class="form-group row justify-content-center">
-                        <label for="description" class="form-label">Project Description</label>
+                        <label for="description" class="form-label">{{project_description_label}}</label>
                         <input name="description" id="description" 
                                 type="text" class="form-control" value="{{projectDescription}}" required/>
                     </div>
 
                     <!--Submit button-->
                     <div class="row justify-content-center">
-                        <button class="btn btn-primary submit-btn" style="width:100%;" type="submit">Update Project</button>
+                        <button class="btn btn-primary submit-btn" style="width:100%;" type="submit">{{update_button}}</button>
                     </div>
                 </form>
 
@@ -64,11 +64,11 @@
     {{!-- </div> --}}
 
     {{#if noParts}}
-        <h2>No car parts added in this project</h2>
+        <h2>{{noparts_message}}</h2>
     {{else}}
         <div id="show-project-all-parts">
             <h2 style="text-align: center; margin-top: 2rem; margin-bottom: 1.5rem">
-                    Car Parts in Project</h2>
+                    {{parts_in_project_label}}</h2>
 
             <div class="row">
                 {{#each projectParts}}
@@ -87,8 +87,8 @@
                                             {{/if}}
 
                                             <h5 class="card-title">{{name}}</h5>
-                                            <p class="card-text">Part number: {{partNumber}}</p>
-                                            <p class="card-text">Condition: {{condition}}</p>
+                                            <p class="card-text">{{../partNumberLabel}}: {{partNumber}}</p>
+                                            <p class="card-text">{{../partConditionLabel}}: {{condition}}</p>
                                         </div>
                                         <!--Delete project button-->
                                         <div class="text-center">

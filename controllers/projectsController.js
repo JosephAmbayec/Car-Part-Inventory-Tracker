@@ -386,12 +386,12 @@ async function showSpecificProject(request, response) {
     let noPartsFound, name, description;
     // console.log(this.);
 
+    
+    description = theProject[0].description;
+    name = theProject[0].name;
+
     if (arrayOFCatPartsInProject.length === 0) {
         noPartsFound = true;
-    }
-    else {
-        name = theProject[0].name;
-        theProject[0].description;
     }
     if (projectID != 'null') {
         theProjectId = projectID;
@@ -420,7 +420,16 @@ async function showSpecificProject(request, response) {
             projectDescription: description,
             projectId: parseInt(theProjectId),
             projectParts: arrayOFCatPartsInProject,
-            noParts: noPartsFound
+            noParts: noPartsFound,
+            back_button: "Return",
+            edit: "Edit",
+            project_name_label: "Project Name",
+            project_description_label: "Project Description",
+            update_button: "Update Project",
+            noparts_message: "No car parts added in this project",
+            parts_in_project_label: "Car Parts in Project",
+            partNumberLabel: "Part Number",
+            partConditionLabel: "Condition"
         }
     }
     else {
@@ -438,7 +447,16 @@ async function showSpecificProject(request, response) {
             projectDescription: description,
             projectId: parseInt(theProjectId),
             projectParts: arrayOFCatPartsInProject,
-            noParts: noPartsFound
+            noParts: noPartsFound,
+            back_button: "Retournez",
+            edit: "Modifier",
+            project_name_label: "Nom du Projet",
+            project_description_label: "Description du Projet",
+            update_button: "Mettre à Jour le Projet",
+            noparts_message: "Aucune pièce de voiture ajoutée dans ce projet",
+            parts_in_project_label: "Pièces dans le Projet",
+            partNumberLabel: "Numéro de Pièce",
+            partConditionLabel: "Condition"
         }
     }
 
@@ -486,7 +504,7 @@ async function updateProject(request, response) {
             endpointLogInLogOut: "login",
             clickedNewProject: false,
             Home: "Home",
-            loggedInUser: login,
+            loggedInUser: login
         }
     }
     else {
@@ -504,7 +522,7 @@ async function updateProject(request, response) {
             endpointLogInLogOut: "login",
             clickedNewProject: false,
             Home: "Accueil",
-            loggedInUser: login,
+            loggedInUser: login
         }
     }
 
