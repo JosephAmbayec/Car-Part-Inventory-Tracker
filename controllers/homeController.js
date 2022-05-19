@@ -22,6 +22,14 @@ function sendHome(request, response) {
     let pageData;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let accessProject = request.cookies.lastAccessedProject;
+    let AccessProject;
+    let AccessProjectName;
+    if (accessProject && accessProject != '-1'){
+        AccessProject = true;
+        AccessProjectName = await projectModel.getProjectByProjectId(accessProject)
+        AccessProjectName = AccessProjectName[0].name;
+    }
 
     // If the user just registered
     if (justRegistered == 'true') {
@@ -42,6 +50,7 @@ function sendHome(request, response) {
             signupDisplay = "block";
             endpoint = "login";
             logInText = "Log In";
+            AccessProject = false;
         }
 
         pageData = {
@@ -60,6 +69,9 @@ function sendHome(request, response) {
             loggedInUser: login,
             projects_text: "Projects",
             about_text: "About Us"
+            accessProject: true,
+            accessProjectId: accessProject,
+            accessProjectName: AccessProjectName
         }
     }
     else{
@@ -74,6 +86,7 @@ function sendHome(request, response) {
             signupDisplay = "block";
             endpoint = "login";
             logInText = "Connexion";
+            AccessProject = false;
         }
 
         pageData = {
@@ -92,6 +105,9 @@ function sendHome(request, response) {
             loggedInUser: login,
             projects_text: "Projets",
             about_text: "À propos de nous"
+            accessProject: true,
+            accessProjectId: accessProject,
+            accessProjectName: AccessProjectName
         }
     }
 
