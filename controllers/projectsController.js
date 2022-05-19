@@ -272,7 +272,6 @@ async function showSpecificProject(request, response){
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-    response.cookie("lastAccessedProject", projectID);
     response.status(201).render('showProject.hbs', pageData);
 }
 

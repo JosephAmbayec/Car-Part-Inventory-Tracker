@@ -15,7 +15,7 @@ router.use(cookieParser());
  * @param {*} request 
  * @param {*} response 
  */
-function sendHome(request, response) {
+async function sendHome(request, response) {
     // Getting the values
     const justRegistered = request.cookies.justRegistered;
     const lang = request.cookies.language;
