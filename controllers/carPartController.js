@@ -264,6 +264,7 @@ async function getAllCarParts(request, response){
 
             }
 
+            // If the language is english
             if (!lang || lang === 'en') {
                 output.signUpText = "Sign Up";
                 output.Add = role === 1 ? "Add a car part" : "";
@@ -272,6 +273,7 @@ async function getAllCarParts(request, response){
                 output.Edit = role === 1 ? "Update a Car Part" : "";
                 output.Delete = role === 1 ? "Delete a Car Part" : "";
             }
+            // If the language is french
             else{
                 output.signUpText = "Enregistrer";
                 output.Add = "Ajouter une Pièce Auto";

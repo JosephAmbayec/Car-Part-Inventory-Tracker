@@ -43,6 +43,10 @@ footer {
 .title:hover{
     color:  #0D6EFD ;
 }
+#select-inventory-action-text{
+  text-align: center;
+  margin-top: 5rem;
+}
 
 .inventory-actions-button{
   border-radius: 0.5rem;
@@ -61,9 +65,10 @@ footer {
 #aside-sidebar{
   display: flex;
   flex-direction: column;
-  align-items: initial;
+  /* align-items: inherit; */
   border: 0.5px solid #0D6EFD ;
   width: 17rem;
+  height:min-content;
   border-radius: 5px;
   justify-content: flex-end;
   margin-left: 6rem;
@@ -167,12 +172,14 @@ table {
 }
 
 #add-project-btn{
-    /* border: 1px solid #0D6EFD; */
     border-radius: 0.85rem;
-    /* color: black; */
-    /* background: none; */
+    cursor: pointer;
     padding: 3px 5px;
-    margin: 0 auto;
+    /* margin: 0 auto; */
+    text-align: center;
+    width: 175px;
+    height: 32px; 
+    margin-top: 2rem;
 }
 
 .grid-container-projects{
@@ -366,7 +373,8 @@ table {
 
  #show-project-flex{
    display: grid;
-   grid-template-columns: 1.5fr 5fr;
+   grid-template-columns: 2fr 5fr;
+   gap: 1em;
 }
 #show-project-first-flex{
   /* flex: 1.5; */
@@ -376,10 +384,12 @@ table {
   /* display: flex;
   flex-direction: column;
   justify-content: center; */
-  width: 100%;
+  width: 75%;
+  margin-left: auto;
+  margin-right:auto;
 }
 #show-project-all-parts{
-  /* flex:3; */
+  padding: 0 1rem 0 1.5rem;
 }
 
 .dropdown-button{
@@ -417,6 +427,7 @@ table {
 
 .card-show-specific{
   width: 100%;
+  margin-top: 1.5rem;
 }
 .card-show-specific:hover{
   cursor: pointer;
