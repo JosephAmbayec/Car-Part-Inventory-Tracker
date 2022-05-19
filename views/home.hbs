@@ -39,7 +39,10 @@
 <div class="row d-flex justify-content-start">
   <!--Sidebar containing all CRUD buttons-->
   <div id="aside-sidebar" class="col-2 ">
-    <h4 style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.5rem">Inventory Actions</h4>
+    <h4 style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.75rem"
+      title="Actions you can perform as a user">
+      Inventory Actions
+      </h4>
 
     {{!-- <aside class="col-2 "> --}}
     <div class="d-flex " id="wrapper ">
@@ -94,8 +97,9 @@
   <div class="col-7">
     <!--Showing the specified form-->
     {{#if showForm}}
+        <!--Legend text-->
         <div style="text-align: center; margin-right: auto; margin-left: auto; width: 70%;">
-          <legend style="width: 100%;">{{legend}}</legend>
+          <legend style="width: 100%; font-weight: 1000;">{{legend}}</legend>
         </div>
 
         <section id="form-container-home">
@@ -134,6 +138,11 @@
         </div>
       <!--If there are car parts-->
       {{else}}
+        <!--Legend text-->
+        <div style="text-align: center; margin-right: auto; margin-left: auto; width: 70%;">
+          <legend style="width: 100%; font-weight: 1000;">All car parts in the inventory</legend>
+        </div>
+
         <div class="list-section">
           <!--Creating the tables-->
           <table>

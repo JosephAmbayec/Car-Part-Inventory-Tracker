@@ -12,6 +12,9 @@ body {
 .navbar {
     font-weight: bold;
 }
+.navbar .nav-item  a:hover{
+  color:#0D6EFD;
+}
 .mr-auto { 
     margin-right: auto;
 }
@@ -23,6 +26,7 @@ footer {
 .list-section {
     border-collapse: collapse;
     width: 100%;
+    margin-top: 75px;
   }
   
   td, th {
@@ -48,7 +52,7 @@ footer {
 }
 .inventory-actions-button:hover{
   cursor: pointer;
-  box-shadow: 0 0 5px 2px #06377e;
+  box-shadow: 0 0 5px 3px #06377e;
   background-color: #0D6EFD;
 }
 #aside-sidebar{
@@ -94,7 +98,6 @@ footer {
    width: 35%;
    margin-left: auto;
    margin-right:auto;
-   
 }
 
 /* #region loginsignup.hbs */
@@ -104,8 +107,9 @@ footer {
    justify-content: center;
    align-items: center;
    flex-direction: column;
-   width: 100%;
-   margin-left: -75px;
+   width: 50%;
+   margin-left: auto;
+   margin-right:auto;
 }
 
 #form-loginsignup > *{
