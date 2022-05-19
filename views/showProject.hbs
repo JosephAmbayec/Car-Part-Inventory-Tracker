@@ -65,27 +65,32 @@
         <div id="show-project-all-parts">
             <div class="row">
                 {{#each projectParts}}
-                    {{!-- <div class="card" style="width: 18rem;">
-                        {{#if image}}
-                            <img src="{{image}}" class="card-img-top">
-                        {{/if}}
-
-                        <div class="card-body">
-                            <h5 class="card-title">{{name}}</h5>
-                            <p class="card-text">Part number: {{partNumber}}</p>
-                            <p class="card-text">Condition: {{condition}}</p>
-                        </div>
-                    </div> --}}
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <div class="card card-show-specific">
                             <div class="card-body">
-                                {{#if image}}
-                                    <img src="{{image}}" class="card-img-top">
-                                {{/if}}
+                                <form action="/projects/del/part/{{this.projectId}}" method="post" enctype="multipart/form-data">
+                                    <div class="card-grid">
+                                    
+                                        <input type="hidden" name="_method" value="{{partNumber}}" required>
 
-                                <h5 class="card-title">{{name}}</h5>
-                                <p class="card-text">Part number: {{partNumber}}</p>
-                                <p class="card-text">Condition: {{condition}}</p>
+                                        <!--Car part information-->
+                                        <div style="display:flex; flex-direction:column; ">
+                                            {{#if image}}
+                                                <img src="{{image}}" class="card-img-top">
+                                            {{/if}}
+
+                                            <h5 class="card-title">{{name}}</h5>
+                                            <p class="card-text">Part number: {{partNumber}}</p>
+                                            <p class="card-text">Condition: {{condition}}</p>
+                                        </div>
+                                        <!--Delete project button-->
+                                        <div class="text-center">
+                                            <a class="btn btn-primary del-button-card" title="Delete from project">
+                                                <i class="fa fa-trash-o" style="font-size:26px;"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

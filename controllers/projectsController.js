@@ -353,6 +353,46 @@ async function deleteProject(request, response){
     }
 }
 
+async function deletePartFromProject(request, response){
+    try {
+        // Get the values
+        let projectID = request.params.projectId;
+        let partNumber = request.body.partNumber;
+        let login = loginController.authenticateUser(request);
+
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+        }
+
+        await projectModel.deletePartFromProject(projectID, partNumber);
+
+        // Page data 
+        const pageData = {
+            alertOccurred: true,
+            alertMessage: `Successfully deleted project ${projectID}!`,
+            alertLevel: 'success',
+            alertLevelText: 'success',
+            alertHref: 'exclamation-triangle-fill',
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: login,
+        }
+
+        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+        response.redirect(`/projects/${projectID}`);
+        // response.status(201).render('allProjects.hbs', pageData);
+    } 
+    catch (error) {
+        
+    }
+}
+
 
 router.post("/projects", createProject);
 router.get("/projects", showProjects);
@@ -362,6 +402,7 @@ router.post("/projects/:projectId/update", updateProject);
 
 router.post("/projects/:projectId", addCarPart)
 router.get("/projects/del/:projectId", deleteProject);
+router.post("/projects/del/part/:partNumber", deletePartFromProject);
 
 
 module.exports = {

@@ -309,6 +309,21 @@ async function deleteProject(projectId){
     }
 }
 
+async function deletePartFromProject(projectId, partNumber){
+    try {
+        // Checks if the project exists first
+        if(projectExists(projectId)){
+            // Delete from the PartsProject table first (clears all parts associated with this project)
+            let selectStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
+            await connection.execute(selectStatement);
+        }
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
+
 
 module.exports = {
     initializeProjectModel,
@@ -320,5 +335,6 @@ module.exports = {
     getProjectByProjectId,
     updateProject,
     getProjectCarParts,
-    deleteProject
+    deleteProject,
+    deletePartFromProject
 }

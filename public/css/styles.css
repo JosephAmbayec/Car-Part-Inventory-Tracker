@@ -398,6 +398,9 @@ table {
   width: 100%;
 }
 
+.card-show-specific{
+  width: 100%;
+}
 .card-show-specific:hover{
   cursor: pointer;
   box-shadow: 0 0 5px 2px #0D6EFD;
