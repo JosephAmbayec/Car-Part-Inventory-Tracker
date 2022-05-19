@@ -398,10 +398,41 @@ table {
   width: 100%;
 }
 
+.card-show-specific{
+  width: 100%;
+}
 .card-show-specific:hover{
   cursor: pointer;
   box-shadow: 0 0 5px 2px #0D6EFD;
 }
+.del-button-card{
+  z-index: 999;
+  width: 3rem;
+  height: 3rem;
+}
+.text-center{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+.fa-trash-o{
+  margin-top: 3px;
+}
+.del-button-card:hover{
+  background-color: red;
+  z-index: 999;
+  border: 1px solid #0D6EFD;
+}
+.card-grid{
+  display: grid;
+  grid-template-columns: 10fr 1.5fr;
+}
+.see-more-projects{
+  max-width: 7rem;
+}
+
+
+/* #region About page */
 
 #about-us{
   text-align: center;
@@ -432,3 +463,4 @@ table {
  #social-gp:hover {color: #d34836;transition:all .001s;}
  #social-em:hover {color: #f39c12;transition:all .001s;}
 
+ /* #endregion */
