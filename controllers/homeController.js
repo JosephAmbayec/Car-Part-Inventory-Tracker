@@ -159,7 +159,8 @@ function showForm(request, response) {
         // Case of deleting a car part
         case 'delete':
             logger.info(`SWITCH CASE delete -- showForm`);
-            showDeleteForm(request, response);
+            // showDeleteForm(request, response);
+            response.redirect('/parts/delete/table');
             break;
 
         // Default case
