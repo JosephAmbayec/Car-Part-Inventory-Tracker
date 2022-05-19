@@ -79,7 +79,7 @@ async function createProject(request, response) {
                 endpointLogInLogOut: "login",
                 projects: projs,
                 clickedNewProject: false,
-                Home: "Acceuil",
+                Home: "Accueil",
                 loggedInUser: login
             }
         }
@@ -185,7 +185,7 @@ async function showProjects(request, response) {
                 titleName: 'Créer un Projet',
                 pathNameForActionForm: 'projects',
                 projects: await projectModel.getAllProjects(request.cookies.username),
-                Home: "Acceuil",
+                Home: "Accueil",
                 logInlogOutText: "Déconnecter",
                 loggedInUser: login
             }
@@ -289,7 +289,7 @@ async function showCreateForm(request, response) {
             tableMessage: "Vous n'avez aucun Projet.",
             titleName: 'Créer un Projet',
             pathNameForActionForm: 'projects',
-            Home: "Acceuil",
+            Home: "Accueil",
             logInlogOutText: "Déconnecter",
             loggedInUser: login,
             clickedNewProject: true
@@ -355,7 +355,7 @@ async function addCarPart(request, response) {
                 signUpText: "Enregistrer",
                 endpointLogInLogOut: "login",
                 clickedNewProject: false,
-                Home: "Acceuil",
+                Home: "Accueil",
                 loggedInUser: true,
                 Add: "Ajouter une Pièce Auto",
                 Show: "Trouver une Pièce Auto",
@@ -470,7 +470,7 @@ async function showSpecificProject(request, response) {
                 signUpText: "Enregistrer",
                 endpointLogInLogOut: "login",
                 clickedNewProject: false,
-                Home: "Acceuil",
+                Home: "Accueil",
                 loggedInUser: login,
                 projectName: name,
                 projectDescription: description,
@@ -528,10 +528,9 @@ async function updateProject(request, response) {
     let name = request.body.name;
     let description = request.body.description;
     let projectID = request.params.projectId;
+    let login = loginController.authenticateUser(request);
 
-    try {
-        let login = loginController.authenticateUser(request);
-    
+    try {    
         // Set the login to the username if response is not null
         if (login != null) {
             login = login.userSession.username;
@@ -592,9 +591,16 @@ async function updateProject(request, response) {
             alertLevel: 'danger',
             alertLevelText: 'Danger',
             alertHref: 'exclamation-triangle-fill',
-            loggedInUser: lang,
             errorCode: "",
-            alertMessage: ""
+            alertMessage: "",
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Déconnecter",
+            signUpText: "Enregistrer",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Accueil",
+            loggedInUser: login,
         }
 
         // If the error is an instance of the DatabaseConnectionError error

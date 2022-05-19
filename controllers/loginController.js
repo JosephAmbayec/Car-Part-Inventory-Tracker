@@ -238,7 +238,7 @@ async function showLogin(request, response) {
     else {
         pageData = {
             alertOccurred: false,
-            Home: 'Acceuil',
+            Home: 'Accueil',
             titleName: 'Connexion',
             pathNameForActionForm: 'login',
             showConfirmPassword: false,

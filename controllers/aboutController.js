@@ -40,7 +40,7 @@ function showAbout(request, response) {
             projects_text: "Projets",
             about_text: "À propos de nous",
             signUpText: "Enregistrer",
-            Home: "Acceuil",
+            Home: "Accueil",
             mainTitle: "Qui sont Les Car Guys ?",
             mainText:"Nous sommes un groupe d'étudiants en informatique de 2e année qui s'intéressent à l'industrie automobile. Nos intérêts communs nous ont amenés à proposer un outil de gestion des stocks afin que les passionnés d'automobiles puissent organiser leurs projets.",
             motivationTitle: "Notre motivation et inspiration",
