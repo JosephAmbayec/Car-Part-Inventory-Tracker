@@ -8,6 +8,7 @@
 body { 
     padding: 10px;
     overflow-x: hidden; /* needed because hiding the menu on the right side is not perfect,  */
+    scroll-behavior: smooth;
 }
 .navbar {
     font-weight: bold;
@@ -19,10 +20,45 @@ body {
     margin-right: auto;
 }
 footer {
-    position: sticky;
-    Width: 100%;
+    /* position: fixed; */
+    width: 100%;
     bottom: 0;
+    text-align:center; 
+    margin-top: 11%;
+    /* border-top: 0.10px solid grey; */
+    display: flex;
+    flex-direction: column;
 }
+#footer-container{
+  display:grid;
+  grid-template-columns: 0.8fr 1fr 1fr;
+  padding: 1.5rem 0 3rem 0;
+}
+#footer-container a{
+  cursor: pointer; 
+  background-color: #0D6EFD;
+  color:white;
+  width:fit-content;
+  border-radius: 0.5rem;
+  padding: 6px 10px;
+  transition: 200ms ease-in-out;
+}
+#footer-container a:hover{
+  border: 1px solid #0D6EFD;
+  background-color: white;;
+  color: #0D6EFD;
+}
+#footer-container h4{
+  font-weight: 550;
+  margin-bottom:1.25rem;
+  display: flex;
+  justify-content: center;
+}
+#copyright{
+  padding: 0.75rem 0;
+  background-color: #f9f9f9;
+}
+
 .list-section {
     border-collapse: collapse;
     width: 100%;
