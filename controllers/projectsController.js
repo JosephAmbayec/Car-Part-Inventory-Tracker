@@ -21,6 +21,7 @@ const loginController = require('./loginController');
     let name = request.body.name;
     let description = request.body.description;
     let userId = await usersModel.getUserByName(request.cookies.username);
+    const lang = request.cookies.language;
    
     // If the user id is not specified
     if (userId === -1){
@@ -40,42 +41,87 @@ const loginController = require('./loginController');
             login = login.userSession.username;
         }
 
-        const pageData = {
-            alertOccurred: true,
-            alertMessage: "You have successfully added a project!",
-            alertLevel: 'success',
-            alertLevelText: 'success',
-            alertHref: 'exclamation-triangle-fill',
-            titleName: 'Create a Project',
-            pathNameForActionForm: 'projects',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Log Out",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            projects: projs,
-            clickedNewProject: false,
-            Home: "Home",
-            loggedInUser: login
+        let pageData;
+
+        if (!lang || lang === 'en'){
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "You have successfully added a project!",
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Create a Project',
+                pathNameForActionForm: 'projects',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Log Out",
+                signUpText: "Sign Up",
+                endpointLogInLogOut: "login",
+                projects: projs,
+                clickedNewProject: false,
+                Home: "Home",
+                loggedInUser: login
+            }
         }
+        else{
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "Vous avez ajouté un projet avec succès!",
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Créer un Projet',
+                pathNameForActionForm: 'projects',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Déconnecter",
+                signUpText: "Enregistrer",
+                endpointLogInLogOut: "login",
+                projects: projs,
+                clickedNewProject: false,
+                Home: "Acceuil",
+                loggedInUser: login
+            }
+        }
+        
     
         logger.info(`CREATED PROJECT (Name: ${name}, Description: ${description} -- loginUser`);
         response.cookie("lastAccessedProject", projectId);
         response.status(201).render('allProjects.hbs', pageData);
 
     } catch(error) {
-        const pageData = {
-            alertOccurred: true,
-            alertMessage: "",
-            alertLevel: 'danger',
-            alertLevelText: 'Danger',
-            alertHref: 'exclamation-triangle-fill',
-            titleName: 'Create a Project',
-            pathNameForActionForm: 'projects',
-            projects: await projectModel.getAllProjects(),
-            clickedNewProject: false,
-            loggedInUser: login
+        let pageData;
+
+        if (!lang || lang === 'en'){
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "",
+                alertLevel: 'danger',
+                alertLevelText: 'Danger',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Create a Project',
+                pathNameForActionForm: 'projects',
+                projects: await projectModel.getAllProjects(),
+                clickedNewProject: false,
+                loggedInUser: login
+            }
         }
+        else{
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "",
+                alertLevel: 'danger',
+                alertLevelText: 'Danger',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Créer un Projet',
+                pathNameForActionForm: 'projects',
+                projects: await projectModel.getAllProjects(),
+                clickedNewProject: false,
+                loggedInUser: login
+            }
+        }
+
+
         
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
