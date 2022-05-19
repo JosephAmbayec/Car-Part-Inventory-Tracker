@@ -161,8 +161,8 @@ test("DELETE /parts/id success case", async () =>{
     let before = await connection.execute("select partNumber, name from carPart;");
     expect(before[0].length).toBe(2);
 
-    let testResponse = await testRequest.delete(`/parts/${randomCar1.partNumber}`);
-    expect(testResponse.status).toBe(202);
+    let testResponse = await testRequest.post(`/parts/delete/${randomCar1.partNumber}`);
+    expect(testResponse.status).toBe(200);
     
     let after = await connection.execute("select partNumber, name from carPart;");
     expect(after[0].length).toBe(1);
@@ -179,7 +179,7 @@ test("DELETE /parts/id fail case", async () =>{
     let before = await connection.execute("select partNumber, name from carPart;");
     expect(before[0].length).toBe(2);
 
-    let testResponse = await testRequest.delete('/cars/999999');
+    let testResponse = await testRequest.post('/parts/delete/999999');
     expect(testResponse.status).toBe(404);
     
     let after = await connection.execute("select partNumber, name from carPart;");

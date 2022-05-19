@@ -633,7 +633,17 @@ async function deleteRowCarPart(request, response){
     try {
         // Getting the values
         let thePartNumber = request.params.partNumber;
-        await sqlModel.deleteCarPart(thePartNumber);
+        // Delete from any project first
+        let deletedPartProject = await projectModel.deletePartFromProjectWithNumber(partNumber);
+        let deletedPart = await sqlModel.deleteCarPart(thePartNumber);
+
+        if(deletedPartProject && deletedPart){
+            response.status(200);
+        }
+        else{
+            response.status(404);
+        }
+
         response.redirect('/parts/table/delete');
     } 
     catch (error) {
