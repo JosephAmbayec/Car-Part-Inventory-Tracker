@@ -44,8 +44,12 @@ async function createPart(request, response){
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
+            const data = {
+                message: "There was an error connecting to the database.",
+                errorCode: 500
+            }
             logger.error("DatabaseConnectionError when CREATING part -- createPart");
-            response.status(500).render('error.hbs', {message: "Error connecting to database."});
+            response.status(500).render('error.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -54,11 +58,14 @@ async function createPart(request, response){
         }
         // If any other error
         else {
+            const data = {
+                message: `Unexpected error while trying to add part: ${error.message}`,
+                errorCode: 500
+            }
             logger.error("OTHER error when CREATING part -- createPart");
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to add part: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }
-
 }
 /**
  * GET controller method that allows the user to retrieve the part with the given part number
@@ -88,8 +95,12 @@ async function getPartByNumber(request, response){
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
+            const data = {
+                message: "There was an error connecting to the database.",
+                errorCode: 500
+            }
             logger.error(`DatabaseConnectionError when FINDING car part by number ${number} -- getPartByNumber`);
-            response.status(500).render('home.hbs', {message: "Error connecting to database."});
+            response.status(500).render('home.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -98,8 +109,12 @@ async function getPartByNumber(request, response){
         }
         // If any other error
         else {
+            const data = {
+                message: `Unexpected error while trying to show part: ${error.message}`,
+                errorCode: 500
+            }
             logger.error(`OTHER error when FINDING car part by number ${number} -- getPartByNumber`);
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to show part: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }
 }
@@ -298,8 +313,12 @@ async function getAllCarParts(request, response){
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
+            const data = {
+                message: "There was an error connecting to the database.",
+                errorCode: 500
+            }
             logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('home.hbs', {message: "Error connecting to database."});
+            response.status(500).render('home.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -308,8 +327,12 @@ async function getAllCarParts(request, response){
         }
         // If any other error
         else {
+            const data = {
+                message: `Unexpected error while trying to show part: ${error.message}`,
+                errorCode: 500
+            }
             logger.error("OTHER error when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to show part: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }
 }
@@ -343,8 +366,12 @@ async function updatePartName(request, response){
         
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
+            const data = {
+                message: "There was an error connecting to the database.",
+                errorCode: 500
+            }
             logger.error(`DatabaseConnectionError when UPDATING car part ${partNumber} -- updatePartName`);
-            response.status(500).render('home.hbs', {message: "Error connecting to database."});
+            response.status(500).render('home.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -353,8 +380,12 @@ async function updatePartName(request, response){
         }
         // If any other error
         else {
+            const data = {
+                message: `Unexpected error while trying to show part: ${error.message}`,
+                errorCode: 500
+            }
             logger.error(`OTHER error when UPDATING car part ${partNumber} -- updatePartName`);
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to show part: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }   
 }
@@ -550,8 +581,12 @@ async function deleteSpecificCarPart(request, response){
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
+            const data = {
+                message: "There was an error connecting to the database.",
+                errorCode: 500
+            }
             logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('home.hbs', {message: "Error connecting to database."});
+            response.status(500).render('home.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -560,8 +595,12 @@ async function deleteSpecificCarPart(request, response){
         }
         // If any other error
         else {
+            const data = {
+                message: `Unexpected error while trying to show part: ${error.message}`,
+                errorCode: 500
+            }
             logger.error("OTHER error when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to show part: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }
 }
@@ -595,8 +634,12 @@ async function deletePart(request, response){
         
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
+            const data = {
+                message: "There was an error connecting to the database.",
+                errorCode: 500
+            }
             logger.error(`DatabaseConnectionError when DELETING car part ${partNumber} -- deletePart`);
-            response.status(500).render('home.hbs', {message: "Error connecting to database."});
+            response.status(500).render('home.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
