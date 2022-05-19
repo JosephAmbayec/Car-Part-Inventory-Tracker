@@ -274,10 +274,7 @@
                   <!--If delete-->
                   {{#if ../isDelete}}
                     <td>
-                      <form action="/home" method="post">
-                          <!--The partNumber to delete the row-->
-                          <input type="hidden" name="partNumber" value="{{partNumber}}">
-                          
+                      <form action="/parts/delete/{{partNumber}}" method="post">
                           <!--The delete button for the current row-->
                           <button type="submit" name="choice" value="delete row" class="trash-delete" 
                                           style="font-size:27px; background-color: transparent; border: none;">

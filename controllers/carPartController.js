@@ -624,15 +624,30 @@ async function addCarPartToProject(request, response){
     }
 }
 
+async function deleteRowCarPart(request, response){
+    try {
+        // Getting the values
+        let thePartNumber = request.params.partNumber;
+        
+        let result = await sqlModel.deleteCarPart(thePartNumber);
+        
+        response.redirect('/parts/table/delete');
+    } 
+    catch (error) {
+        
+    }
+}
+
+
 router.post("/parts", createPart)
 router.get("/parts/:partNumber", getPartByNumber)
 router.get("/parts", getAllCarParts)
-router.get("/parts/delete/table", deleteSpecificCarPart);
+router.get("/parts/table/delete", deleteSpecificCarPart);
 router.put("/parts/:partNumber", updatePartName)
-router.delete("/parts/:partNumber", deletePart)
+router.post("/parts/delete/:partNumber", deleteRowCarPart)
 router.get("/", getAllCarParts)
-
 router.get("/parts/addto/:projectId", addCarPartToProject);
+
 
 
 module.exports = {

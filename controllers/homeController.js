@@ -160,7 +160,7 @@ function showForm(request, response) {
         case 'delete':
             logger.info(`SWITCH CASE delete -- showForm`);
             // showDeleteForm(request, response);
-            response.redirect('/parts/delete/table');
+            response.redirect('/parts/table/delete');
             break;
 
         // Default case

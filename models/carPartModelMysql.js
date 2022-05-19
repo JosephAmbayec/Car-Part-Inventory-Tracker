@@ -199,8 +199,12 @@ async function updateCarPartName(partNumber, name){
     }
 
     try {
-        const addStatement = `DELETE FROM carPart where partNumber = ${partNumber};`;
-        await connection.execute(addStatement);
+        let sqlStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
+        await connection.execute(sqlStatement);
+
+        sqlStatement = `DELETE FROM carPart where partNumber = ${partNumber};`;
+        await connection.execute(sqlStatement);
+
         logger.info(`DELETED the car part (${partNumber}) from the database.`);
 
         return {"partNumber": partNumber }
