@@ -501,6 +501,16 @@ table {
 
  /* #endregion */
 
+/* #region error page*/
 
+#error-container{
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+}
+#error-container > *{
+  margin-top: 1.5rem;
+}
 
- 
+/* #endregion*/
