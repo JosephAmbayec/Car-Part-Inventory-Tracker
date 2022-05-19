@@ -19,7 +19,7 @@ body {
     margin-right: auto;
 }
 footer {
-    position: fixed;
+    position: sticky;
     Width: 100%;
     bottom: 0;
 }

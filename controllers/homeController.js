@@ -20,11 +20,11 @@ router.use(cookieParser());
  */
 async function sendHome(request, response) {
     let pageData;
+    const lang = request.cookies.language;
 
     try {
         // Getting the values
         const justRegistered = request.cookies.justRegistered;
-        const lang = request.cookies.language;
         let login = loginController.authenticateUser(request);
         let signupDisplay, endpoint, logInText;
         let accessProject = request.cookies.lastAccessedProject;

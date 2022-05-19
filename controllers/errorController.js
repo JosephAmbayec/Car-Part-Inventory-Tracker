@@ -12,7 +12,8 @@ const logger = require('../logger');
  */
 function sendError(request, response){
     const error = {
-        errorCode: 500,
+        errorCode: 404,
+        alertMessage: "There was a slight error..."
     }
 
     response.status(error.errorCode);
