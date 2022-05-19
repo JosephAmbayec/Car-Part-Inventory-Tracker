@@ -1,14 +1,17 @@
 
 
 <div id="error-container">
-    <h2>{{errorCode}} Error</h2>
+    <div style="display: flex; flex-direction: row; align-items: center;">
+        <img src="/images/gear-error.png" alt="Gear error icon" style="width:45px;">
+        <h2 style="margin-left: 0.75rem;">{{errorCode}} Error</h2>
+    </div>
 
     <h5>Sorry for the inconvenience!</h5>
     <h5>There was a slight error!</h5>
 
     <p>Would you like to go back to the home page?</p>
 
-    <a href="/" style="cursor: pointer; width: 175px; height: 32px;">
+    <a href="/" id="error-button-back-home">
         <i class='fas fa-arrow-left' style='font-size:17px; margin-right: 4px;'></i>
         Home Page
     </a>

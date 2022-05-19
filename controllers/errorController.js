@@ -13,7 +13,7 @@ const logger = require('../logger');
 function sendError(request, response){
     response.status(404);
     logger.info(`RENDERING home page WITH Invalid URL ERROR -- sendError`);
-    response.render('home.hbs', {alertMessage: 'Invalid URL entered.  Please try again.'});
+    response.render('error.hbs');
 }
 
 router.all('*', sendError);

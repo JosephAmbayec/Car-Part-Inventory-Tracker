@@ -512,5 +512,9 @@ table {
 #error-container > *{
   margin-top: 1.5rem;
 }
-
+#error-button-back-home{
+  cursor: pointer; 
+  width: 175px; 
+  height: 32px;
+}
 /* #endregion*/
