@@ -6,6 +6,7 @@ const routeRoot = '/';
 const partController = require('./carPartController');
 const logger = require('../logger');
 const loginController = require('./loginController');
+const projectModel = require('../models/projectModel')
 
 const cookieParser = require("cookie-parser")
 router.use(cookieParser());
@@ -68,8 +69,8 @@ async function sendHome(request, response) {
             Delete: "Delete a Car Part",
             loggedInUser: login,
             projects_text: "Projects",
-            about_text: "About Us"
-            accessProject: true,
+            about_text: "About Us",
+            accessProject: AccessProject,
             accessProjectId: accessProject,
             accessProjectName: AccessProjectName
         }
@@ -104,8 +105,8 @@ async function sendHome(request, response) {
             Delete: "Supprimer une Pièce Auto",
             loggedInUser: login,
             projects_text: "Projets",
-            about_text: "À propos de nous"
-            accessProject: true,
+            about_text: "À propos de nous",
+            accessProject: AccessProject,
             accessProjectId: accessProject,
             accessProjectName: AccessProjectName
         }
