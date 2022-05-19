@@ -123,6 +123,8 @@ async function getUserByName(username){
         return -1;
     let query = `SELECT id from Users where username = '${username}'`;
     let result = await connection.query(query);
+    if (result[0].length == 0)
+        return -1;
     return result[0][0].id;
 }
 /**

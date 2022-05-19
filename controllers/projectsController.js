@@ -24,17 +24,57 @@ async function createProject(request, response) {
     const lang = request.cookies.language;
 
     // If the user id is not specified
-    if (userId === -1) {
-        logger.error(`No user to create project -- createProject`);
-        throw new sqlModel.DatabaseConnectionError("The project is not associated with a user");
-    }
 
     try {
-        // Add project
-        let projectId = await projectModel.addProject(name, description)
-        await projectModel.addUserToProject(projectId, userId);
-        let projs = await projectModel.getAllProjects(request.cookies.username);
-        let login = loginController.authenticateUser(request);
+        let projectId;
+        let projs;
+        let login;
+        if (userId === -1) {
+            logger.error(`No user to create project -- createProject`);
+            
+            let pageData;
+
+            if (!lang || lang === 'en' || lang == undefined) {
+                pageData = {
+                    alertOccurred: true,
+                    alertMessage: "",
+                    alertLevel: 'danger',
+                    alertLevelText: 'Danger',
+                    alertHref: 'exclamation-triangle-fill',
+                    titleName: 'Create a Project',
+                    pathNameForActionForm: 'projects',
+                    projects: await projectModel.getAllProjects(),
+                    clickedNewProject: false,
+                    loggedInUser: login
+                }
+            }
+            else {
+                pageData = {
+                    alertOccurred: true,
+                    alertMessage: "",
+                    alertLevel: 'danger',
+                    alertLevelText: 'Danger',
+                    alertHref: 'exclamation-triangle-fill',
+                    titleName: 'Créer un Projet',
+                    pathNameForActionForm: 'projects',
+                    projects: await projectModel.getAllProjects(),
+                    clickedNewProject: false,
+                    loggedInUser: login
+                }
+            }
+
+                response.status(500).render('allProjects.hbs', pageData);
+                return;
+        }
+        else {
+            // Add project
+            projectId = await projectModel.addProject(name, description)
+            await projectModel.addUserToProject(projectId, userId);
+            projs = await projectModel.getAllProjects(request.cookies.username);
+            login = loginController.authenticateUser(request);
+        }
+
+
 
         // Set the login to the username if response is not null
         if (login != null) {
@@ -92,7 +132,7 @@ async function createProject(request, response) {
     } catch (error) {
         let pageData;
 
-        if (!lang || lang === 'en') {
+        if (!lang || lang === 'en' || lang == undefined) {
             pageData = {
                 alertOccurred: true,
                 alertMessage: "",
