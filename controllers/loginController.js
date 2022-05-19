@@ -9,8 +9,6 @@ const logger = require('../logger');
 const session = require('./sessionController');
 const sessionModel = require('../models/sessionModel');
 
-let LOGGED_IN_USER = null;
-
 /**
  * Handles the request for logging in a user and forms the appropriate response.
  * @param {*} request 
@@ -37,7 +35,6 @@ async function loginUser(request, response) {
 
             let pageData;
 
-            LOGGED_IN_USER = username;
             const lang = request.cookies.language;
 
             if (!lang || lang === 'en') {
@@ -135,6 +132,7 @@ async function loginUser(request, response) {
 
         let errorData;
         const lang = request.cookies.language;
+        
         // Error data for when an error occurs
         if (!lang || lang === 'en') {
             errorData = {
@@ -170,9 +168,13 @@ async function loginUser(request, response) {
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof DatabaseConnectionError) {
-            errorData.alertMessage = "Error while connecting to database.";
+            const data = {
+                message: "There was an error connecting to the database.",
+                errorCode: 500
+            }
+            errorData.alertMessage = data.message;
             logger.error(`DatabaseConnectionError when LOGGING IN user ${username} -- loginUser`);
-            response.status(500).render('loginsignup.hbs', { alertMessage: "Error while connecting to database." });
+            response.status(500).render('error.hbs', data);
         }
         // If the error is an instance of the UserLoginError error
         else if (error instanceof userModel.UserLoginError) {
@@ -182,8 +184,13 @@ async function loginUser(request, response) {
         }
         // If any other error occurs
         else {
+            const data = {
+                message: `Unexpected error while trying to log in user: ${error.message}`,
+                errorCode: 500
+            }
+            errorData.alertMessage = data.message;
             logger.error(`OTHER error when LOGGING IN user ${username} -- loginUser`);
-            response.status(500).render('error.hbs', { message: `Unexpected error while trying to register user: ${error.message}` });
+            response.status(500).render('error.hbs', data);
         }
     }
 }
@@ -290,7 +297,6 @@ router.get('/users/logout', logoutUser)
 module.exports = {
     router,
     routeRoot,
-    LOGGED_IN_USER,
     authenticateUser
 }
 

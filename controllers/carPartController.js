@@ -40,7 +40,8 @@ async function createPart(request, response){
 
         response.status(201).render('home.hbs', {message: `Created part: Part #${number}, ${partName}, Condition: ${condition}`});
 
-    } catch(error) {
+    } 
+    catch(error) {
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
@@ -100,7 +101,7 @@ async function getPartByNumber(request, response){
                 errorCode: 500
             }
             logger.error(`DatabaseConnectionError when FINDING car part by number ${number} -- getPartByNumber`);
-            response.status(500).render('home.hbs', data);
+            response.status(500).render('error.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -318,7 +319,7 @@ async function getAllCarParts(request, response){
                 errorCode: 500
             }
             logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('home.hbs', data);
+            response.status(500).render('error.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -371,7 +372,7 @@ async function updatePartName(request, response){
                 errorCode: 500
             }
             logger.error(`DatabaseConnectionError when UPDATING car part ${partNumber} -- updatePartName`);
-            response.status(500).render('home.hbs', data);
+            response.status(500).render('error.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -390,7 +391,7 @@ async function updatePartName(request, response){
     }   
 }
 
-async function deleteSpecificCarPart(request, response){
+async function deleteSpecificCarPartTable(request, response){
     try {
         let parts = await sqlModel.findAllCarParts();
         let login = loginController.authenticateUser(request);
@@ -586,7 +587,7 @@ async function deleteSpecificCarPart(request, response){
                 errorCode: 500
             }
             logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('home.hbs', data);
+            response.status(500).render('error.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -605,33 +606,74 @@ async function deleteSpecificCarPart(request, response){
     }
 }
 
+async function addCarPartToProject(request, response){
+    try {
+        // Getting the values
+        let projectId = request.params.projectId;
+        
+        let result = await projectModel.addPartToProject(projectId);
+        console.log(result);
+    } 
+    catch (error) {
+        // If the error is an instance of the DatabaseConnectionError error
+        if (error instanceof sqlModel.DatabaseConnectionError){
+            const data = {
+                message: "There was an error connecting to the database.",
+                errorCode: 500
+            }
+            logger.error(`DatabaseConnectionError when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
+            response.status(500).render('error.hbs', data);
+        }
+        // If the error is an instance of the InvalidInputError error
+        else if (error instanceof sqlModel.InvalidInputError){
+            logger.error(`InvalidInputError when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
+            response.status(404).render('home.hbs', {message: "Invalid input, check that all fields are alpha numeric where applicable."});
+        }
+        // If any other error
+        else {
+            logger.error(`OTHER error when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
+            response.status(500).render('error.hbs', {message: `Unexpected error while trying to show part: ${error.message}`});
+        }
+    }
+}
+
 /**
- * DELETE controller method that allows the user to delete a specific part given it's part number
+ * Deletes the specified car part from the database.
  * @param {*} request 
  * @param {*} response 
  */
 async function deletePart(request, response){
-    // Getting the values
-    let partNumber = request.params.partNumber;
-
     try {
+        // Getting the values
+        let partNumber = request.params.partNumber;
 
         // If the car part exists
         if (await sqlModel.verifyCarPartExists(partNumber)){
-            await sqlModel.deleteCarPart(partNumber)
-                .then(part => {
-                    logger.info(`DELETING car part ${partNumber} because car part DOESN'T exist -- deletePart`);
-                    response.status(202).render('home.hbs', {message: `Deleted part with part number ${part.partNumber}`});
-                })
+            // Delete from any project first
+            let deletedPartProject = await projectModel.deletePartFromProjectWithNumber(partNumber);
+            // Then delete the car part
+            let deletedPart = await sqlModel.deleteCarPart(partNumber);
+
+            if(deletedPartProject && deletedPart){
+                response.status(200);
+                logger.info(`DELETING car part ${partNumber} controller -- deletePart`);
+            }
+            else{
+                response.status(404);
+                logger.info(`DELETING car part ${partNumber} failed -- deletePart`);
+            }
+
+            // response.status(202).render('home.hbs', {message: `Deleted part with part number ${part.partNumber}`});
+
+            response.redirect('/parts/table/delete');
         }
         // If the car part doesn't exists
         else{
             logger.info(`NOT DELETING car part ${partNumber} in database -- deletePart`);
             response.status(404).render('home.hbs', {message:`Could not find part #${partNumber}`});
         }
-    }
-    catch (error){
-        
+    } 
+    catch (error) {
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
             const data = {
@@ -639,7 +681,7 @@ async function deletePart(request, response){
                 errorCode: 500
             }
             logger.error(`DatabaseConnectionError when DELETING car part ${partNumber} -- deletePart`);
-            response.status(500).render('home.hbs', data);
+            response.status(500).render('error.hbs', data);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
@@ -654,55 +696,13 @@ async function deletePart(request, response){
     }
 }
 
-async function addCarPartToProject(request, response){
-    try {
-        // Getting the values
-        let projectId = request.params.projectId;
-        
-        let result = await projectModel.addPartToProject(projectId);
-        console.log(result);
-    } 
-    catch (error) {
-        
-    }
-}
-
-/**
- * Deletes the specified car part from the database.
- * @param {*} request 
- * @param {*} response 
- */
-async function deleteRowCarPart(request, response){
-    try {
-        // Getting the values
-        let thePartNumber = request.params.partNumber;
-
-        // Delete from any project first
-        let deletedPartProject = await projectModel.deletePartFromProjectWithNumber(partNumber);
-        // Then delete the car part
-        let deletedPart = await sqlModel.deleteCarPart(thePartNumber);
-
-        if(deletedPartProject && deletedPart){
-            response.status(200);
-        }
-        else{
-            response.status(404);
-        }
-
-        response.redirect('/parts/table/delete');
-    } 
-    catch (error) {
-        
-    }
-}
-
 
 router.post("/parts", createPart)
 router.get("/parts/:partNumber", getPartByNumber)
 router.get("/parts", getAllCarParts)
-router.get("/parts/table/delete", deleteSpecificCarPart);
+router.get("/parts/table/delete", deleteSpecificCarPartTable);
 router.put("/parts/:partNumber", updatePartName)
-router.post("/parts/delete/:partNumber", deleteRowCarPart)
+router.post("/parts/delete/:partNumber", deletePart)
 router.get("/", getAllCarParts)
 router.get("/parts/addto/:projectId", addCarPartToProject);
 

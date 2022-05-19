@@ -186,9 +186,13 @@ async function createUser(request, response){
 
             // If the error is an instance of the DatabaseConnectionError error
             if (error instanceof DatabaseConnectionError){
-                errorData.alertMessage = "Error while connecting to database.";
+                const data = {
+                    message: "There was an error connecting to the database.",
+                    errorCode: 500
+                }
+                errorData.alertMessage = data.message;
                 logger.error(`DatabaseConnectionError when CREATING user ${username} -- createUser`);
-                response.status(500).render('users.hbs', {alertMessage: "Error while connecting to database."});
+                response.status(500).render('error.hbs', data);
             }
             // If the error is an instance of the UserLoginError error
             else if (error instanceof userModel.UserLoginError){
@@ -198,6 +202,11 @@ async function createUser(request, response){
             }
             // If any other error occurs
             else {
+                const data = {
+                    message: `Unexpected error while trying to register user: ${error.message}`,
+                    errorCode: 500
+                }
+                errorData.alertMessage = data.message;
                 logger.error(`OTHER error when CREATING user ${username} -- createUser`);
                 response.status(500).render('error.hbs', {message: `Unexpected error while trying to register user: ${error.message}`});
             }
@@ -229,14 +238,23 @@ async function createUser(request, response){
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof DatabaseConnectionError){
-            errorData.alertMessage = "Error while connecting to database.";
+            const data = {
+                message: "There was an error connecting to the database.",
+                errorCode: 500
+            }
+            errorData.alertMessage = data.message;
             logger.error(`DatabaseConnectionError when RETRIEVING all users -- showUsers`);
-            response.status(500).render('users.hbs', {alertMessage: "Error while connecting to database."});
+            response.status(500).render('users.hbs', data);
         }
         // If any other error occurs
         else {
+            const data = {
+                message: `Unexpected error while trying to register user: ${error.message}`,
+                errorCode: 500
+            }
+            errorData.alertMessage = data.message;
             logger.error(`OTHER error when RETRIEVING all users -- showUsers`);
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to register user: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }
 }

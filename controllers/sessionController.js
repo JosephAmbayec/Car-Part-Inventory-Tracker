@@ -17,12 +17,18 @@ async function createSession(username, numMinutes) {
         return sessionId;
     }
     catch(error){
+        const data = {
+            message: `Unexpected error while trying to create sessionId for user: ${error.message}`,
+            errorCode: 500
+        }
+        errorData.alertMessage = data.message;
         logger.error(`error when CREATING sessionId for user ${username} -- createUser`);
         app.get('/'), (request, response)=>{
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to create sessionId for user: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }
 }
+
 
 module.exports = {
     createSession

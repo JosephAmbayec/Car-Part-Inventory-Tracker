@@ -103,7 +103,8 @@ async function createProject(request, response) {
                 pathNameForActionForm: 'projects',
                 projects: await projectModel.getAllProjects(),
                 clickedNewProject: false,
-                loggedInUser: login
+                loggedInUser: login,
+                errorCode: ""
             }
         }
         else {
@@ -117,17 +118,17 @@ async function createProject(request, response) {
                 pathNameForActionForm: 'projects',
                 projects: await projectModel.getAllProjects(),
                 clickedNewProject: false,
-                loggedInUser: login
+                loggedInUser: login,
+                errorCode: ""
             }
         }
 
-
-
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError) {
-            pageData.alertMessage = "Error connecting to database.";
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
             logger.error(`DatabaseConnectionError when CREATING PROJECT ${name} -- createProject`);
-            response.status(500).render('allProjects.hbs', pageData);
+            response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError) {
@@ -138,8 +139,9 @@ async function createProject(request, response) {
         // If any other error occurs
         else {
             pageData.alertMessage = `Unexpected error while trying to create project: ${error.message}`;
+            pageData.errorCode = 500;
             logger.error(`OTHER error when CREATING PROJECT ${name} -- createProject`);
-            response.status(500).render('allProjects.hbs', pageData);
+            response.status(500).render('error.hbs', pageData);
         }
     }
 }
@@ -151,54 +153,102 @@ async function createProject(request, response) {
  */
 async function showProjects(request, response) {
 
-    let login = loginController.authenticateUser(request);
+    try {
+        let login = loginController.authenticateUser(request);
+    
+        // Set the login to the username if response is not null
+        if (login != null) {
+            login = login.userSession.username;
+        }
+    
+        const lang = request.cookies.language;
+        let pageData;
+    
+        if (!lang || lang === 'en') {
+            pageData = {
+                alertOccurred: false,
+                showTable: true,
+                tableMessage: "You do not have any Projects.",
+                titleName: 'Create a Project',
+                pathNameForActionForm: 'projects',
+                projects: await projectModel.getAllProjects(request.cookies.username),
+                Home: "Home",
+                logInlogOutText: "Log Out",
+                loggedInUser: login
+            }
+        }
+        else {
+            pageData = {
+                alertOccurred: false,
+                showTable: true,
+                tableMessage: "Vous n'avez aucun Projet.",
+                titleName: 'Créer un Projet',
+                pathNameForActionForm: 'projects',
+                projects: await projectModel.getAllProjects(request.cookies.username),
+                Home: "Acceuil",
+                logInlogOutText: "Déconnecter",
+                loggedInUser: login
+            }
+        }
 
-    // Set the login to the username if response is not null
-    if (login != null) {
-        login = login.userSession.username;
-    }
+        // If there's no projects
+        if (pageData.projects.length == 0) {
+            logger.info(`CANNOT SHOW PROJECTS TABLE due to there being no projects created -- showProjects`);
+            pageData.showTable = false;
+        }
+    
+        logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+        response.status(201).render('allProjects.hbs', pageData);
+    } 
+    catch (error) {
+        let pageData;
 
-    const lang = request.cookies.language;
-    let pageData;
+        if (!lang || lang === 'en') {
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "",
+                alertLevel: 'danger',
+                alertLevelText: 'Danger',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Create a Project',
+                pathNameForActionForm: 'projects',
+                projects: await projectModel.getAllProjects(),
+                clickedNewProject: false,
+                loggedInUser: login,
+                errorCode: ""
+            }
+        }
+        else {
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "",
+                alertLevel: 'danger',
+                alertLevelText: 'Danger',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Créer un Projet',
+                pathNameForActionForm: 'projects',
+                projects: await projectModel.getAllProjects(),
+                clickedNewProject: false,
+                loggedInUser: login,
+                errorCode: ""
+            }
+        }
 
-    if (!lang || lang === 'en') {
-        pageData = {
-            alertOccurred: false,
-            showTable: true,
-            tableMessage: "You do not have any Projects.",
-            titleName: 'Create a Project',
-            pathNameForActionForm: 'projects',
-            projects: await projectModel.getAllProjects(request.cookies.username),
-            Home: "Home",
-            logInlogOutText: "Log Out",
-            loggedInUser: login
+        // If the error is an instance of the DatabaseConnectionError error
+        if (error instanceof sqlModel.DatabaseConnectionError) {
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
+            logger.error(`DatabaseConnectionError when SHOWING PROJECTS -- showProjects`);
+            response.status(500).render('error.hbs', pageData);
+        }
+        // If any other error occurs
+        else {
+            pageData.alertMessage = `Unexpected error while trying to show projects: ${error.message}`;
+            pageData.errorCode = 500;
+            logger.error(`OTHER error when SHOWING PROJECTS -- showProjects`);
+            response.status(500).render('error.hbs', pageData);
         }
     }
-    else {
-        pageData = {
-            alertOccurred: false,
-            showTable: true,
-            tableMessage: "Vous n'avez aucun Projet.",
-            titleName: 'Créer un Projet',
-            pathNameForActionForm: 'projects',
-            projects: await projectModel.getAllProjects(request.cookies.username),
-            Home: "Acceuil",
-            logInlogOutText: "Déconnecter",
-            loggedInUser: login
-        }
-    }
-
-    // Page data 
-
-
-    // If there's no projects
-    if (pageData.projects.length == 0) {
-        logger.info(`CANNOT SHOW PROJECTS TABLE due to there being no projects created -- showProjects`);
-        pageData.showTable = false;
-    }
-
-    logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-    response.status(201).render('allProjects.hbs', pageData);
 }
 
 /**
@@ -246,10 +296,10 @@ async function showCreateForm(request, response) {
         }
     }
 
-
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
     response.status(201).render('allProjects.hbs', pageData);
 }
+
 /**
  * Called when adding a car part
  * @param {*} request 
@@ -257,13 +307,14 @@ async function showCreateForm(request, response) {
  */
 
 async function addCarPart(request, response) {
+    const lang = request.cookies.language;
+
     try {
         let partNumber = request.body.partNumber;
         let projectId = request.params.projectId;
 
         await projectModel.addPartToProject(projectId, partNumber);
 
-        const lang = request.cookies.language;
         let pageData;
 
         if (!lang || lang === 'en') {
@@ -322,19 +373,23 @@ async function addCarPart(request, response) {
         response.status(201).render('home.hbs', pageData);
     }
     catch (error) {
-        const pageData = {
+        let pageData = {
             alertOccurred: true,
             alertMessage: "",
             alertLevel: 'danger',
             alertLevelText: 'Danger',
             alertHref: 'exclamation-triangle-fill',
-            loggedInUser: LOGGED_IN_USER
+            loggedInUser: lang,
+            errorCode: "",
+            alertMessage: ""
         }
 
+         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError) {
-            pageData.alertMessage = "Error connecting to database.";
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
             logger.error(`DatabaseConnectionError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
-            response.status(500).render('home.hbs', pageData);
+            response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError) {
@@ -345,8 +400,9 @@ async function addCarPart(request, response) {
         // If any other error occurs
         else {
             pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+            pageData.errorCode = 500;
             logger.error(`OTHER error when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
-            response.status(500).render('home.hbs', pageData);
+            response.status(500).render('error.hbs', pageData);
         }
     }
 }
@@ -359,74 +415,107 @@ let theProjectId;
  * @param {*} response 
  */
 async function showSpecificProject(request, response) {
-    let projectID = request.params.projectId;
-    let theProject = await projectModel.getProjectByProjectId(projectID);
-    let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
-    let login = loginController.authenticateUser(request);
-    let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
-    let noPartsFound, name, description;
-    // console.log(this.);
+    try {
+        let projectID = request.params.projectId;
+        let theProject = await projectModel.getProjectByProjectId(projectID);
+        let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
+        let login = loginController.authenticateUser(request);
+        let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
+        let noPartsFound, name, description;
+        // console.log(this.);
+    
+        if (arrayOFCatPartsInProject.length === 0) {
+            noPartsFound = true;
+        }
+        else {
+            name = theProject[0].name;
+            theProject[0].description;
+        }
+        if (projectID != 'null') {
+            theProjectId = projectID;
+        }
+        // Set the login to the username if response is not null
+        if (login != null) {
+            login = login.userSession.username;
+        }
+    
+        const lang = request.cookies.language;
+        let pageData;
+    
+        if (!lang || lang === 'en') {
+            //Page data
+            pageData = {
+                alertOccurred: false,
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Log Out",
+                signUpText: "Sign Up",
+                endpointLogInLogOut: "login",
+                clickedNewProject: false,
+                Home: "Home",
+                loggedInUser: login,
+                projectName: name,
+                projectDescription: description,
+                projectId: parseInt(theProjectId),
+                projectParts: arrayOFCatPartsInProject,
+                noParts: noPartsFound
+            }
+        }
+        else {
+            pageData = {
+                alertOccurred: false,
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Déconnecter",
+                signUpText: "Enregistrer",
+                endpointLogInLogOut: "login",
+                clickedNewProject: false,
+                Home: "Acceuil",
+                loggedInUser: login,
+                projectName: name,
+                projectDescription: description,
+                projectId: parseInt(theProjectId),
+                projectParts: arrayOFCatPartsInProject,
+                noParts: noPartsFound
+            }
+        }
+    
+        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+        response.status(201).render('showProject.hbs', pageData);
+    } 
+    catch (error) {
+        let pageData = {
+            alertOccurred: true,
+            alertMessage: "",
+            alertLevel: 'danger',
+            alertLevelText: 'Danger',
+            alertHref: 'exclamation-triangle-fill',
+            loggedInUser: lang,
+            errorCode: "",
+            alertMessage: ""
+        }
 
-    if (arrayOFCatPartsInProject.length === 0) {
-        noPartsFound = true;
-    }
-    else {
-        name = theProject[0].name;
-        theProject[0].description;
-    }
-    if (projectID != 'null') {
-        theProjectId = projectID;
-    }
-    // Set the login to the username if response is not null
-    if (login != null) {
-        login = login.userSession.username;
-    }
-
-    const lang = request.cookies.language;
-    let pageData;
-
-    if (!lang || lang === 'en') {
-        //Page data
-        pageData = {
-            alertOccurred: false,
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Log Out",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            clickedNewProject: false,
-            Home: "Home",
-            loggedInUser: login,
-            projectName: name,
-            projectDescription: description,
-            projectId: parseInt(theProjectId),
-            projectParts: arrayOFCatPartsInProject,
-            noParts: noPartsFound
+         // If the error is an instance of the DatabaseConnectionError error
+        if (error instanceof sqlModel.DatabaseConnectionError) {
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
+            logger.error(`DatabaseConnectionError when ADDING CAR PAR to PROJECT  -- showSpecificProject`);
+            response.status(500).render('error.hbs', pageData);
+        }
+        // If the error is an instance of the InvalidInputError error
+        else if (error instanceof sqlModel.InvalidInputError) {
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            logger.error(`InvalidInputError when SHOWING SPECIFIC PROJECT -- showSpecificProject`);
+            response.status(404).render('home.hbs', pageData);
+        }
+        // If any other error occurs
+        else {
+            pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+            pageData.errorCode = 500;
+            logger.error(`OTHER error when SHOWING SPECIFIC PROJECT -- showSpecificProject`);
+            response.status(500).render('error.hbs', pageData);
         }
     }
-    else {
-        pageData = {
-            alertOccurred: false,
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Déconnecter",
-            signUpText: "Enregistrer",
-            endpointLogInLogOut: "login",
-            clickedNewProject: false,
-            Home: "Acceuil",
-            loggedInUser: login,
-            projectName: name,
-            projectDescription: description,
-            projectId: parseInt(theProjectId),
-            projectParts: arrayOFCatPartsInProject,
-            noParts: noPartsFound
-        }
-    }
-
-
-
-    // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-    response.status(201).render('showProject.hbs', pageData);
 }
 
 /**
@@ -439,67 +528,103 @@ async function updateProject(request, response) {
     let name = request.body.name;
     let description = request.body.description;
     let projectID = request.params.projectId;
-    let login = loginController.authenticateUser(request);
 
-    // Set the login to the username if response is not null
-    if (login != null) {
-        login = login.userSession.username;
-    }
-
-    await projectModel.updateProject(name, description, projectID);
-
-
-    const lang = request.cookies.language;
-    let pageData;
-
-    if (!lang || lang === 'en') {
-        // Page data 
-        pageData = {
+    try {
+        let login = loginController.authenticateUser(request);
+    
+        // Set the login to the username if response is not null
+        if (login != null) {
+            login = login.userSession.username;
+        }
+    
+        await projectModel.updateProject(name, description, projectID);
+    
+        const lang = request.cookies.language;
+        let pageData;
+    
+        if (!lang || lang === 'en') {
+            // Page data 
+            pageData = {
+                alertOccurred: true,
+                alertMessage: `Successfully updated project ${name}!`,
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Log Out",
+                signUpText: "Sign Up",
+                endpointLogInLogOut: "login",
+                clickedNewProject: false,
+                Home: "Home",
+                loggedInUser: login,
+            }
+        }
+        else {
+            // Page data 
+            pageData = {
+                alertOccurred: true,
+                alertMessage: `Projet mis à jour avec succès ${name}!`,
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Déconnecter",
+                signUpText: "Enregistrer",
+                endpointLogInLogOut: "login",
+                clickedNewProject: false,
+                Home: "Acceuil",
+                loggedInUser: login,
+            }
+        }
+    
+    
+        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+        response.cookie("lastAccessedProject", projectID);
+        response.redirect(`/projects/${projectID}`);
+        response.status(201).render('showProject.hbs', pageData);
+    } 
+    catch (error) {
+        let pageData = {
             alertOccurred: true,
-            alertMessage: `Successfully updated project ${name}!`,
-            alertLevel: 'success',
-            alertLevelText: 'success',
+            alertMessage: "",
+            alertLevel: 'danger',
+            alertLevelText: 'Danger',
             alertHref: 'exclamation-triangle-fill',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Log Out",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            clickedNewProject: false,
-            Home: "Home",
-            loggedInUser: login,
+            loggedInUser: lang,
+            errorCode: "",
+            alertMessage: ""
+        }
+
+        // If the error is an instance of the DatabaseConnectionError error
+        if (error instanceof sqlModel.DatabaseConnectionError) {
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
+            logger.error(`DatabaseConnectionError when UPDATING PROJECT ${name} -- updateProject`);
+            response.status(500).render('error.hbs', pageData);
+        }
+        // If the error is an instance of the InvalidInputError error
+        else if (error instanceof sqlModel.InvalidInputError) {
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            logger.error(`InvalidInputError when UPDATING PROJECT ${name} -- updateProject`);
+            response.status(404).render('home.hbs', pageData);
+        }
+        // If any other error occurs
+        else {
+            pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+            pageData.errorCode = 500;
+            logger.error(`OTHER error when UPDATING PROJECT ${name} -- updateProject`);
+            response.status(500).render('error.hbs', pageData);
         }
     }
-    else {
-        // Page data 
-        pageData = {
-            alertOccurred: true,
-            alertMessage: `Projet mis à jour avec succès ${name}!`,
-            alertLevel: 'success',
-            alertLevelText: 'success',
-            alertHref: 'exclamation-triangle-fill',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Déconnecter",
-            signUpText: "Enregistrer",
-            endpointLogInLogOut: "login",
-            clickedNewProject: false,
-            Home: "Acceuil",
-            loggedInUser: login,
-        }
-    }
-
-
-    // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-    response.cookie("lastAccessedProject", projectID);
-    response.redirect(`/projects/${projectID}`);
-    response.status(201).render('showProject.hbs', pageData);
 }
 
 async function deleteProject(request, response) {
+    // Get the values
+    let projectID = request.params.projectId;
+
     try {
-        // Get the values
-        let projectID = request.params.projectId;
         let login = loginController.authenticateUser(request);
 
         // Set the login to the username if response is not null
@@ -531,15 +656,46 @@ async function deleteProject(request, response) {
         // response.status(201).render('allProjects.hbs', pageData);
     }
     catch (error) {
+        let pageData = {
+            alertOccurred: true,
+            alertMessage: "",
+            alertLevel: 'danger',
+            alertLevelText: 'Danger',
+            alertHref: 'exclamation-triangle-fill',
+            loggedInUser: lang,
+            errorCode: "",
+            alertMessage: ""
+        }
 
+        // If the error is an instance of the DatabaseConnectionError error
+        if (error instanceof sqlModel.DatabaseConnectionError) {
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
+            logger.error(`DatabaseConnectionError when DELETING PROJECT ${projectID} -- deleteProject`);
+            response.status(500).render('error.hbs', pageData);
+        }
+        // If the error is an instance of the InvalidInputError error
+        else if (error instanceof sqlModel.InvalidInputError) {
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            logger.error(`InvalidInputError when DELETING PROJECT ${projectID} -- deleteProject`);
+            response.status(404).render('home.hbs', pageData);
+        }
+        // If any other error occurs
+        else {
+            pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+            pageData.errorCode = 500;
+            logger.error(`OTHER error when DELETING PROJECT ${projectID} -- deleteProject`);
+            response.status(500).render('error.hbs', pageData);
+        }
     }
 }
 
 async function deletePartFromProject(request, response) {
+    // Get the values
+    let projectID = request.params.projectId;
+    let partNumber = request.params.partNumber;
+
     try {
-        // Get the values
-        let projectID = request.params.projectId;
-        let partNumber = request.params.partNumber;
         let login = loginController.authenticateUser(request);
 
         // Set the login to the username if response is not null
@@ -571,7 +727,35 @@ async function deletePartFromProject(request, response) {
         // response.status(201).render('allProjects.hbs', pageData);
     }
     catch (error) {
+        let pageData = {
+            alertOccurred: true,
+            alertMessage: "",
+            alertLevel: 'danger',
+            alertLevelText: 'Danger',
+            alertHref: 'exclamation-triangle-fill',
+            titleName: 'Créer un Projet',
+            pathNameForActionForm: 'projects',
+            projects: await projectModel.getAllProjects(),
+            clickedNewProject: false,
+            loggedInUser: login,
+            errorCode: ""
+        }
 
+        // If the error is an instance of the DatabaseConnectionError error
+        if (error instanceof sqlModel.DatabaseConnectionError) {
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
+            logger.error(`DatabaseConnectionError when DELETING PART ${partNumber} from PROJECT ${projectID} -- deletePartFromProject`);
+            response.status(500).render('error.hbs', pageData);
+        }
+        // If any other error occurs
+        else {
+            pageData.alertMessage = `Unexpected error while trying to show projects: ${error.message}`;
+            pageData.errorCode = 500;
+            logger.error(`OTHER error when DELETING PART ${partNumber} from PROJECT ${projectID} -- deletePartFromProject`);
+            response.status(500).render('error.hbs', pageData);
+        
+        }
     }
 }
 
