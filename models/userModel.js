@@ -41,21 +41,24 @@ async function initializeUserModel(dbname, reset){
         throw new DatabaseConnectionError();
     }
 }
+
+/**
+ * Drops the specified tables.
+ * @param {*} connection The connection to the database.
+ */
 async function resetTables(connection){
+    // Dropping the tables
     resetTable("PartProject");
     resetTable("UsersProject");
     resetTable("Project");
-    // Dropping the Users table
     resetTable("Users");
-    // let dropQuery = "DROP TABLE IF EXISTS Users";
-    // await connection.execute(dropQuery);
-    // logger.info("Users table dropped");
-    // .then(console.log("User table dropped")).catch((error) => { console.error(error) });
-
-    // Dropping the Roles table
     resetTable("Roles");
 }
 
+/**
+ * Creates the specified tables.
+ * @param {*} connection The connection to the database.
+ */
 async function createTables(connection){
     const createRoleStatement = `CREATE TABLE IF NOT EXISTS Roles(roleID int, rolename VARCHAR(50), PRIMARY KEY (roleID))`;
     await connection.execute(createRoleStatement);
@@ -127,7 +130,7 @@ async function getUserByName(username){
  * @param {string} username The username of the user.
  * @param {string} password The password of the user.
  */
-async function addUser(username, password) {
+async function addUser(username, password, role) {
 
     // Checks if the user already exists in the database
     if (await userExists(username)){
@@ -141,7 +144,7 @@ async function addUser(username, password) {
         if (userUtils.isValidPassword(password)){
             try {
                 let hashedPassword = await userUtils.hashPassword(password);
-                let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', '2');`
+                let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', '${role}');`
 
                 await connection.execute(insertQuery);
                 logger.info("User added successfully to the database");
@@ -204,6 +207,31 @@ async function getRole(username){
     }
 }
 
+/**
+ * Determines the role of the specified user.
+ * @param {*} login The login username of the user.
+ * @returns Returns 1 if the role is admin; otherwise 2 for a guest.
+ */
+ async function determineRole(login){
+    let role;
+
+    // If the login is specified
+    if(login){
+        // Get the role of the username
+        let theRole = await getRole(login);
+
+        // Set the role to 1 if theRole is 1, otherwise 2
+        role = theRole === 1 
+                        ? 1 
+                        : 2;
+    }
+    // Guest
+    else{
+        role = 2;
+    }
+
+    return role;
+}
 
 //#region Validating
 
@@ -277,5 +305,6 @@ module.exports = {
     getRole,
     getUserByName,
     createTables,
-    resetTables
+    resetTables,
+    determineRole
 }

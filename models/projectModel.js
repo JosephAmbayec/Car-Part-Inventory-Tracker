@@ -63,7 +63,7 @@ async function initializeProjectModel(dbname, reset){
     } 
     catch (err) {
         logger.error(err);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -89,7 +89,7 @@ async function getConnection(){
 
     } catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 //#endregion
@@ -108,7 +108,7 @@ async function getConnection(){
     }    
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 /**
@@ -125,7 +125,7 @@ async function getAllProjects(username){
     } 
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -151,11 +151,11 @@ async function addPartToProject(projectId, partNumber){
             }
         }
         else
-            throw new model.DatabaseConnectionError();
+            throw new DatabaseConnectionError();
     }
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }     
 
@@ -169,7 +169,7 @@ async function partExistsInProject(projectId, partNumber){
     }
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 //#region Project operations
@@ -186,11 +186,11 @@ async function addUserToProject(projectId, id) {
             await connection.execute(insertStatement);
         }
         else
-            throw new model.DatabaseConnectionError();
+            throw new DatabaseConnectionError();
     }
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -209,7 +209,7 @@ async function projectExists(projectId){
     }
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -227,11 +227,11 @@ async function getProjectByProjectId(projectId){
             return projectArray[0];
         }
         else
-            throw new model.DatabaseConnectionError();
+            throw new DatabaseConnectionError();
     } 
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
@@ -251,18 +251,19 @@ async function updateProject(newName, newDescription, projectId){
             return projectArray[0];
         }
         else
-            throw new model.DatabaseConnectionError();
+            throw new DatabaseConnectionError();
     } 
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
 
 async function getProjectCarParts(projectId) {
     try {
+        // Checks if the project exists first
         if(projectExists(projectId)){
-            let selectStatement = `SELECT * FROM PartProject WHERE projectId = ${projectId};`;
+            const selectStatement = `SELECT * FROM PartProject WHERE projectId = ${projectId};`;
             let theProject = await connection.execute(selectStatement);
             return theProject[0];
             
@@ -271,15 +272,58 @@ async function getProjectCarParts(projectId) {
             // }
             // else{
             //     logger.error(error);
-            //     throw new model.DatabaseConnectionError();
+            //     throw new DatabaseConnectionError();
             // }
         }
     } 
     catch (error) {
         logger.error(error);
-        throw new model.DatabaseConnectionError();
+        throw new DatabaseConnectionError();
     }
 }
+
+/**
+ * Deletes the specified project project.
+ * @param {*} projectId The project id of the project to be deleted.
+ */
+async function deleteProject(projectId){
+    try {
+        // Checks if the project exists first
+        if(projectExists(projectId)){
+            // Delete from the PartsProject table first (clears all parts associated with this project)
+            let selectStatement = `DELETE FROM PartProject WHERE projectId = ${projectId};`;
+            let deletedProj = await connection.execute(selectStatement);
+
+            // Delete from the UsersProject table (no foreign key constraints)
+            selectStatement = `DELETE FROM UsersProject WHERE projectId = ${projectId};`;
+            deletedProj = await connection.execute(selectStatement);
+
+            // Delete the actual Project 
+            selectStatement = `DELETE FROM Project WHERE projectId = ${projectId};`;
+            deletedProj = await connection.execute(selectStatement);
+        }
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
+
+async function deletePartFromProject(projectId, partNumber){
+    try {
+        // Checks if the project exists first
+        if(projectExists(projectId)){
+            // Delete from the PartsProject table first (clears all parts associated with this project)
+            let selectStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
+            await connection.execute(selectStatement);
+        }
+    } 
+    catch (error) {
+        logger.error(error);
+        throw new DatabaseConnectionError();
+    }
+}
+
 
 module.exports = {
     initializeProjectModel,
@@ -290,5 +334,7 @@ module.exports = {
     getAllProjects,
     getProjectByProjectId,
     updateProject,
-    getProjectCarParts
+    getProjectCarParts,
+    deleteProject,
+    deletePartFromProject
 }

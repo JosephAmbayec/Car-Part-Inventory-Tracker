@@ -12,6 +12,9 @@ body {
 .navbar {
     font-weight: bold;
 }
+.navbar .nav-item  a:hover{
+  color:#0D6EFD;
+}
 .mr-auto { 
     margin-right: auto;
 }
@@ -23,6 +26,7 @@ footer {
 .list-section {
     border-collapse: collapse;
     width: 100%;
+    margin-top: 75px;
   }
   
   td, th {
@@ -42,13 +46,16 @@ footer {
 
 .inventory-actions-button{
   border-radius: 0.5rem;
-  width: 11rem;
+  width: 14rem;
   height: 3rem;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center
 }
 .inventory-actions-button:hover{
   cursor: pointer;
-  box-shadow: 0 0 5px 2px #06377e;
+  box-shadow: 0 0 5px 3px #06377e;
   background-color: #0D6EFD;
 }
 #aside-sidebar{
@@ -56,7 +63,7 @@ footer {
   flex-direction: column;
   align-items: initial;
   border: 0.5px solid #0D6EFD ;
-  width: 15rem;
+  width: 17rem;
   border-radius: 5px;
   justify-content: flex-end;
   margin-left: 6rem;
@@ -86,6 +93,15 @@ footer {
     margin-left: auto;
     margin-right: auto;
 }
+#form-container-home:not(legend){
+  display:flex;
+   justify-content: center;
+   align-items: center;
+   flex-direction: column;
+   width: 35%;
+   margin-left: auto;
+   margin-right:auto;
+}
 
 /* #region loginsignup.hbs */
 
@@ -94,8 +110,9 @@ footer {
    justify-content: center;
    align-items: center;
    flex-direction: column;
-   width: 100%;
-   margin-left: -75px;
+   width: 50%;
+   margin-left: auto;
+   margin-right:auto;
 }
 
 #form-loginsignup > *{
@@ -398,10 +415,41 @@ table {
   width: 100%;
 }
 
+.card-show-specific{
+  width: 100%;
+}
 .card-show-specific:hover{
   cursor: pointer;
   box-shadow: 0 0 5px 2px #0D6EFD;
 }
+.del-button-card{
+  z-index: 999;
+  width: 3rem;
+  height: 3rem;
+}
+.text-center{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+.fa-trash-o{
+  margin-top: 3px;
+}
+.del-button-card:hover{
+  background-color: red;
+  z-index: 999;
+  border: 1px solid #0D6EFD;
+}
+.card-grid{
+  display: grid;
+  grid-template-columns: 10fr 1.5fr;
+}
+.see-more-projects{
+  max-width: 7rem;
+}
+
+
+/* #region About page */
 
 #about-us{
   text-align: center;
@@ -432,3 +480,8 @@ table {
  #social-gp:hover {color: #d34836;transition:all .001s;}
  #social-em:hover {color: #f39c12;transition:all .001s;}
 
+ /* #endregion */
+
+
+
+ 

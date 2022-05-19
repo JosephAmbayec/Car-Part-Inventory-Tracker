@@ -63,7 +63,18 @@ async function createUser(request, response){
     // If both passwords match
     else{
         try {
-            await userModel.addUser(username, password);
+            let role;
+
+            // Admins are only the creators of the website
+            if(username === 'Braeden' || username === 'Jayden' || username === 'Joseph'){
+                role = 1;
+            }
+            // If it's a guest on the website
+            else{
+                role = 2;
+            }
+
+            await userModel.addUser(username, password, role);
 
             // Save cookie that will expire.
             response.cookie("username", username);

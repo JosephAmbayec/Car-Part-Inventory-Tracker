@@ -60,6 +60,7 @@ const loginController = require('./loginController');
         }
     
         logger.info(`CREATED PROJECT (Name: ${name}, Description: ${description} -- loginUser`);
+        response.cookie("lastAccessedProject", projectId);
         response.status(201).render('allProjects.hbs', pageData);
 
     } catch(error) {
@@ -199,6 +200,7 @@ async function addCarPart(request, response){
             about_text: "About Us",
             Current: "English"
         }
+        response.cookie("lastAccessedProject", projectId);
         response.status(201).render('home.hbs', pageData);
     }
     catch(error) {
@@ -213,23 +215,25 @@ async function addCarPart(request, response){
 
         if (error instanceof sqlModel.DatabaseConnectionError){
             pageData.alertMessage = "Error connecting to database.";
-            logger.error(`DatabaseConnectionError when CREATING PROJECT ${name} -- createProject`);
+            logger.error(`DatabaseConnectionError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
             response.status(500).render('home.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-            logger.error(`UserLoginError when CREATING PROJECT ${name} -- createProject`);
+            logger.error(`UserLoginError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
             response.status(404).render('home.hbs', pageData);
         }
         // If any other error occurs
         else {
             pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
-            logger.error(`OTHER error when CREATING PROJECT ${name} -- createProject`);
+            logger.error(`OTHER error when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
             response.status(500).render('home.hbs', pageData);
         }
     }
 }
+
+let theProjectId;
 
 /**
  * Shows the specified project on a new page.
@@ -242,10 +246,18 @@ async function showSpecificProject(request, response){
     let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
     let login = loginController.authenticateUser(request);
     let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
-    let showImage = false;
+    let noPartsFound, name, description;
+    // console.log(this.);
 
     if(arrayOFCatPartsInProject.length === 0){
-
+        noPartsFound = true;
+    }
+    else{
+        name = theProject[0].name;
+        theProject[0].description;
+    }
+    if(projectID != 'null'){
+        theProjectId = projectID;
     }
     // Set the login to the username if response is not null
     if(login != null) {
@@ -263,10 +275,11 @@ async function showSpecificProject(request, response){
             clickedNewProject: false,
             Home: "Home",
             loggedInUser: login,
-            projectName: theProject[0].name,
-            projectDescription: theProject[0].description,
-            projectId: projectID,
-            projectParts: arrayOFCatPartsInProject
+            projectName:name,
+            projectDescription: description,
+            projectId: parseInt(theProjectId),
+            projectParts: arrayOFCatPartsInProject,
+            noParts: noPartsFound
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
@@ -300,7 +313,7 @@ async function updateProject(request, response){
             alertLevelText: 'success',
             alertHref: 'exclamation-triangle-fill',
             display_signup: "none",
-            display_login: "block",
+            display_login: "block", 
             logInlogOutText: "Log Out",
             signUpText: "Sign Up",
             endpointLogInLogOut: "login",
@@ -310,9 +323,90 @@ async function updateProject(request, response){
     }
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+    response.cookie("lastAccessedProject", projectID);
     response.redirect(`/projects/${projectID}`);
     response.status(201).render('showProject.hbs', pageData);
 }
+
+async function deleteProject(request, response){
+    try {
+        // Get the values
+        let projectID = request.params.projectId;
+        let login = loginController.authenticateUser(request);
+
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+        }
+
+        await projectModel.deleteProject(projectID);
+
+        // Page data 
+        const pageData = {
+            alertOccurred: true,
+            alertMessage: `Successfully deleted project ${projectID}!`,
+            alertLevel: 'success',
+            alertLevelText: 'success',
+            alertHref: 'exclamation-triangle-fill',
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: login,
+        }
+
+        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+        response.redirect(`/projects`);
+        // response.status(201).render('allProjects.hbs', pageData);
+    } 
+    catch (error) {
+        
+    }
+}
+
+async function deletePartFromProject(request, response){
+    try {
+        // Get the values
+        let projectID = request.params.projectId;
+        let partNumber = request.params.partNumber;
+        let login = loginController.authenticateUser(request);
+
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+        }
+
+        await projectModel.deletePartFromProject(projectID, partNumber);
+
+        // Page data 
+        const pageData = {
+            alertOccurred: true,
+            alertMessage: `Successfully deleted project ${projectID}!`,
+            alertLevel: 'success',
+            alertLevelText: 'success',
+            alertHref: 'exclamation-triangle-fill',
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Log Out",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Home",
+            loggedInUser: login,
+        }
+
+        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+        response.redirect(`/projects/${projectID}`);
+        // response.status(201).render('allProjects.hbs', pageData);
+    } 
+    catch (error) {
+        
+    }
+}
+
 
 router.post("/projects", createProject);
 router.get("/projects", showProjects);
@@ -321,6 +415,8 @@ router.get("/projects/:projectId", showSpecificProject);
 router.post("/projects/:projectId/update", updateProject);
 
 router.post("/projects/:projectId", addCarPart)
+router.get("/projects/del/:projectId", deleteProject);
+router.post("/projects/del/part/:projectId/:partNumber", deletePartFromProject);
 
 
 module.exports = {
