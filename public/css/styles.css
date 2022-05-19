@@ -46,9 +46,12 @@ footer {
 
 .inventory-actions-button{
   border-radius: 0.5rem;
-  width: 11rem;
+  width: 14rem;
   height: 3rem;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center
 }
 .inventory-actions-button:hover{
   cursor: pointer;
@@ -60,7 +63,7 @@ footer {
   flex-direction: column;
   align-items: initial;
   border: 0.5px solid #0D6EFD ;
-  width: 15rem;
+  width: 17rem;
   border-radius: 5px;
   justify-content: flex-end;
   margin-left: 6rem;
@@ -478,3 +481,7 @@ table {
  #social-em:hover {color: #f39c12;transition:all .001s;}
 
  /* #endregion */
+
+
+
+ 
