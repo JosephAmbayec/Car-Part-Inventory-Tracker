@@ -171,7 +171,11 @@ async function showProjects(request, response) {
             projects: await projectModel.getAllProjects(request.cookies.username),
             Home: "Home",
             logInlogOutText: "Log Out",
-            loggedInUser: login
+            loggedInUser: login,
+            new_project: "New Project",
+            your_projects: "Your Projects",
+            see_more: "See more",
+            last_updated: "Last updated 3 minutes ago"
         }
     }
     else {
@@ -184,7 +188,11 @@ async function showProjects(request, response) {
             projects: await projectModel.getAllProjects(request.cookies.username),
             Home: "Accueil",
             logInlogOutText: "Déconnecter",
-            loggedInUser: login
+            loggedInUser: login,
+            new_project: "Nouveau Projet",
+            your_projects: "Vos Projets",
+            see_more: "Voir plus",
+            last_updated: "Dernière mise à jour il y a 3 minutes"
         }
     }
 
@@ -228,7 +236,13 @@ async function showCreateForm(request, response) {
             Home: "Home",
             logInlogOutText: "Log Out",
             loggedInUser: login,
-            clickedNewProject: true
+            clickedNewProject: true,
+            project_name: "Project Name",
+            name_field: "Enter a project name",
+            project_description: "Project Description",
+            description_field: "Enter a description",
+            back_button: "Return"
+
         }
     }
     else {
@@ -242,7 +256,12 @@ async function showCreateForm(request, response) {
             Home: "Accueil",
             logInlogOutText: "Déconnecter",
             loggedInUser: login,
-            clickedNewProject: true
+            clickedNewProject: true,
+            project_name: "Nom du Projet",
+            name_field: "Entrez un nom de Projet",
+            project_description: "Description du Projet",
+            description_field: "Entrez une description",
+            back_button: "Retournez"
         }
     }
 
