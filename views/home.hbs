@@ -54,6 +54,7 @@
             </div>
         </div>
 {{/if}}
+
 <div class="row d-flex justify-content-start">
   <!--Sidebar containing all CRUD buttons-->
   <div id="aside-sidebar" class="col-2 ">
@@ -115,7 +116,7 @@
 
         <section id="form-container-home">
           <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
-            enctype="application/x-www-form-urlencoded">
+            enctype="application/x-www-form-urlencoded" id="addingForm">
 
             <input type="hidden" name="_method" value="{{methodOverride}}" required>
 
@@ -123,7 +124,22 @@
             {{#each formfields}}
               <div class="form-group row justify-content-center">
                 <label for="{{field}}">{{pretty}}</label><br>
-                <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
+                
+                <!--If the form field is the condition (to use the select)s-->
+                {{#if isCondition}}
+                  <select id="{{field}}" name="addingForm" form="addingForm" {{required}}
+                    style="padding: 2px 0;">
+
+                    <!--Adding each condition to the dropdown-->
+                    {{#each conditions}}
+                      <option>{{this}}</option>
+                    {{/each}}
+
+                  </select>
+                <!--If it's a normal input field-->
+                {{else}}
+                  <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
+                {{/if}}
               </div>
               <br>
             {{/each}}

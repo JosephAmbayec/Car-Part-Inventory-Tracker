@@ -20,7 +20,7 @@ async function createPart(request, response){
     let number = request.body.partNumber;
     let partName = request.body.name;
     let image = request.body.image;
-    let condition = request.body.condition;
+    let condition = request.body.addingForm;
 
     // If the image is not a valid url, set image to null
     if (!validUtils.isURL(image)){
