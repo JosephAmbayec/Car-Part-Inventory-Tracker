@@ -6,10 +6,12 @@ const routeRoot = '/';
 const partController = require('./carPartController');
 const logger = require('../logger');
 const loginController = require('./loginController');
-const projectModel = require('../models/projectModel')
+const projectModel = require('../models/projectModel');
+const userModel = require('../models/userModel');
 
 const cookieParser = require("cookie-parser")
 router.use(cookieParser());
+
 
 /**
  * GET controller method that outputs the home view
@@ -26,6 +28,8 @@ async function sendHome(request, response) {
     let accessProject = request.cookies.lastAccessedProject;
     let AccessProject;
     let AccessProjectName;
+    let role;
+    
     if (accessProject && accessProject != '-1'){
         AccessProject = true;
         AccessProjectName = await projectModel.getProjectByProjectId(accessProject)
@@ -54,6 +58,8 @@ async function sendHome(request, response) {
             AccessProject = false;
         }
 
+        role = await userModel.determineRole(login);
+
         pageData = {
             Home: "Home",
             display_signup: signupDisplay,
@@ -62,11 +68,11 @@ async function sendHome(request, response) {
             endpointLogInLogOut: endpoint,
             signUpText: "Sign Up",
             Current: "English",
-            Add: "Add a Car part",
+            Add: role === 1 ? "Add a Car part" : "",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
-            Edit: "Update a Car Part",
-            Delete: "Delete a Car Part",
+            Edit: role === 1 ? "Update a Car Part" : "",
+            Delete: role === 1 ? "Delete a Car Part" : "",
             loggedInUser: login,
             projects_text: "Projects",
             about_text: "About Us",
@@ -90,6 +96,8 @@ async function sendHome(request, response) {
             AccessProject = false;
         }
 
+        role = await userModel.determineRole(login);
+
         pageData = {
             Home: "Accueil",
             display_signup: signupDisplay,
@@ -98,11 +106,11 @@ async function sendHome(request, response) {
             endpointLogInLogOut: endpoint,
             signUpText: "Enregistrer",
             Current: "French",
-            Add: "Ajouter une Pièce Auto",
+            Add: role === 1 ? "Ajouter une Pièce Auto" : "",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
-            Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto",
+            Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
+            Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
             loggedInUser: login,
             projects_text: "Projets",
             about_text: "À propos de nous",
@@ -164,10 +172,11 @@ function showForm(request, response) {
  * Displays the add car part form
  * @param {*} response 
  */
-function showAddForm(request, response) {
+async function showAddForm(request, response) {
     let lang = request.cookies.language;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let role;
 
     let pageData;
 
@@ -185,6 +194,8 @@ function showAddForm(request, response) {
             logInText = "Log In";
         }
 
+        role = await userModel.determineRole(login);
+
         pageData = {
             Home: "Home",
             showForm: true,
@@ -200,11 +211,11 @@ function showAddForm(request, response) {
             logInlogOutText: logInText,
             signUpText: "Sign Up",
             endpointLogInLogOut: endpoint,
-            Add: "Add a Car part",
+            Add: role === 1 ? "Add a Car part" : "",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
-            Edit: "Update a Car Part",
-            Delete: "Delete a Car Part",
+            Edit: role === 1 ? "Update a Car Part" : "",
+            Delete: role === 1 ? "Delete a Car Part" : "",
             loggedInUser: login,
             projects_text: "Projects",
             about_text: "About Us"
@@ -224,6 +235,8 @@ function showAddForm(request, response) {
             logInText = "Connexion";
         }
 
+        role = await userModel.determineRole(login);
+
         pageData = {
             Home: "Accueil",
             showForm: true,
@@ -239,11 +252,11 @@ function showAddForm(request, response) {
             logInlogOutText: logInText,
             signUpText: "Enregistrer",
             endpointLogInLogOut: endpoint,
-            Add: "Ajouter une Pièce Auto",
+            Add: role === 1 ? "Ajouter une Pièce Auto" : "",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
-            Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto",
+            Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
+            Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
             loggedInUser: login,
             projects_text: "Projets",
             about_text: "À propos de nous"
@@ -258,10 +271,11 @@ function showAddForm(request, response) {
  * Displays the show car part form
  * @param {*} response 
  */
-function showListOneForm(request, response) {
+async function showListOneForm(request, response) {
     let lang = request.cookies.language;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let role;
 
     let pageData;
 
@@ -278,6 +292,8 @@ function showListOneForm(request, response) {
             endpoint = "login";
             logInText = "Log In";
         }
+
+        role = await userModel.determineRole(login);
 
         pageData = {
             Home: "Home",
@@ -295,11 +311,11 @@ function showListOneForm(request, response) {
             logInlogOutText: logInText,
             signUpText: "Sign Up",
             endpointLogInLogOut: endpoint,
-            Add: "Add a car part",
+            Add: role === 1 ? "Add a car part" : "",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
-            Edit: "Update a Car Part",
-            Delete: "Delete a Car Part",
+            Edit: role === 1 ? "Update a Car Part" : "",
+            Delete: role === 1 ? "Delete a Car Part" : "",
             loggedInUser: login,
             projects_text: "Projects",
             about_text: "About Us"
@@ -319,6 +335,8 @@ function showListOneForm(request, response) {
             logInText = "Connexion";
         }
 
+        role = await userModel.determineRole(login);
+
         pageData = {
             Home: "Accueil",
             showForm: true,
@@ -335,11 +353,11 @@ function showListOneForm(request, response) {
             logInlogOutText: logInText,
             signUpText: "Enregistrer",
             endpointLogInLogOut: endpoint,
-            Add: "Ajouter une Pièce Auto",
+            Add: role === 1 ? "Ajouter une Pièce Auto" : "",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
-            Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto",
+            Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
+            Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
             loggedInUser: login,
             projects_text: "Projets",
             about_text: "À propos de nous"
@@ -356,10 +374,11 @@ function showListOneForm(request, response) {
  * Displays the update car part form
  * @param {*} response 
  */
-function showEditForm(request, response) {
+async function showEditForm(request, response) {
     let lang = request.cookies.language;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let role;
 
     let pageData;
 
@@ -376,6 +395,8 @@ function showEditForm(request, response) {
             endpoint = "login";
             logInText = "Log In";
         }
+
+        role = await userModel.determineRole(login);
 
         pageData = {
             Home: "Home",
@@ -394,11 +415,11 @@ function showEditForm(request, response) {
             logInlogOutText: logInText,
             signUpText: "Sign Up",
             endpointLogInLogOut: endpoint,
-            Add: "Add a car part",
+            Add: role === 1 ? "Add a car part" : "",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
-            Edit: "Update a Car Part",
-            Delete: "Delete a Car Part",
+            Edit: role === 1 ? "Update a Car Part" : "",
+            Delete: role === 1 ? "Delete a Car Part" : "",
             loggedInUser: login,
             projects_text: "Projects",
             about_text: "About Us"
@@ -417,6 +438,8 @@ function showEditForm(request, response) {
             endpoint = "login";
             logInText = "Connexion";
         }
+
+        role = await userModel.determineRole(login);
 
         pageData = {
             Home: "Accueil",
@@ -435,11 +458,11 @@ function showEditForm(request, response) {
             logInlogOutText: logInText,
             signUpText: "Enregistrer",
             endpointLogInLogOut: endpoint,
-            Add: "Ajouter une Pièce Auto",
+            Add: role === 1 ? "Ajouter une Pièce Auto" : "",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
-            Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto",
+            Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
+            Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
             loggedInUser: login,
             projects_text: "Projets",
             about_text: "À propos de nous"
@@ -454,10 +477,11 @@ function showEditForm(request, response) {
  * Displays the delete car part form
  * @param {*} response 
  */
-function showDeleteForm(request, response) {
+async function showDeleteForm(request, response) {
     let lang = request.cookies.language;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let role;
     
     let pageData;
 
@@ -475,6 +499,8 @@ function showDeleteForm(request, response) {
             logInText = "Log In";
         }
 
+        role = await userModel.determineRole(login);
+
         pageData = {
             Home: "Home",
             showForm: true,
@@ -491,11 +517,11 @@ function showDeleteForm(request, response) {
             logInlogOutText: logInText,
             signUpText: "Sign Up",
             endpointLogInLogOut: endpoint,
-            Add: "Add a car part",
+            Add: role === 1 ? "Add a car part" : "",
             Show: "Find a Car Part",
             List: "Show all Car Parts",
-            Edit: "Update a Car Part",
-            Delete: "Delete a Car Part",
+            Edit: role === 1 ? "Update a Car Part" : "",
+            Delete: role === 1 ? "Delete a Car Part" : "",
             loggedInUser: login,
             projects_text: "Projects",
             about_text: "About Us"
@@ -515,6 +541,8 @@ function showDeleteForm(request, response) {
             logInText = "Connexion";
         }
 
+        role = await userModel.determineRole(login);
+
         pageData = {
             Home: "Accueil",
             showForm: true,
@@ -531,11 +559,11 @@ function showDeleteForm(request, response) {
             logInlogOutText: logInText,
             signUpText: "Enregistrer",
             endpointLogInLogOut: endpoint,
-            Add: "Ajouter une Pièce Auto",
+            Add: role === 1 ? "Ajouter une Pièce Auto" : "",
             Show: "Trouver une Pièce Auto",
             List: "Afficher Toutes les Pièces de Voiture",
-            Edit: "Mettre à Jour une Pièce Auto",
-            Delete: "Supprimer une Pièce Auto",
+            Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
+            Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
             loggedInUser: login,
             projects_text: "Projets",
             about_text: "À propos de nous"
@@ -546,11 +574,12 @@ function showDeleteForm(request, response) {
     response.render('home.hbs', pageData);
 }
 
+
 router.get('/', sendHome);
 router.post('/', showForm);
 
 
 module.exports = {
     router,
-    routeRoot
+    routeRoot,
 }
