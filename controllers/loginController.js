@@ -195,6 +195,7 @@ async function logoutUser(request, response) {
         response.sendStatus(401); // Unauthorized access
         return;
     }
+    // Fix *****************************
     delete session.sessions[authenticatedSession.sessionId]
     console.log("Logged out user " + authenticatedSession.userSession.username);
 
@@ -283,6 +284,9 @@ function authenticateUser(request) {
 
 router.get('/users/login', showLogin)
 router.post("/users/login", loginUser)
+router.get('/users/logout', logoutUser)
+
+
 module.exports = {
     router,
     routeRoot,

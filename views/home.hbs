@@ -57,7 +57,10 @@
 <div class="row d-flex justify-content-start">
   <!--Sidebar containing all CRUD buttons-->
   <div id="aside-sidebar" class="col-2 ">
-    <h4 style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.5rem">Inventory Actions</h4>
+    <h4 style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.75rem"
+      title="Actions you can perform as a user">
+      Inventory Actions
+      </h4>
 
     {{!-- <aside class="col-2 "> --}}
     <div class="d-flex " id="wrapper ">
@@ -65,43 +68,36 @@
       {{!-- <div class="border-end bg-white" id="sidebar-wrapper"> --}}
         <div class="list-group list-group-flush " id="inventory-actions-form">
           <form action="/" method="post" role="form" enctype="application/x-www-form-urlencoded" >
+            <!--If add-->
             {{#if Add}}
               <button id="show" name="choice" class="btn btn-primary inventory-actions-button"
                 value="add">{{Add}}
               </button>
             {{/if}}
+            <!--If show-->
              {{#if Show}}
               <button id="show" name="choice" class="btn btn-primary inventory-actions-button"
               value="show">{{Show}}
             </button>
             {{/if}}
+            <!--If list-->
              {{#if List}}
               <button id="list" name="choice" class="btn btn-primary inventory-actions-button"
               value="list">{{List}}
               </button>
             {{/if}}
+            <!--If update-->
              {{#if Edit}}
               <button id="update" name="choice" class="btn btn-primary inventory-actions-button"
               value="edit">{{Edit}}
               </button>
             {{/if}}
+            <!--If delete-->
              {{#if Delete}}
                <button id="delete" name="choice" class="btn btn-primary inventory-actions-button"
               value="delete">{{Delete}}
               </button>
             {{/if}}
-            {{!-- <button id="show" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
-              value="show">{{Show}}
-            </button>
-            <button id="list" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
-              value="list">{{List}}
-            </button>
-            <button id="update" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
-              value="edit">{{Edit}}
-            </button>
-            <button id="delete" name="choice" class="list-group-item list-group-item-action list-group-item-light p-3"
-              value="delete">{{Delete}}
-            </button> --}}
           </form>
         {{!-- </div> --}}
       </div>
@@ -109,23 +105,45 @@
   {{!-- </aside> --}}
   </div>
 
-  <div class="col-7">
+  <div class="col-7 container-home-forms">
     <!--Showing the specified form-->
     {{#if showForm}}
-        <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
-          enctype="application/x-www-form-urlencoded">
-          <legend>{{legend}}</legend>
-          <input type="hidden" name="_method" value="{{methodOverride}}" required>
+        <!--Legend text-->
+        <div style="text-align: center; margin-right: auto; margin-left: auto; width: 70%;">
+          <legend style="width: 100%; font-weight: 1000;">{{legend}}</legend>
+        </div>
 
-          <!--Form fields for each form-->
-          {{#each formfields}}
-            <label for="{{field}}">{{pretty}}</label><br>
-            <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
-            <br>
-          {{/each}}
+        <section id="form-container-home">
+          <form action="{{endpoint}}" method="{{method}}" onsubmit="{{submitfn}}" role="form"
+            enctype="application/x-www-form-urlencoded">
 
-          <button id="submitAction" type="submit" class="btn btn-primary">{{Submit}}</button>
-        </form>
+            <input type="hidden" name="_method" value="{{methodOverride}}" required>
+
+            <!--Form fields for each form-->
+            {{#each formfields}}
+              <div class="form-group row justify-content-center">
+                <label for="{{field}}">{{pretty}}</label><br>
+                <input type="{{type}}" id="{{field}}" name="{{field}}" {{required}}>
+              </div>
+              <br>
+            {{/each}}
+
+            <div class="row justify-content-center">
+              <button id="submitAction" type="submit" class="btn btn-primary" style="width: 100%;">
+                {{Submit}}
+              </button>
+            </div>
+          </form>
+        </section>
+    {{else}}
+      {{#if showList}}
+
+      {{else}}
+      <!--Showing select inventory action text if form or list isn't shown-->
+        <h2 id="select-inventory-action-text">
+          Select an inventory action to continue!
+        </h2>
+      {{/if}}
     {{/if}}
 
     <!--Shows the list of all car parts-->
@@ -140,6 +158,11 @@
         </div>
       <!--If there are car parts-->
       {{else}}
+        <!--Legend text-->
+        <div style="text-align: center; margin-right: auto; margin-left: auto; width: 70%;">
+          <legend style="width: 100%; font-weight: 1000;">All car parts in the inventory</legend>
+        </div>
+
         <div class="list-section">
           <!--Creating the tables-->
           <table>
@@ -228,7 +251,6 @@
         </div>
       {{/if}}
     {{/if}}
-
   </div>
 </div>
 {{!-- 

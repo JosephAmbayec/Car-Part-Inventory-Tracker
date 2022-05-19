@@ -8,6 +8,7 @@ const validUtils = require('../validateUtils.js');
 const logger = require('../logger');
 const projectModel = require('../models/projectModel');
 const loginController = require('./loginController');
+const userModel = require('../models/userModel');
 
 /**
  * POST controller method that allows the user to create parts via the request body
@@ -114,7 +115,7 @@ async function getAllCarParts(request, response){
         let login = loginController.authenticateUser(request);
         let lang = request.cookies.language;
         let signupDisplay, endpoint, logInText;
-        let output;
+        let output, role;
         let accessProject = request.cookies.lastAccessedProject;
         let AccessProject;
         let AccessProjectName;
@@ -142,6 +143,8 @@ async function getAllCarParts(request, response){
                 AccessProject = false;
             }
 
+            role = await userModel.determineRole(login);
+
             output = {
                 showList: true,
                 noCarParts: true,
@@ -151,13 +154,14 @@ async function getAllCarParts(request, response){
                 signUpText: "Sign Up",
                 endpointLogInLogOut: endpoint,
                 Home: "Home",
-                Add: "Add a car part",
+                Add: role === 1 ? "Add a car part" : "",
                 Show: "Find a Car Part",
                 List: "Show all Car Parts",
-                Edit: "Update a Car Part",
-                Delete: "Delete a Car Part",
+                Edit: role === 1 ? "Update a Car Part" : "",
+                Delete: role === 1 ? "Delete a Car Part" : "",
                 Current: "English",
-                loggedInUser: login
+                loggedInUser: login,
+                projects_text: "Projects",
             }
 
             if (AccessProject){
@@ -170,11 +174,11 @@ async function getAllCarParts(request, response){
                     signUpText: "Sign Up",
                     endpointLogInLogOut: endpoint,
                     Home: "Home",
-                    Add: "Add a car part",
+                    Add: role === 1 ? "Add a car part" : "",
                     Show: "Find a Car Part",
                     List: "Show all Car Parts",
-                    Edit: "Update a Car Part",
-                    Delete: "Delete a Car Part",
+                    Edit: role === 1 ? "Update a Car Part" : "",
+                    Delete: role === 1 ? "Delete a Car Part" : "",
                     Current: "English",
                     loggedInUser: login,
                     accessProject: true,
@@ -213,6 +217,8 @@ async function getAllCarParts(request, response){
                 }
             }
 
+            role = await userModel.determineRole(login);
+
             output = {
                 part: parts, 
                 showList: true,
@@ -229,7 +235,8 @@ async function getAllCarParts(request, response){
                 Delete: "Delete a Car Part",
                 Current: "English",
                 project: projs,
-                loggedInUser: login
+                loggedInUser: login,
+                about_text: "About Us"
             };
 
             if (AccessProject){
@@ -257,14 +264,16 @@ async function getAllCarParts(request, response){
 
             }
 
+            // If the language is english
             if (!lang || lang === 'en') {
                 output.signUpText = "Sign Up";
-                output.Add = "Add a car part";
+                output.Add = role === 1 ? "Add a car part" : "";
                 output.Show = "Find a Car Part";
                 output.List = "Show all Car Parts";
-                output.Edit = "Update a Car Part";
-                output.Delete = "Delete a Car Part";
+                output.Edit = role === 1 ? "Update a Car Part" : "";
+                output.Delete = role === 1 ? "Delete a Car Part" : "";
             }
+            // If the language is french
             else{
                 output.signUpText = "Enregistrer";
                 output.Add = "Ajouter une Pièce Auto";
@@ -413,6 +422,7 @@ router.get("/parts", getAllCarParts)
 router.put("/parts/:partNumber", updatePartName)
 router.delete("/parts/:partNumber", deletePart)
 router.get("/", getAllCarParts)
+
 router.get("/parts/addto/:projectId", addCarPartToProject);
 
 

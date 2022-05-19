@@ -23,16 +23,17 @@
 <div id="show-project-flex">
     {{!-- <div id="show-project-first-flex"> --}}
         <div id="show-project-update-form">
+            <!--Back to projects tab-->
             <a href="/projects" id="add-project-btn" class="btn btn-outline-primary"
-            style="cursor: pointer; width: 175px; height: 32px; margin: 2rem 1rem;">
-            <i class='fas fa-arrow-left' style='font-size:17px; margin-right: 4px;'></i>
-            Back to Projects
+                    >
+                <i class='fas fa-arrow-left' style='font-size:17px; margin-right: 4px;'></i>
+                Back to Projects
             </a>
 
             <!--container for form-->
             {{!-- <section id="form-container-update"> --}}
 
-                <!--Form to sign up to the website-->
+                <!--Form to update the project information-->
                 <form method="POST" action="/projects/{{projectId}}/update" 
                             id="form-loginsignup-update" >
                     <!-- Legend title for the current form-->
@@ -66,16 +67,19 @@
         <h2>No car parts added in this project</h2>
     {{else}}
         <div id="show-project-all-parts">
+            <h2 style="text-align: center; margin-top: 2rem; margin-bottom: 1.5rem">
+                    Car Parts in Project</h2>
+
             <div class="row">
                 {{#each projectParts}}
                     <div class="col-sm-4">
                         <div class="card card-show-specific">
                             <div class="card-body">
-                                <form action="/projects/del/part/{{this.projectId}}" method="post" enctype="multipart/form-data">
-                                    <div class="card-grid">
-                                    
-                                        <input type="hidden" name="_method" value="{{partNumber}}" required>
+                                <!--Form for deleting project part-->
+                                <form action="/projects/del/part/{{../projectId}}/{{partNumber}}" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="_method" value="{{partNumber}}" required>
 
+                                    <div class="card-grid">
                                         <!--Car part information-->
                                         <div style="display:flex; flex-direction:column; ">
                                             {{#if image}}
@@ -89,7 +93,7 @@
                                         <!--Delete project button-->
                                         <div class="text-center">
                                             <button type="submit" class="btn btn-primary del-button-card" title="Delete from project">
-                                                <i class="fa fa-trash-o" style="font-size:26px;"></i>
+                                                <i class="fa fa-trash-o" style="font-size:27px;"></i>
                                             </button>
                                         </div>
                                     </div>
