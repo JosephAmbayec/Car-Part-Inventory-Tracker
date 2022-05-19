@@ -16,14 +16,15 @@ const loginController = require('./loginController');
  * @param {*} request 
  * @param {*} response 
  */
- async function createProject(request, response){
+async function createProject(request, response) {
     // Getting the values
     let name = request.body.name;
     let description = request.body.description;
     let userId = await usersModel.getUserByName(request.cookies.username);
-   
+    const lang = request.cookies.language;
+
     // If the user id is not specified
-    if (userId === -1){
+    if (userId === -1) {
         logger.error(`No user to create project -- createProject`);
         throw new sqlModel.DatabaseConnectionError("The project is not associated with a user");
     }
@@ -36,55 +37,100 @@ const loginController = require('./loginController');
         let login = loginController.authenticateUser(request);
 
         // Set the login to the username if response is not null
-        if(login != null) {
+        if (login != null) {
             login = login.userSession.username;
         }
 
-        const pageData = {
-            alertOccurred: true,
-            alertMessage: "You have successfully added a project!",
-            alertLevel: 'success',
-            alertLevelText: 'success',
-            alertHref: 'exclamation-triangle-fill',
-            titleName: 'Create a Project',
-            pathNameForActionForm: 'projects',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Log Out",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            projects: projs,
-            clickedNewProject: false,
-            Home: "Home",
-            loggedInUser: login
+        let pageData;
+
+        if (!lang || lang === 'en') {
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "You have successfully added a project!",
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Create a Project',
+                pathNameForActionForm: 'projects',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Log Out",
+                signUpText: "Sign Up",
+                endpointLogInLogOut: "login",
+                projects: projs,
+                clickedNewProject: false,
+                Home: "Home",
+                loggedInUser: login
+            }
         }
-    
+        else {
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "Vous avez ajouté un projet avec succès!",
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Créer un Projet',
+                pathNameForActionForm: 'projects',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Déconnecter",
+                signUpText: "Enregistrer",
+                endpointLogInLogOut: "login",
+                projects: projs,
+                clickedNewProject: false,
+                Home: "Acceuil",
+                loggedInUser: login
+            }
+        }
+
+
         logger.info(`CREATED PROJECT (Name: ${name}, Description: ${description} -- loginUser`);
         response.cookie("lastAccessedProject", projectId);
         response.status(201).render('allProjects.hbs', pageData);
 
-    } catch(error) {
-        const pageData = {
-            alertOccurred: true,
-            alertMessage: "",
-            alertLevel: 'danger',
-            alertLevelText: 'Danger',
-            alertHref: 'exclamation-triangle-fill',
-            titleName: 'Create a Project',
-            pathNameForActionForm: 'projects',
-            projects: await projectModel.getAllProjects(),
-            clickedNewProject: false,
-            loggedInUser: login
+    } catch (error) {
+        let pageData;
+
+        if (!lang || lang === 'en') {
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "",
+                alertLevel: 'danger',
+                alertLevelText: 'Danger',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Create a Project',
+                pathNameForActionForm: 'projects',
+                projects: await projectModel.getAllProjects(),
+                clickedNewProject: false,
+                loggedInUser: login
+            }
         }
-        
+        else {
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "",
+                alertLevel: 'danger',
+                alertLevelText: 'Danger',
+                alertHref: 'exclamation-triangle-fill',
+                titleName: 'Créer un Projet',
+                pathNameForActionForm: 'projects',
+                projects: await projectModel.getAllProjects(),
+                clickedNewProject: false,
+                loggedInUser: login
+            }
+        }
+
+
+
         // If the error is an instance of the DatabaseConnectionError error
-        if (error instanceof sqlModel.DatabaseConnectionError){
+        if (error instanceof sqlModel.DatabaseConnectionError) {
             pageData.alertMessage = "Error connecting to database.";
             logger.error(`DatabaseConnectionError when CREATING PROJECT ${name} -- createProject`);
             response.status(500).render('allProjects.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
-        else if (error instanceof sqlModel.InvalidInputError){
+        else if (error instanceof sqlModel.InvalidInputError) {
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
             logger.error(`UserLoginError when CREATING PROJECT ${name} -- createProject`);
             response.status(404).render('allProjects.hbs', pageData);
@@ -103,30 +149,50 @@ const loginController = require('./loginController');
  * @param {*} request 
  * @param {*} response 
  */
- async function showProjects(request, response){
+async function showProjects(request, response) {
 
     let login = loginController.authenticateUser(request);
 
-     // Set the login to the username if response is not null
-     if(login != null) {
+    // Set the login to the username if response is not null
+    if (login != null) {
         login = login.userSession.username;
     }
 
-    // Page data 
-    const pageData = {
-        alertOccurred: false,
-        showTable: true,
-        tableMessage: "You do not have any Projects.",
-        titleName: 'Create a Project',
-        pathNameForActionForm: 'projects',
-        projects: await projectModel.getAllProjects(request.cookies.username),
-        Home: "Home",
-        logInlogOutText: "Log Out",
-        loggedInUser: login
+    const lang = request.cookies.language;
+    let pageData;
+
+    if (!lang || lang === 'en') {
+        pageData = {
+            alertOccurred: false,
+            showTable: true,
+            tableMessage: "You do not have any Projects.",
+            titleName: 'Create a Project',
+            pathNameForActionForm: 'projects',
+            projects: await projectModel.getAllProjects(request.cookies.username),
+            Home: "Home",
+            logInlogOutText: "Log Out",
+            loggedInUser: login
+        }
+    }
+    else {
+        pageData = {
+            alertOccurred: false,
+            showTable: true,
+            tableMessage: "Vous n'avez aucun Projet.",
+            titleName: 'Créer un Projet',
+            pathNameForActionForm: 'projects',
+            projects: await projectModel.getAllProjects(request.cookies.username),
+            Home: "Acceuil",
+            logInlogOutText: "Déconnecter",
+            loggedInUser: login
+        }
     }
 
+    // Page data 
+
+
     // If there's no projects
-    if (pageData.projects.length == 0){
+    if (pageData.projects.length == 0) {
         logger.info(`CANNOT SHOW PROJECTS TABLE due to there being no projects created -- showProjects`);
         pageData.showTable = false;
     }
@@ -140,26 +206,46 @@ const loginController = require('./loginController');
  * @param {*} request 
  * @param {*} response 
  */
-async function showCreateForm(request, response){
+async function showCreateForm(request, response) {
     let login = loginController.authenticateUser(request);
 
-     // Set the login to the username if response is not null
-     if(login != null) {
+    // Set the login to the username if response is not null
+    if (login != null) {
         login = login.userSession.username;
     }
 
-    // Page data 
-    const pageData = {
-        alertOccurred: false,
-        showTable: true,
-        tableMessage: "You do not have any Projects.",
-        titleName: 'Create a Project',
-        pathNameForActionForm: 'projects',
-        Home: "Home",
-        logInlogOutText: "Log Out",
-        loggedInUser: login,
-        clickedNewProject: true
+    const lang = request.cookies.language;
+    let pageData;
+
+    if (!lang || lang === 'en') {
+        // Page data 
+        pageData = {
+            alertOccurred: false,
+            showTable: true,
+            tableMessage: "You do not have any Projects.",
+            titleName: 'Create a Project',
+            pathNameForActionForm: 'projects',
+            Home: "Home",
+            logInlogOutText: "Log Out",
+            loggedInUser: login,
+            clickedNewProject: true
+        }
     }
+    else {
+        // Page data 
+        pageData = {
+            alertOccurred: false,
+            showTable: true,
+            tableMessage: "Vous n'avez aucun Projet.",
+            titleName: 'Créer un Projet',
+            pathNameForActionForm: 'projects',
+            Home: "Acceuil",
+            logInlogOutText: "Déconnecter",
+            loggedInUser: login,
+            clickedNewProject: true
+        }
+    }
+
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
     response.status(201).render('allProjects.hbs', pageData);
@@ -170,40 +256,72 @@ async function showCreateForm(request, response){
  * @param {*} response 
  */
 
-async function addCarPart(request, response){
-    try{
+async function addCarPart(request, response) {
+    try {
         let partNumber = request.body.partNumber;
         let projectId = request.params.projectId;
 
         await projectModel.addPartToProject(projectId, partNumber);
 
-        const pageData = {
-            alertOccurred: true,
-            alertMessage: "You have successfully added to a project!",
-            alertLevel: 'success',
-            alertLevelText: 'success',
-            alertHref: 'exclamation-triangle-fill',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Log Out",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            clickedNewProject: false,
-            Home: "Home",
-            loggedInUser: true,
-            Add: "Add a Car part",
-            Show: "Find a Car Part",
-            List: "Show all Car Parts",
-            Edit: "Update a Car Part",
-            Delete: "Delete a Car Part",
-            projects_text: "Projects",
-            about_text: "About Us",
-            Current: "English"
+        const lang = request.cookies.language;
+        let pageData;
+
+        if (!lang || lang === 'en') {
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "You have successfully added to a project!",
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Log Out",
+                signUpText: "Sign Up",
+                endpointLogInLogOut: "login",
+                clickedNewProject: false,
+                Home: "Home",
+                loggedInUser: true,
+                Add: "Add a Car part",
+                Show: "Find a Car Part",
+                List: "Show all Car Parts",
+                Edit: "Update a Car Part",
+                Delete: "Delete a Car Part",
+                projects_text: "Projects",
+                about_text: "About Us",
+                Current: "English"
+            }
         }
+        else {
+            pageData = {
+                alertOccurred: true,
+                alertMessage: "Vous avez ajouté à un projet avec succès!",
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Déconnecter",
+                signUpText: "Enregistrer",
+                endpointLogInLogOut: "login",
+                clickedNewProject: false,
+                Home: "Acceuil",
+                loggedInUser: true,
+                Add: "Ajouter une Pièce Auto",
+                Show: "Trouver une Pièce Auto",
+                List: "Afficher Toutes les Pièces de Voiture",
+                Edit: "Mettre à Jour une Pièce Auto",
+                Delete: "Supprimer une Pièce Auto",
+                projects_text: "Projets",
+                about_text: "À propos de nous",
+                Current: "French"
+            }
+        }
+
+
         response.cookie("lastAccessedProject", projectId);
         response.status(201).render('home.hbs', pageData);
     }
-    catch(error) {
+    catch (error) {
         const pageData = {
             alertOccurred: true,
             alertMessage: "",
@@ -213,13 +331,13 @@ async function addCarPart(request, response){
             loggedInUser: LOGGED_IN_USER
         }
 
-        if (error instanceof sqlModel.DatabaseConnectionError){
+        if (error instanceof sqlModel.DatabaseConnectionError) {
             pageData.alertMessage = "Error connecting to database.";
             logger.error(`DatabaseConnectionError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
             response.status(500).render('home.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
-        else if (error instanceof sqlModel.InvalidInputError){
+        else if (error instanceof sqlModel.InvalidInputError) {
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
             logger.error(`UserLoginError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
             response.status(404).render('home.hbs', pageData);
@@ -240,7 +358,7 @@ let theProjectId;
  * @param {*} request 
  * @param {*} response 
  */
-async function showSpecificProject(request, response){
+async function showSpecificProject(request, response) {
     let projectID = request.params.projectId;
     let theProject = await projectModel.getProjectByProjectId(projectID);
     let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
@@ -249,23 +367,27 @@ async function showSpecificProject(request, response){
     let noPartsFound, name, description;
     // console.log(this.);
 
-    if(arrayOFCatPartsInProject.length === 0){
+    if (arrayOFCatPartsInProject.length === 0) {
         noPartsFound = true;
     }
-    else{
+    else {
         name = theProject[0].name;
         theProject[0].description;
     }
-    if(projectID != 'null'){
+    if (projectID != 'null') {
         theProjectId = projectID;
     }
     // Set the login to the username if response is not null
-    if(login != null) {
+    if (login != null) {
         login = login.userSession.username;
     }
 
-    // Page data 
-    const pageData = {
+    const lang = request.cookies.language;
+    let pageData;
+
+    if (!lang || lang === 'en') {
+        //Page data
+        pageData = {
             alertOccurred: false,
             display_signup: "none",
             display_login: "block",
@@ -275,12 +397,33 @@ async function showSpecificProject(request, response){
             clickedNewProject: false,
             Home: "Home",
             loggedInUser: login,
-            projectName:name,
+            projectName: name,
             projectDescription: description,
             projectId: parseInt(theProjectId),
             projectParts: arrayOFCatPartsInProject,
             noParts: noPartsFound
+        }
     }
+    else {
+        pageData = {
+            alertOccurred: false,
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Déconnecter",
+            signUpText: "Enregistrer",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Acceuil",
+            loggedInUser: login,
+            projectName: name,
+            projectDescription: description,
+            projectId: parseInt(theProjectId),
+            projectParts: arrayOFCatPartsInProject,
+            noParts: noPartsFound
+        }
+    }
+
+
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
     response.status(201).render('showProject.hbs', pageData);
@@ -291,7 +434,7 @@ async function showSpecificProject(request, response){
  * @param {*} request 
  * @param {*} response 
  */
-async function updateProject(request, response){
+async function updateProject(request, response) {
     // Get the values
     let name = request.body.name;
     let description = request.body.description;
@@ -299,28 +442,53 @@ async function updateProject(request, response){
     let login = loginController.authenticateUser(request);
 
     // Set the login to the username if response is not null
-    if(login != null) {
+    if (login != null) {
         login = login.userSession.username;
     }
 
     await projectModel.updateProject(name, description, projectID);
-    
-    // Page data 
-    const pageData = {
+
+
+    const lang = request.cookies.language;
+    let pageData;
+
+    if (!lang || lang === 'en') {
+        // Page data 
+        pageData = {
             alertOccurred: true,
             alertMessage: `Successfully updated project ${name}!`,
             alertLevel: 'success',
             alertLevelText: 'success',
             alertHref: 'exclamation-triangle-fill',
             display_signup: "none",
-            display_login: "block", 
+            display_login: "block",
             logInlogOutText: "Log Out",
             signUpText: "Sign Up",
             endpointLogInLogOut: "login",
             clickedNewProject: false,
             Home: "Home",
             loggedInUser: login,
+        }
     }
+    else {
+        // Page data 
+        pageData = {
+            alertOccurred: true,
+            alertMessage: `Projet mis à jour avec succès ${name}!`,
+            alertLevel: 'success',
+            alertLevelText: 'success',
+            alertHref: 'exclamation-triangle-fill',
+            display_signup: "none",
+            display_login: "block",
+            logInlogOutText: "Déconnecter",
+            signUpText: "Enregistrer",
+            endpointLogInLogOut: "login",
+            clickedNewProject: false,
+            Home: "Acceuil",
+            loggedInUser: login,
+        }
+    }
+
 
     // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
     response.cookie("lastAccessedProject", projectID);
@@ -328,14 +496,14 @@ async function updateProject(request, response){
     response.status(201).render('showProject.hbs', pageData);
 }
 
-async function deleteProject(request, response){
+async function deleteProject(request, response) {
     try {
         // Get the values
         let projectID = request.params.projectId;
         let login = loginController.authenticateUser(request);
 
         // Set the login to the username if response is not null
-        if(login != null) {
+        if (login != null) {
             login = login.userSession.username;
         }
 
@@ -361,13 +529,13 @@ async function deleteProject(request, response){
         // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
         response.redirect(`/projects`);
         // response.status(201).render('allProjects.hbs', pageData);
-    } 
+    }
     catch (error) {
-        
+
     }
 }
 
-async function deletePartFromProject(request, response){
+async function deletePartFromProject(request, response) {
     try {
         // Get the values
         let projectID = request.params.projectId;
@@ -375,7 +543,7 @@ async function deletePartFromProject(request, response){
         let login = loginController.authenticateUser(request);
 
         // Set the login to the username if response is not null
-        if(login != null) {
+        if (login != null) {
             login = login.userSession.username;
         }
 
@@ -401,9 +569,9 @@ async function deletePartFromProject(request, response){
         // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
         response.redirect(`/projects/${projectID}`);
         // response.status(201).render('allProjects.hbs', pageData);
-    } 
+    }
     catch (error) {
-        
+
     }
 }
 

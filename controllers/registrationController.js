@@ -123,7 +123,7 @@ async function createUser(request, response){
                     logInlogOutText: "Déconnecter",
                     endpointLogInLogOut: "login",
                     loggedInUser: username,
-                    Home: "Home",
+                    Home: "Acceuil",
                     Add: "Ajouter une Pièce Auto",
                     Show: "Trouver une Pièce Auto",
                     List: "Afficher Toutes les Pièces de Voiture",
