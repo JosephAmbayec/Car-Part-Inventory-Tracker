@@ -199,6 +199,13 @@ async function updateCarPartName(partNumber, name){
     }
 
     try {
+        // Delete from any project first
+        let tableExists = await connection.query("SHOW TABLES LIKE 'PartProject'")
+        if (tableExists[0].length != 0){
+            let sqlStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
+            await connection.execute(sqlStatement);
+        }
+
         // Delete from part table
         let sqlStatement = `DELETE FROM carPart where partNumber = ${partNumber};`;
         await connection.execute(sqlStatement);

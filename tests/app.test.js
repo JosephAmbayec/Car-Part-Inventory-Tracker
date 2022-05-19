@@ -163,6 +163,7 @@ test("DELETE /parts/id success case", async () =>{
 
     let testResponse = await testRequest.post(`/parts/delete/${randomCar1.partNumber}`);
     expect(testResponse.status).toBe(200);
+    // expect(testResponse.status).toBe(202);
     
     let after = await connection.execute("select partNumber, name from carPart;");
     expect(after[0].length).toBe(1);
