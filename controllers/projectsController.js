@@ -154,10 +154,19 @@ async function createProject(request, response) {
 async function showProjects(request, response) {
 
     let login = loginController.authenticateUser(request);
+    let signupDisplay, endpoint, logInText;
 
     // Set the login to the username if response is not null
-    if (login != null) {
+    if(login != null) {
         login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
+    }
+    else{
+        signupDisplay = "block";
+        endpoint = "login";
+        logInText = "Log In";
     }
 
     const lang = request.cookies.language;
@@ -173,12 +182,15 @@ async function showProjects(request, response) {
                 pathNameForActionForm: 'projects',
                 projects: await projectModel.getAllProjects(request.cookies.username),
                 Home: "Home",
-                logInlogOutText: "Log Out",
+                logInlogOutText: logInText,
                 loggedInUser: login,
                 new_project: "New Project",
                 your_projects: "Your Projects",
                 see_more: "See more",
-                last_updated: "Last updated 3 minutes ago"
+                last_updated: "Last updated 3 minutes ago",
+                about_text: "About Us",
+                endpointLogInLogOut: endpoint,
+                projects_text: "Projects",
             }
         }
         else {
@@ -190,12 +202,15 @@ async function showProjects(request, response) {
                 pathNameForActionForm: 'projects',
                 projects: await projectModel.getAllProjects(request.cookies.username),
                 Home: "Accueil",
-                logInlogOutText: "Déconnecter",
+                logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
                 loggedInUser: login,
                 new_project: "Nouveau Projet",
                 your_projects: "Vos Projets",
                 see_more: "Voir plus",
-                last_updated: "Dernière mise à jour il y a 3 minutes"
+                last_updated: "Dernière mise à jour il y a 3 minutes",
+                about_text: "À Propos de Nous",
+                endpointLogInLogOut: endpoint,
+                projects_text: "Projets"
             }
         } 
 
@@ -266,10 +281,19 @@ async function showProjects(request, response) {
  */
 async function showCreateForm(request, response) {
     let login = loginController.authenticateUser(request);
+    let signupDisplay, endpoint, logInText;
 
     // Set the login to the username if response is not null
-    if (login != null) {
+    if(login != null) {
         login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
+    }
+    else{
+        signupDisplay = "block";
+        endpoint = "login";
+        logInText = "Log In";
     }
 
     const lang = request.cookies.language;
@@ -284,15 +308,17 @@ async function showCreateForm(request, response) {
             titleName: 'Create a Project',
             pathNameForActionForm: 'projects',
             Home: "Home",
-            logInlogOutText: "Log Out",
+            logInlogOutText: logInText,
             loggedInUser: login,
             clickedNewProject: true,
             project_name: "Project Name",
             name_field: "Enter a project name",
             project_description: "Project Description",
             description_field: "Enter a description",
-            back_button: "Return"
-
+            back_button: "Return",
+            endpointLogInLogOut: endpoint,
+            projects_text: "Projects",
+            about_text: "About Us"
         }
     }
     else {
@@ -304,14 +330,17 @@ async function showCreateForm(request, response) {
             titleName: 'Créer un Projet',
             pathNameForActionForm: 'projects',
             Home: "Accueil",
-            logInlogOutText: "Déconnecter",
+            logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
             loggedInUser: login,
             clickedNewProject: true,
             project_name: "Nom du Projet",
             name_field: "Entrez un nom de Projet",
             project_description: "Description du Projet",
             description_field: "Entrez une description",
-            back_button: "Retournez"
+            back_button: "Retournez",
+            endpointLogInLogOut: endpoint,
+            projects_text: "Projets",
+            about_text: "À propos de nous"
         }
     }
 
@@ -444,6 +473,7 @@ async function showSpecificProject(request, response) {
         let login = loginController.authenticateUser(request);
         let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
         let noPartsFound;
+        let signupDisplay, endpoint, logInText;
 
         let description = theProject[0].description;
         let name = theProject[0].name;
@@ -454,20 +484,29 @@ async function showSpecificProject(request, response) {
         if (projectID != 'null') {
             theProjectId = projectID;
         }
+
         // Set the login to the username if response is not null
-        if (login != null) {
+        if(login != null) {
             login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Log In";
         }
 
         if (!lang || lang === 'en') {
             //Page data
             pageData = {
                 alertOccurred: false,
-                display_signup: "none",
+                display_signup: signupDisplay,
                 display_login: "block",
-                logInlogOutText: "Log Out",
+                logInlogOutText: logInText,
                 signUpText: "Sign Up",
-                endpointLogInLogOut: "login",
+                endpointLogInLogOut: endpoint,
                 clickedNewProject: false,
                 Home: "Home",
                 loggedInUser: login,
@@ -484,7 +523,9 @@ async function showSpecificProject(request, response) {
                 noparts_message: "No car parts added in this project",
                 parts_in_project_label: "Car Parts in Project",
                 partNumberLabel: "Part Number",
-                partConditionLabel: "Condition"
+                partConditionLabel: "Condition",
+                about_text: "About Us",
+                projects_text: "Projects"
             }
         }
         else {
@@ -492,9 +533,9 @@ async function showSpecificProject(request, response) {
                 alertOccurred: false,
                 display_signup: "none",
                 display_login: "block",
-                logInlogOutText: "Déconnecter",
+                logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
                 signUpText: "Enregistrer",
-                endpointLogInLogOut: "login",
+                endpointLogInLogOut: endpoint,
                 clickedNewProject: false,
                 Home: "Accueil",
                 loggedInUser: login,
@@ -511,7 +552,9 @@ async function showSpecificProject(request, response) {
                 noparts_message: "Aucune pièce de voiture ajoutée dans ce projet",
                 parts_in_project_label: "Pièces dans le Projet",
                 partNumberLabel: "Numéro de Pièce",
-                partConditionLabel: "Condition"
+                partConditionLabel: "Condition",
+                about_text: "À propos de nous",
+                projects_text: "Projets"
             }
         }
     

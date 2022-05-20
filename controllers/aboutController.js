@@ -51,7 +51,7 @@ function showAbout(request, response) {
         pageData = {
             display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Se déconnecter" : "",
+            logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
             endpointLogInLogOut: endpoint,
             about_text: "À propos de nous",
             signUpText: "Enregistrer",
