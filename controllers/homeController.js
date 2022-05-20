@@ -82,7 +82,8 @@ async function sendHome(request, response) {
                 about_text: "About Us",
                 accessProject: AccessProject,
                 accessProjectId: accessProject,
-                accessProjectName: AccessProjectName
+                accessProjectName: AccessProjectName,
+                selectActionText: "Select an inventory action to continue!"
             }
         }
         else{
@@ -120,7 +121,8 @@ async function sendHome(request, response) {
                 about_text: "À propos de nous",
                 accessProject: AccessProject,
                 accessProjectId: accessProject,
-                accessProjectName: AccessProjectName
+                accessProjectName: AccessProjectName,
+                selectActionText: "Sélectionnez une action d'inventaire pour continuer!"
             }
         }
     
