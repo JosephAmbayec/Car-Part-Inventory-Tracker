@@ -198,12 +198,12 @@ async function logoutUser(request, response) {
         response.sendStatus(401); // Unauthorized access
         return;
     }
-    // Fix *****************************
+
     delete sessionModel.sessions[authenticatedSession.sessionId]
     console.log("Logged out user " + authenticatedSession.userSession.username);
 
     response.cookie("sessionId", "", { expires: new Date() }); // "erase" cookie by forcing it to expire.
-    response.redirect('/');
+    response.redirect('/parts');
 
     const lang = request.cookies.language;
 

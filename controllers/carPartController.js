@@ -282,6 +282,7 @@ async function getAllCarParts(request, response){
                     accessProjectId: accessProject,
                     accessProjectName: AccessProjectName,
                     projects_text: "Projects",
+                    about_text: "About Us"
                 }
 
             }
