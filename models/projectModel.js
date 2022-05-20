@@ -256,8 +256,8 @@ async function updateProject(newName, newDescription, projectId){
         // Checks if the project exists first
         if(await projectExists(projectId)){
             const selectStatement = `UPDATE Project SET name = '${newName}', description = '${newDescription}' WHERE projectId = '${projectId}';`;
-            let projectArray = await connection.query(selectStatement);
-            return projectArray[0];
+            let updateProj = await connection.execute(selectStatement);
+            return updateProj[0];
         }
         else
             throw new DatabaseConnectionError();
