@@ -153,8 +153,8 @@ async function createProject(request, response) {
  */
 async function showProjects(request, response) {
 
-    let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let login = loginController.authenticateUser(request);
 
     // Set the login to the username if response is not null
     if(login != null) {
@@ -163,10 +163,9 @@ async function showProjects(request, response) {
         endpoint = "logout";
         logInText = "Log Out";
     }
+    // Redirect to home page since a user shouldn't be viewing the project if not logged in
     else{
-        signupDisplay = "block";
-        endpoint = "login";
-        logInText = "Log In";
+        response.redirect('/parts');
     }
 
     const lang = request.cookies.language;
@@ -280,21 +279,20 @@ async function showProjects(request, response) {
  * @param {*} response 
  */
 async function showCreateForm(request, response) {
-    let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let login = loginController.authenticateUser(request);
 
     // Set the login to the username if response is not null
-    if(login != null) {
-        login = login.userSession.username;
-        signupDisplay = "none";
-        endpoint = "logout";
-        logInText = "Log Out";
-    }
-    else{
-        signupDisplay = "block";
-        endpoint = "login";
-        logInText = "Log In";
-    }
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        // Redirect to home page since a user shouldn't be viewing the project if not logged in
+        else{
+            response.redirect('/parts');
+        }
 
     const lang = request.cookies.language;
     let pageData;
@@ -467,13 +465,26 @@ async function showSpecificProject(request, response) {
     const lang = request.cookies.language;
 
     try {
+        let signupDisplay, endpoint, logInText;
+        let login = loginController.authenticateUser(request);
+
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        // Redirect to home page since a user shouldn't be viewing the project if not logged in
+        else{
+            response.redirect('/parts');
+        }
+
         let projectID = request.params.projectId;
         let theProject = await projectModel.getProjectByProjectId(projectID);
         let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
-        let login = loginController.authenticateUser(request);
         let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
         let noPartsFound;
-        let signupDisplay, endpoint, logInText;
 
         let description = theProject[0].description;
         let name = theProject[0].name;
@@ -483,19 +494,6 @@ async function showSpecificProject(request, response) {
         }
         if (projectID != 'null') {
             theProjectId = projectID;
-        }
-
-        // Set the login to the username if response is not null
-        if(login != null) {
-            login = login.userSession.username;
-            signupDisplay = "none";
-            endpoint = "logout";
-            logInText = "Log Out";
-        }
-        else{
-            signupDisplay = "block";
-            endpoint = "login";
-            logInText = "Log In";
         }
 
         if (!lang || lang === 'en') {

@@ -179,6 +179,7 @@ async function getAllCarParts(request, response){
                 Current: "English",
                 loggedInUser: login,
                 projects_text: "Projects",
+                about_text: "About Us"
             }
 
             if (AccessProject){
@@ -202,6 +203,7 @@ async function getAllCarParts(request, response){
                     accessProjectId: accessProject,
                     accessProjectName: AccessProjectName,
                     projects_text: "Projects",
+                    about_text: "À propos de nous"
                 }
 
             }
