@@ -63,8 +63,7 @@ async function createProject(request, response) {
                 loggedInUser: login,
                 new_project: "New Project",
                 your_projects: "Your Projects",
-                see_more: "See more",
-                last_updated: "Last updated 3 minutes ago"
+                see_more: "See more"
             }
         }
         else {
@@ -87,8 +86,7 @@ async function createProject(request, response) {
                 loggedInUser: login,
                 new_project: "Nouveau Projet",
                 your_projects: "Vos Projets",
-                see_more: "Voir plus",
-                last_updated: "Dernière mise à jour il y a 3 minutes"
+                see_more: "Voir plus"
             }
         }
 
@@ -182,8 +180,7 @@ async function showProjects(request, response) {
             loggedInUser: login,
             new_project: "New Project",
             your_projects: "Your Projects",
-            see_more: "See more",
-            last_updated: "Last updated 3 minutes ago"
+            see_more: "See more"
         }
     }
     else {
@@ -199,8 +196,7 @@ async function showProjects(request, response) {
             loggedInUser: login,
             new_project: "Nouveau Projet",
             your_projects: "Vos Projets",
-            see_more: "Voir plus",
-            last_updated: "Dernière mise à jour il y a 3 minutes"
+            see_more: "Voir plus"
         }
     }
 
