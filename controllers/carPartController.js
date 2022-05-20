@@ -79,15 +79,80 @@ async function getPartByNumber(request, response){
 
     try {
         let part = await sqlModel.findCarPartByNumber(number);
+        let output, signupDisplay, endpoint, logInText;
+        let login = loginController.authenticateUser(request);
+        let role = await userModel.determineRole(login);
+
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        else{
+            signupDisplay = "block";
+            endpoint = "login";
+            logInText = "Log In";
+        }
 
         // If no part was found
         if (part.length == 0){
+            output = {
+                alertOccurred: true,
+                alertMessage:`Could not find any parts with part number \'${number}\'`,
+                showList: false,
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                signUpText: "Sign Up",
+                endpointLogInLogOut: endpoint,
+                Home: "Home",
+                Add: role === 1 ? "Add a car part" : "",
+                Show: "Find a Car Part",
+                List: "Show all Car Parts",
+                Edit: role === 1 ? "Update a Car Part" : "",
+                Delete: role === 1 ? "Delete a Car Part" : "",
+                Current: "English",
+                loggedInUser: login,
+                projects_text: "Projects",
+                about_text: "About Us",
+                part,
+                    alertLevel: 'danger',
+                    alertLevelText: 'Danger',
+                    alertHref: 'exclamation-triangle-fill',
+            }
+
             logger.info(`DID NOT FIND car part by number ${number} -- getPartByNumber`);
-            response.status(404).render('home.hbs', {message: `Could not find any parts with part number \'${number}\'`});
+            response.status(404).render('home.hbs', output);
         }
         // If the part was found
         else{
-            let output = {part, showList: true};
+            output = {
+                alertOccurred: true,
+                alertMessage: `Successfully found car part ${number}!`,
+                showList: true,
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                signUpText: "Sign Up",
+                endpointLogInLogOut: endpoint,
+                Home: "Home",
+                Add: role === 1 ? "Add a car part" : "",
+                Show: "Find a Car Part",
+                List: "Show all Car Parts",
+                Edit: role === 1 ? "Update a Car Part" : "",
+                Delete: role === 1 ? "Delete a Car Part" : "",
+                Current: "English",
+                loggedInUser: login,
+                projects_text: "Projects",
+                about_text: "About Us",
+                part,
+                alertLevel: 'success',
+                    alertLevelText: 'success',
+                    alertHref: 'exclamation-triangle-fill',
+            }
+
             logger.info(`FOUND car part by number ${number} -- getPartByNumber`);
             response.status(200).render('home.hbs', output);
         }
@@ -97,7 +162,7 @@ async function getPartByNumber(request, response){
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
             const data = {
-                message: "There was an error connecting to the database.",
+                alertMessage: "There was an error connecting to the database.",
                 errorCode: 500
             }
             logger.error(`DatabaseConnectionError when FINDING car part by number ${number} -- getPartByNumber`);
@@ -111,7 +176,7 @@ async function getPartByNumber(request, response){
         // If any other error
         else {
             const data = {
-                message: `Unexpected error while trying to show part: ${error.message}`,
+                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
                 errorCode: 500
             }
             logger.error(`OTHER error when FINDING car part by number ${number} -- getPartByNumber`);
@@ -282,6 +347,7 @@ async function getAllCarParts(request, response){
                     accessProjectId: accessProject,
                     accessProjectName: AccessProjectName,
                     projects_text: "Projects",
+                    about_text: "About Us"
                 }
 
             }
