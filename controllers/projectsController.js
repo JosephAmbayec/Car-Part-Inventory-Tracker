@@ -60,7 +60,11 @@ async function createProject(request, response) {
                 projects: projs,
                 clickedNewProject: false,
                 Home: "Home",
-                loggedInUser: login
+                loggedInUser: login,
+                new_project: "New Project",
+                your_projects: "Your Projects",
+                see_more: "See more",
+                last_updated: "Last updated 3 minutes ago"
             }
         }
         else {
@@ -80,7 +84,11 @@ async function createProject(request, response) {
                 projects: projs,
                 clickedNewProject: false,
                 Home: "Accueil",
-                loggedInUser: login
+                loggedInUser: login,
+                new_project: "Nouveau Projet",
+                your_projects: "Vos Projets",
+                see_more: "Voir plus",
+                last_updated: "Dernière mise à jour il y a 3 minutes"
             }
         }
 
