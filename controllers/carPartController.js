@@ -56,13 +56,17 @@ async function createPart(request, response){
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
+            const data = {
+                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable. Ensure the url is a valid image url",
+                errorCode: 404
+            }
             logger.error("InvalidInputError when CREATING part -- createPart");
-            response.status(404).render('home.hbs', {message: "Invalid input, check that all fields are alpha numeric where applicable. Ensure the url is a valid image url"});
+            response.status(404).render('home.hbs', data);
         }
         // If any other error
         else {
             const data = {
-                message: `Unexpected error while trying to add part: ${error.message}`,
+                alertMessage: `Unexpected error while trying to add part: ${error.message}`,
                 errorCode: 500
             }
             logger.error("OTHER error when CREATING part -- createPart");
@@ -249,8 +253,12 @@ async function getPartByNumber(request, response){
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
+            const data = {
+                alertMessage:  "Invalid input, check that all fields are alpha numeric where applicable.",
+                errorCode: 404
+            }
             logger.error(`InvalidInputError when FINDING car part by number ${number} -- getPartByNumber`);
-            response.status(404).render('home.hbs', {message: "Invalid input, check that all fields are alpha numeric where applicable."});
+            response.status(404).render('home.hbs', data);
         }
         // If any other error
         else {
@@ -282,7 +290,7 @@ async function getAllCarParts(request, response){
         if (accessProject && accessProject != '-1'){
             AccessProject = true;
             AccessProjectName = await projectModel.getProjectByProjectId(accessProject)
-            AccessProjectName = AccessProjectName[0].name;
+            AccessProjectName = accessProject[0].name;
         }
         else
             AccessProject = false
@@ -576,7 +584,7 @@ async function getAllCarParts(request, response){
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
             const data = {
-                message: "There was an error connecting to the database.",
+                alertMessage: "There was an error connecting to the database.",
                 errorCode: 500
             }
             logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
@@ -584,13 +592,17 @@ async function getAllCarParts(request, response){
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
+            const data = {
+                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
+                errorCode: 404
+            }
             logger.error("InvalidInputError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(404).render('home.hbs', {message: "Invalid input, check that all fields are alpha numeric where applicable."});
+            response.status(404).render('home.hbs', data);
         }
         // If any other error
         else {
             const data = {
-                message: `Unexpected error while trying to show part: ${error.message}`,
+                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
                 errorCode: 500
             }
             logger.error("OTHER error when RETRIEVING all car parts -- getAllCarParts");
@@ -614,14 +626,22 @@ async function updatePartName(request, response){
 
         // If the car part doesn't exist in the database
         if (!await sqlModel.verifyCarPartExists(partNumber)){
+            const data = {
+                alertMessage: `Could not find part #${partNumber}`,
+                errorCode: 404
+            }
             logger.info(`NOT UPDATED car part ${partNumber} because car part DOESN'T exist -- updatePartName`);
-            response.status(404).render('home.hbs', {message:`Could not find part #${partNumber}`});
+            response.status(404).render('home.hbs', data);
         }
         else{
             await sqlModel.updateCarPartName(partNumber, newName)
                 .then(part => {
+                    const data = {
+                        alertMessage: `Updated part name with part number ${part.partNumber} to ${part.name}`,
+                        errorCode: 200
+                    }
                     logger.info(`UPDATED car part ${partNumber} in database -- updatePartName`);
-                    response.status(200).render('home.hbs', {message:`Updated part name with part number ${part.partNumber} to ${part.name}`});
+                    response.status(200).render('home.hbs', data);
                 })
         }
     }
@@ -630,7 +650,7 @@ async function updatePartName(request, response){
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
             const data = {
-                message: "There was an error connecting to the database.",
+                alertMessage: "There was an error connecting to the database.",
                 errorCode: 500
             }
             logger.error(`DatabaseConnectionError when UPDATING car part ${partNumber} -- updatePartName`);
@@ -638,13 +658,17 @@ async function updatePartName(request, response){
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
+            const data = {
+                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
+                errorCode: 404
+            }
             logger.error(`InvalidInputError when UPDATING car part ${partNumber} -- updatePartName`);
-            response.status(404).render('home.hbs', {message: "Invalid input, check that all fields are alpha numeric where applicable."});
+            response.status(404).render('home.hbs', data);
         }
         // If any other error
         else {
             const data = {
-                message: `Unexpected error while trying to show part: ${error.message}`,
+                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
                 errorCode: 500
             }
             logger.error(`OTHER error when UPDATING car part ${partNumber} -- updatePartName`);
@@ -960,7 +984,7 @@ async function deleteSpecificCarPartTable(request, response){
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
             const data = {
-                message: "There was an error connecting to the database.",
+                alertMessage: "There was an error connecting to the database.",
                 errorCode: 500
             }
             logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
@@ -968,13 +992,17 @@ async function deleteSpecificCarPartTable(request, response){
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
+            const data = {
+                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
+                errorCode: 404
+            }
             logger.error("InvalidInputError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(404).render('home.hbs', {message: "Invalid input, check that all fields are alpha numeric where applicable."});
+            response.status(404).render('home.hbs', data);
         }
         // If any other error
         else {
             const data = {
-                message: `Unexpected error while trying to show part: ${error.message}`,
+                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
                 errorCode: 500
             }
             logger.error("OTHER error when RETRIEVING all car parts -- getAllCarParts");
@@ -997,7 +1025,7 @@ async function addCarPartToProject(request, response){
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
             const data = {
-                message: "There was an error connecting to the database.",
+                alertMessage: "There was an error connecting to the database.",
                 errorCode: 500
             }
             logger.error(`DatabaseConnectionError when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
@@ -1005,13 +1033,17 @@ async function addCarPartToProject(request, response){
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
+            const data = {
+                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
+                errorCode: 404
+            }
             logger.error(`InvalidInputError when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
-            response.status(404).render('home.hbs', {message: "Invalid input, check that all fields are alpha numeric where applicable."});
+            response.status(404).render('home.hbs', data);
         }
         // If any other error
         else {
             const data = {
-                message: `Unexpected error while trying to show part: ${error.message}`,
+                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
                 errorCode: 500
             }
             logger.error(`OTHER error when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
@@ -1054,15 +1086,19 @@ async function deletePart(request, response){
         }
         // If the car part doesn't exists
         else{
+            const data = {
+                alertMessage: `Could not find part #${partNumber}`,
+                errorCode: 404
+            }
             logger.info(`NOT DELETING car part ${partNumber} in database -- deletePart`);
-            response.status(404).render('home.hbs', {message:`Could not find part #${partNumber}`});
+            response.status(404).render('home.hbs', data);
         }
     } 
     catch (error) {
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
             const data = {
-                message: "There was an error connecting to the database.",
+                alertMessage: "There was an error connecting to the database.",
                 errorCode: 500
             }
             logger.error(`DatabaseConnectionError when DELETING car part ${partNumber} -- deletePart`);
@@ -1070,13 +1106,17 @@ async function deletePart(request, response){
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
+            const data = {
+                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
+                errorCode: 500
+            }
             logger.error(`InvalidInputError when DELETING car part ${partNumber} -- deletePart`);
-            response.status(404).render('home.hbs', {message: "Invalid input, check that all fields are alpha numeric where applicable."});
+            response.status(404).render('home.hbs', data);
         }
         // If any other error
         else {
             const data = {
-                message: `Unexpected error while trying to show part: ${error.message}`,
+                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
                 errorCode: 500
             }
             logger.error(`OTHER error when DELETING car part ${partNumber} -- deletePart`);

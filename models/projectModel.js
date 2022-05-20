@@ -6,7 +6,6 @@ const logger = require('../logger');
 const model = require('../models/carPartModelMysql');
 const userModel = require('../models/userModel');
 const partModel = require('../models/carPartModelMysql');
-//const { DatabaseConnectionError } = require('../models/carPartModelMysql.js');
 var connection;
 
 /**
