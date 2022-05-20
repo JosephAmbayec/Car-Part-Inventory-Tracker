@@ -376,7 +376,6 @@ async function showCreateForm(request, response) {
  * @param {*} request 
  * @param {*} response 
  */
-
 async function addCarPart(request, response) {
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
@@ -413,15 +412,19 @@ async function addCarPart(request, response) {
                         clickedNewProject: false,
                         Home: "Home",
                         loggedInUser: login,
-                        Add: role === 1 ? "Add a Car part" : "",
-                        Show: "Find a Car Part",
-                        List: "Show all Car Parts",
-                        Edit: role === 1 ? "Update a Car Part" : "",
-                        Delete: role === 1 ? "Delete a Car Part" : "",
                         projects_text: "Projects",
                         about_text: "About Us",
                         Current: "English",
-                        footerData: footerLangObject(lang)
+                        footerData: footerLangObject(lang),
+                        showList: true,
+                        tableMessage: "You do not have any Projects.",
+                        titleName: 'Create a Project',
+                        pathNameForActionForm: 'projects',
+                        projects: await projectModel.getAllProjects(request.cookies.username),
+                        new_project: "New Project",
+                        your_projects: "Your Projects",
+                        see_more: "See more",
+                        last_updated: "Last updated 3 minutes ago",
                     }
                 }
                 else {
@@ -433,21 +436,26 @@ async function addCarPart(request, response) {
                         alertHref: 'exclamation-triangle-fill',
                         display_signup: signupDisplay,
                         display_login: "block",
-                        logInlogOutText: "Déconnecter",
                         signUpText: "Enregistrer",
                         endpointLogInLogOut: endpoint,
                         clickedNewProject: false,
                         Home: "Accueil",
                         loggedInUser: login,
-                        Add: role === 1 ? "Ajouter une Pièce Auto" : "",
-                        Show: "Trouver une Pièce Auto",
-                        List: "Afficher Toutes les Pièces de Voiture",
-                        Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
-                        Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
                         projects_text: "Projets",
                         about_text: "À propos de nous",
                         Current: "French",
-                        footerData: footerLangObject(lang)
+                        footerData: footerLangObject(lang),
+                        showList: true,
+                        tableMessage: "Vous n'avez aucun Projet.",
+                        titleName: 'Créer un Projet',
+                        pathNameForActionForm: 'projects',
+                        projects: await projectModel.getAllProjects(request.cookies.username),
+                        Home: "Accueil",
+                        logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                        new_project: "Nouveau Projet",
+                        your_projects: "Vos Projets",
+                        see_more: "Voir plus",
+                        last_updated: "Dernière mise à jour il y a 3 minutes"
                     }
                 }
         
@@ -546,7 +554,7 @@ async function showSpecificProject(request, response) {
         let noPartsFound;
 
         let description = theProject[0].description;
-        let name = theProject[0].name;
+        let theName = theProject[0].name;
 
         if (arrayOFCatPartsInProject.length === 0) {
             noPartsFound = true;
@@ -567,7 +575,7 @@ async function showSpecificProject(request, response) {
                 clickedNewProject: false,
                 Home: "Home",
                 loggedInUser: login,
-                projectName: name,
+                projectName: theName,
                 projectDescription: description,
                 projectId: parseInt(theProjectId),
                 projectParts: arrayOFCatPartsInProject,
@@ -597,7 +605,7 @@ async function showSpecificProject(request, response) {
                 clickedNewProject: false,
                 Home: "Accueil",
                 loggedInUser: login,
-                projectName: name,
+                projectName: theName,
                 projectDescription: description,
                 projectId: parseInt(theProjectId),
                 projectParts: arrayOFCatPartsInProject,
@@ -728,6 +736,7 @@ async function deleteProject(request, response) {
     let signupDisplay, endpoint, logInText;
     let login = loginController.authenticateUser(request);
     const lang = request.cookies.language;
+    let pageData;
 
     // Set the login to the username if response is not null
     if(login != null) {
@@ -738,28 +747,95 @@ async function deleteProject(request, response) {
 
             try {
                 await projectModel.deleteProject(projectID);
-        
-                // Page data 
-                const pageData = {
-                    alertOccurred: true,
-                    alertMessage: `Successfully deleted project ${projectID}!`,
-                    alertLevel: 'success',
-                    alertLevelText: 'success',
-                    alertHref: 'exclamation-triangle-fill',
-                    display_signup: signupDisplay,
-                    display_login: "block",
-                    logInlogOutText: logInText,
-                    signUpText: "Sign Up",
-                    endpointLogInLogOut: endpoint,
-                    clickedNewProject: false,
-                    Home: "Home",
-                    loggedInUser: login,
-                    projects: await projectModel.getAllProjects(request.cookies.username),
-                    about_text: "About Us",
-                    endpointLogInLogOut: endpoint,
-                    projects_text: "Projects",
-                    footerData: footerLangObject(lang)
+
+                if (!lang || lang === 'en') {
+                    pageData = {
+                        alertOccurred: true,
+                        showList: true,
+                        tableMessage: "You do not have any Projects.",
+                        titleName: 'Create a Project',
+                        pathNameForActionForm: 'projects',
+                        projects: await projectModel.getAllProjects(request.cookies.username),
+                        about_text: "About Us",
+                        endpointLogInLogOut: endpoint,
+                        projects_text: "Projects",
+                        Home: "Home",
+                        logInlogOutText: logInText,
+                        loggedInUser: login,
+                        new_project: "New Project",
+                        your_projects: "Your Projects",
+                        see_more: "See more",
+                        last_updated: "Last updated 3 minutes ago",
+                        footerData: footerLangObject(lang),
+                        alertMessage: `Successfully deleted project ${projectID}!`,
+                        alertLevel: 'success',
+                        alertLevelText: 'success',
+                        alertHref: 'exclamation-triangle-fill',
+                        display_signup: signupDisplay,
+                        display_login: "block",
+                        signUpText: "Sign Up",
+                    }
                 }
+                else {
+                    pageData = {
+                        alertOccurred: false,
+                        showList: true,
+                        tableMessage: "Vous n'avez aucun Projet.",
+                        titleName: 'Créer un Projet',
+                        pathNameForActionForm: 'projects',
+                        projects: await projectModel.getAllProjects(request.cookies.username),
+                        Home: "Accueil",
+                        logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                        loggedInUser: login,
+                        new_project: "Nouveau Projet",
+                        your_projects: "Vos Projets",
+                        see_more: "Voir plus",
+                        last_updated: "Dernière mise à jour il y a 3 minutes",
+                        about_text: "À Propos de Nous",
+                        endpointLogInLogOut: endpoint,
+                        projects_text: "Projets",
+                        footerData: footerLangObject(lang),
+                        alertOccurred: false,
+                // showList: true,
+                // tableMessage: "Vous n'avez aucun Projet.",
+                // titleName: 'Créer un Projet',
+                // pathNameForActionForm: 'projects',
+                // projects: await projectModel.getAllProjects(request.cookies.username),
+                // Home: "Accueil",
+                // logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                // loggedInUser: login,
+                // new_project: "Nouveau Projet",
+                // your_projects: "Vos Projets",
+                // see_more: "Voir plus",
+                // last_updated: "Dernière mise à jour il y a 3 minutes",
+                // about_text: "À Propos de Nous",
+                // endpointLogInLogOut: endpoint,
+                // projects_text: "Projets",
+                // footerData: footerLangObject(lang)
+                    }
+                } 
+        
+                // // Page data 
+                // const pageData = {
+                //     alertOccurred: true,
+                //     alertMessage: `Successfully deleted project ${projectID}!`,
+                //     alertLevel: 'success',
+                //     alertLevelText: 'success',
+                //     alertHref: 'exclamation-triangle-fill',
+                //     display_signup: signupDisplay,
+                //     display_login: "block",
+                //     logInlogOutText: logInText,
+                //     signUpText: "Sign Up",
+                //     endpointLogInLogOut: endpoint,
+                //     clickedNewProject: false,
+                //     Home: "Home",
+                //     loggedInUser: login,
+                //     projects: await projectModel.getAllProjects(request.cookies.username),
+                //     about_text: "About Us",
+                //     endpointLogInLogOut: endpoint,
+                //     projects_text: "Projects",
+                //     footerData: footerLangObject(lang)
+                // }
         
                 // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
                 // response.redirect(`/projects`);
