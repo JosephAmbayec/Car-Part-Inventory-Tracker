@@ -16,7 +16,6 @@ async function showAbout(request, response) {
     const lang = request.cookies.language;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
-    let role;
     let pageData;
 
     // Set the login to the username if response is not null
@@ -32,7 +31,7 @@ async function showAbout(request, response) {
         logInText = "Log In";
     }
 
-    role = await userModel.determineRole(login);
+    let role = await userModel.determineRole(login);
     
     if (!lang || lang === 'en'){
         pageData = {

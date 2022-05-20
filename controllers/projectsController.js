@@ -746,8 +746,8 @@ async function deleteProject(request, response) {
         }
 
         // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-        response.redirect(`/projects`);
-        // response.status(201).render('allProjects.hbs', pageData);
+        // response.redirect(`/projects`);
+        response.status(201).render('allProjects.hbs', pageData);
     }
     catch (error) {
         let pageData = {
