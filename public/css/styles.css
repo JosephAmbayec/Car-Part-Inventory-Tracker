@@ -92,7 +92,20 @@ footer {
   margin-left: 2rem;
   margin-top: 5rem;
 }
-
+#noProjsProjects{
+  text-align: center;
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center;
+ align-items: center; 
+ margin-left: 2rem;
+ margin-top: 5rem;
+ margin-bottom: 2rem;
+}
+#noProjsProjects:hover{
+  border: none;
+  box-shadow: none;
+}
 .inventory-actions-button{
   border-radius: 0.5rem;
   width: 14rem;
@@ -259,7 +272,7 @@ table {
 #container-projs > div{
     margin-bottom: 3rem;
 }
-#container-projs > div:hover{
+#container-projs > div:hover:not(noProjsProjects){
     /* border: 1px solid #0D6EFD; */
     cursor: pointer;
     box-shadow: 0 0 5px 2px #0D6EFD;
