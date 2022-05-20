@@ -19,6 +19,21 @@ async function loginUser(request, response) {
     // Getting the values
     let username = request.body.username;
     let password = request.body.password;
+    let signupDisplay, endpoint, logInText;
+    let login = authenticateUser(request);
+
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
+    }
+    else{
+        signupDisplay = "block";
+        endpoint = "login";
+        logInText = "Log In";
+    }
 
     try {
         let result = await userModel.validateLogin(username, password);
@@ -71,10 +86,8 @@ async function loginUser(request, response) {
                     alertHref: 'check-circle-fill',
                     display_signup: "none",
                     display_login: "block",
-                    logInlogOutText: "Déconnecter",
                     signUpText: "Enregistrer",
                     endpointLogInLogOut: "login",
-                    loggedInUser: username,
                     Add: "Ajouter une Pièce Auto",
                     Show: "Trouver une Pièce Auto",
                     List: "Afficher Toutes les Pièces de Voiture",
@@ -83,7 +96,11 @@ async function loginUser(request, response) {
                     projects_text: "Projets",
                     about_text: "À propos de nous",
                     Current: "French",
-                    footerData: footerLangObject(lang)
+                    footerData: footerLangObject(lang),
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    loggedInUser: login,
+                    Home : "Accueil",
+                    Current: "French"
                 }
             }
 
@@ -105,10 +122,17 @@ async function loginUser(request, response) {
                     titleName: 'Log In',
                     pathNameForActionForm: 'login',
                     showConfirmPassword: false,
+                    signUpText: "Sign Up",
                     oppositeFormAction: 'signup',
                     oppositeFormName: 'Sign up',
                     dontHaveAccountText: "Don't have an account?",
-                    footerData: footerLangObject(lang)
+                    footerData: footerLangObject(lang),
+                    endpointLogInLogOut: endpoint,
+                    about_text: "About Us",
+                    projects_text: "Projects",
+                    Home: "Home",
+                    logInlogOutText: logInText,
+                    loggedInUser: login,
                 }
             }
             else {
@@ -121,10 +145,18 @@ async function loginUser(request, response) {
                     titleName: 'Connexion',
                     pathNameForActionForm: 'login',
                     showConfirmPassword: false,
+                    signUpText: "Enregistrer",
                     oppositeFormAction: 'signup',
                     oppositeFormName: 'Enregistrer',
                     dontHaveAccountText: "Vous n'avez pas de compte?",
-                    footerData: footerLangObject(lang)
+                    footerData: footerLangObject(lang),
+                    endpointLogInLogOut: endpoint,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    loggedInUser: login,
+                    projects_text: "Projets",
+                    about_text: "À Propos de Nous",
+                    Home : "Accueil",
+                    Current: "French"
                 }
             }
 
@@ -151,6 +183,7 @@ async function loginUser(request, response) {
                 showConfirmPassword: false,
                 oppositeFormAction: 'signup',
                 oppositeFormName: 'Sign up',
+                signUpText: "Sign Up",
                 dontHaveAccountText: "Don't have an account?",
                 alertMessage: "",
                 errorCode: "",
@@ -162,6 +195,7 @@ async function loginUser(request, response) {
                 alertOccurred: true,
                 alertMessage: "",
                 alertLevel: 'danger',
+                signUpText: "Sign Up",
                 alertLevelText: 'Danger',
                 alertHref: 'exclamation-triangle-fill',
                 titleName: 'Connexion',
@@ -172,7 +206,11 @@ async function loginUser(request, response) {
                 dontHaveAccountText: "Vous n'avez pas de compte?",
                 alertMessage: "",
                 errorCode: "",
-                footerData: footerLangObject(lang)
+                footerData: footerLangObject(lang),
+                projects_text: "Projets",
+                about_text: "À Propos de Nous",
+                Home : "Accueil",
+                Current: "French"
             }
         }
 

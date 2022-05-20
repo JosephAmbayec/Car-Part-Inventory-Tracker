@@ -7,6 +7,7 @@ const routeRoot = '/';
 const userModel = require('../models/userModel');
 const logger = require('../logger');
 const homeController = require('../controllers/homeController');
+const loginController = require('./loginController');
 
 /**
  * POST method that allows the creation of a user
@@ -20,6 +21,22 @@ async function createUser(request, response){
     let confirmPassword = request.body.confirmPassword;
     const lang = request.cookies.language;
     let errorData;
+
+    let signupDisplay, endpoint, logInText;
+    let login = loginController.authenticateUser(request);
+
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
+    }
+    else{
+        signupDisplay = "block";
+        endpoint = "login";
+        logInText = "Log In";
+    }
 
     // Making sure the password and confirmed password match
     if (password != confirmPassword){
@@ -54,8 +71,15 @@ async function createUser(request, response){
                 oppositeFormAction: 'login',
                 oppositeFormName: 'Connexion',
                 dontHaveAccountText: "Vous avez déjà un compte?",
-                Home: "Accueil",
-                footerData: footerLangObject(lang)
+                footerData: footerLangObject(lang),
+                endpointLogInLogOut: endpoint,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    loggedInUser: login,
+                    projects_text: "Projets",
+                    about_text: "À Propos de Nous",
+                    Home : "Accueil",
+                    Current: "French",
+                    signUpText: "Enregistrer",
             }
         }
 
@@ -124,19 +148,20 @@ async function createUser(request, response){
                     alertHref: 'check-circle-fill',
                     display_signup: "none",
                     display_login: "block",
-                    logInlogOutText: "Déconnecter",
                     endpointLogInLogOut: "login",
-                    loggedInUser: username,
                     Home: "Accueil",
                     Add: "Ajouter une Pièce Auto",
                     Show: "Trouver une Pièce Auto",
                     List: "Afficher Toutes les Pièces de Voiture",
                     Edit: "Mettre à Jour une Pièce Auto",
                     Delete: "Supprimer une Pièce Auto",
-                    projects_text: "Projets",
-                    about_text: "À propos de nous",
                     Current: "French",
-                    footerData: footerLangObject(lang)
+                    footerData: footerLangObject(lang),
+                    endpointLogInLogOut: endpoint,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    loggedInUser: login,
+                    signUpText: "Enregistrer",
+                    about_text: "À propos de nous",
                 }
             }
 
@@ -190,7 +215,13 @@ async function createUser(request, response){
                     alertMessage: "",
                     errorCode: "",
                     Home: "Accueil",
-                    footerData: footerLangObject(lang)
+                    Current: "French",
+                    footerData: footerLangObject(lang),
+                    endpointLogInLogOut: endpoint,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    loggedInUser: login,
+                    signUpText: "Enregistrer",
+                    about_text: "À propos de nous",
                 } 
             }
 
