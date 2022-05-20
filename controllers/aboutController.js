@@ -4,18 +4,20 @@ const express = require('express');
 const router = express.Router();
 const routeRoot = '/';
 const logger = require('../logger');
-const loginController = require('../controllers/loginController');
+const userModel = require('../models/userModel');
+const loginController = require('./loginController');
 
 /**
  * Renders the about page.
  * @param {*} request 
  * @param {*} response 
  */
-function showAbout(request, response) {
+async function showAbout(request, response) {
     const lang = request.cookies.language;
-    let pageData;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let role;
+    let pageData;
 
     // Set the login to the username if response is not null
     if(login != null) {
@@ -29,6 +31,8 @@ function showAbout(request, response) {
         endpoint = "login";
         logInText = "Log In";
     }
+
+    role = await userModel.determineRole(login);
     
     if (!lang || lang === 'en'){
         pageData = {

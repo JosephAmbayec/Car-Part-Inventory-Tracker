@@ -60,8 +60,6 @@ async function createProject(request, response) {
                 Home: "Home",
                 logInlogOutText: logInText,
                 loggedInUser: login,
-                new_project: "New Project",
-                your_projects: "Your Projects",
                 see_more: "See more",
                 last_updated: "Last updated 3 minutes ago",
                 about_text: "About Us",
@@ -77,8 +75,6 @@ async function createProject(request, response) {
                 alertLevel: 'success',
                 alertLevelText: 'success',
                 alertHref: 'exclamation-triangle-fill',
-                titleName: 'Créer un Projet',
-                pathNameForActionForm: 'projects',
                 display_signup: "none",
                 display_login: "block",
                 logInlogOutText: "Déconnecter",
@@ -87,15 +83,19 @@ async function createProject(request, response) {
                 projects: projs,
                 clickedNewProject: false,
                 Home: "Accueil",
-                loggedInUser: login
+                loggedInUser: login,
+                new_project: "Nouveau Projet",
+                your_projects: "Vos Projets",
+                see_more: "Voir plus",
+                last_updated: "Dernière mise à jour il y a 3 minutes"
             }
         }
 
 
         logger.info(`CREATED PROJECT (Name: ${name}, Description: ${description} -- loginUser`);
         response.cookie("lastAccessedProject", projectId);
-        response.status(201).render('allProjects.hbs', pageData);
-        // response.redirect('/parts');
+        // response.status(201).render('allProjects.hbs', pageData);
+        response.redirect('/projects');
     } 
     catch (error) {
         if (!lang || lang === 'en') {
