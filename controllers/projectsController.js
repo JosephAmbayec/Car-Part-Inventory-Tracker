@@ -10,6 +10,7 @@ const partsModel = require('../models/carPartModelMysql');
 const usersModel = require('../models/userModel');
 const projectModel = require('../models/projectModel');
 const loginController = require('./loginController');
+const homeController = require('../controllers/homeController');
 
 /**
  * POST controller method that allows the user to create projects
@@ -65,7 +66,8 @@ async function createProject(request, response) {
                 about_text: "About Us",
                 endpointLogInLogOut: endpoint,
                 projects_text: "Projects",
-                clickedNewProject: true
+                clickedNewProject: true,
+                footerData: footerLangObject(lang)
             }
         }
         else {
@@ -87,6 +89,7 @@ async function createProject(request, response) {
                 new_project: "Nouveau Projet",
                 your_projects: "Vos Projets",
                 see_more: "Voir plus",
+                footerData: footerLangObject(lang)
             }
         }
 
@@ -108,7 +111,8 @@ async function createProject(request, response) {
                 pathNameForActionForm: 'projects',
                 projects: await projectModel.getAllProjects(),
                 clickedNewProject: false,
-                loggedInUser: login
+                loggedInUser: login,
+                footerData: footerLangObject(lang)
             }
         }
         else {
@@ -122,11 +126,10 @@ async function createProject(request, response) {
                 pathNameForActionForm: 'projects',
                 projects: await projectModel.getAllProjects(),
                 clickedNewProject: false,
-                loggedInUser: login
+                loggedInUser: login,
+                footerData: footerLangObject(lang)
             }
         }
-
-
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError) {
@@ -192,7 +195,8 @@ async function showProjects(request, response) {
                 new_project: "New Project",
                 your_projects: "Your Projects",
                 see_more: "See more",
-                last_updated: "Last updated 3 minutes ago"
+                last_updated: "Last updated 3 minutes ago",
+                footerData: footerLangObject(lang)
             }
         }
         else {
@@ -212,7 +216,8 @@ async function showProjects(request, response) {
                 last_updated: "Dernière mise à jour il y a 3 minutes",
                 about_text: "À Propos de Nous",
                 endpointLogInLogOut: endpoint,
-                projects_text: "Projets"
+                projects_text: "Projets",
+                footerData: footerLangObject(lang)
             }
         } 
 
@@ -240,7 +245,8 @@ async function showProjects(request, response) {
                 projects: await projectModel.getAllProjects(),
                 clickedNewProject: false,
                 loggedInUser: login,
-                errorCode: ""
+                errorCode: "",
+                footerData: footerLangObject(lang)
             }
         }
         else {
@@ -255,7 +261,8 @@ async function showProjects(request, response) {
                 projects: await projectModel.getAllProjects(),
                 clickedNewProject: false,
                 loggedInUser: login,
-                errorCode: ""
+                errorCode: "",
+                footerData: footerLangObject(lang)
             }
         }
 
@@ -332,7 +339,8 @@ async function showCreateForm(request, response) {
             back_button: "Return",
             endpointLogInLogOut: endpoint,
             projects_text: "Projects",
-            about_text: "About Us"
+            about_text: "About Us",
+            footerData: footerLangObject(lang)
         }
     }
     else {
@@ -354,7 +362,8 @@ async function showCreateForm(request, response) {
             back_button: "Retournez",
             endpointLogInLogOut: endpoint,
             projects_text: "Projets",
-            about_text: "À propos de nous"
+            about_text: "À propos de nous",
+            footerData: footerLangObject(lang)
         }
     }
 
@@ -373,6 +382,7 @@ async function addCarPart(request, response) {
     let signupDisplay, endpoint, logInText;
     let partNumber = request.body.partNumber;
     let projectId = request.params.projectId;
+    const lang = request.cookies.language;
 
         // Set the login to the username if response is not null
         if(login != null) {
@@ -386,7 +396,6 @@ async function addCarPart(request, response) {
             try {
                 await projectModel.addPartToProject(projectId, partNumber);
         
-                const lang = request.cookies.language;
                 let pageData;
         
                 if (!lang || lang === 'en') {
@@ -411,7 +420,8 @@ async function addCarPart(request, response) {
                         Delete: role === 1 ? "Delete a Car Part" : "",
                         projects_text: "Projects",
                         about_text: "About Us",
-                        Current: "English"
+                        Current: "English",
+                        footerData: footerLangObject(lang)
                     }
                 }
                 else {
@@ -436,7 +446,8 @@ async function addCarPart(request, response) {
                         Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
                         projects_text: "Projets",
                         about_text: "À propos de nous",
-                        Current: "French"
+                        Current: "French",
+                        footerData: footerLangObject(lang)
                     }
                 }
         
@@ -450,7 +461,8 @@ async function addCarPart(request, response) {
                     alertLevel: 'danger',
                     alertLevelText: 'Danger',
                     alertHref: 'exclamation-triangle-fill',
-                    loggedInUser: login
+                    loggedInUser: login,
+                    footerData: footerLangObject(lang)
                 }
         
                 if (error instanceof sqlModel.DatabaseConnectionError) {
@@ -492,8 +504,6 @@ async function showSpecificProject(request, response) {
     let login = loginController.authenticateUser(request);
     let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
     let noPartsFound, name, description;
-    // console.log(this.);
-
 
     if (arrayOFCatPartsInProject.length === 0) {
         noPartsFound = true;
@@ -572,7 +582,8 @@ async function showSpecificProject(request, response) {
                 partNumberLabel: "Part Number",
                 partConditionLabel: "Condition",
                 about_text: "About Us",
-                projects_text: "Projects"
+                projects_text: "Projects",
+                footerData: footerLangObject(lang)
             }
         }
         else {
@@ -601,7 +612,8 @@ async function showSpecificProject(request, response) {
                 partNumberLabel: "Numéro de Pièce",
                 partConditionLabel: "Condition",
                 about_text: "À propos de nous",
-                projects_text: "Projets"
+                projects_text: "Projets",
+                footerData: footerLangObject(lang)
             }
         }
     
@@ -632,7 +644,8 @@ async function showSpecificProject(request, response) {
             noparts_message: "No car parts added in this project",
             parts_in_project_label: "Car Parts in Project",
             partNumberLabel: "Part Number",
-            partConditionLabel: "Condition"
+            partConditionLabel: "Condition",
+            footerData: footerLangObject(lang)
         }
     }
 
@@ -678,7 +691,8 @@ async function updateProject(request, response) {
             endpointLogInLogOut: "login",
             clickedNewProject: false,
             Home: "Home",
-            loggedInUser: login
+            loggedInUser: login,
+            footerData: footerLangObject(lang)
         }
     }
     else {
@@ -696,7 +710,8 @@ async function updateProject(request, response) {
             endpointLogInLogOut: "login",
             clickedNewProject: false,
             Home: "Accueil",
-            loggedInUser: login
+            loggedInUser: login,
+            footerData: footerLangObject(lang)
         }
     }
 
@@ -743,6 +758,7 @@ async function deleteProject(request, response) {
                     about_text: "About Us",
                     endpointLogInLogOut: endpoint,
                     projects_text: "Projects",
+                    footerData: footerLangObject(lang)
                 }
         
                 // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
@@ -759,7 +775,8 @@ async function deleteProject(request, response) {
                     alertHref: 'exclamation-triangle-fill',
                     loggedInUser: lang,
                     errorCode: "",
-                    alertMessage: ""
+                    alertMessage: "",
+                    footerData: footerLangObject(lang)
                 }
         
                 // If the error is an instance of the DatabaseConnectionError error
@@ -796,6 +813,7 @@ async function deletePartFromProject(request, response) {
      let partNumber = request.params.partNumber;
      let signupDisplay, endpoint, logInText;
      let login = loginController.authenticateUser(request);
+     const lang = request.cookies.language;
      
      // Set the login to the username if response is not null
      if (login != null) {
@@ -822,6 +840,7 @@ async function deletePartFromProject(request, response) {
                 clickedNewProject: false,
                 Home: "Home",
                 loggedInUser: login,
+                footerData: footerLangObject(lang)
             }
 
             // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
@@ -838,7 +857,8 @@ async function deletePartFromProject(request, response) {
                 alertHref: 'exclamation-triangle-fill',
                 loggedInUser: lang,
                 errorCode: "",
-                alertMessage: ""
+                alertMessage: "",
+                footerData: footerLangObject(lang)
             }
 
             // If the error is an instance of the DatabaseConnectionError error
@@ -868,6 +888,43 @@ async function deletePartFromProject(request, response) {
     }
 }
 
+/* #region Helper */
+
+/**
+ * Helper function to display footer information in specified language.
+ * @param {*} lang The specified language.
+ * @returns Object containing the footer information.
+ */
+ function footerLangObject(lang){
+    if (!lang || lang === 'en') {
+        const footerData = {
+            footer_home_title: "Home Page",
+            footerHomeText: "Home",
+            footer_whoAreWe: "Who are the car guys?",
+            footerAboutText: "Learn more",
+            footer_getAccess: "Get access to projects",
+            footer_logIn: "Log In",
+            footer_signUp: "Sign Up"
+        }
+
+        return footerData;
+    }
+    else{
+        const footerData = {
+            footer_home_title: "Page D'accueil",
+            footerHomeText: "Accueil",
+            footer_whoAreWe: "Qui sommes nous?",
+            footerAboutText: "Apprendre plus",
+            footer_getAccess: "Accéder aux Projets",
+            footer_logIn: "Connexion",
+            footer_signUp: "Enregistrer"
+        }
+
+        return footerData;
+    }
+}
+
+/* #endregion */
 
 router.post("/projects", createProject);
 router.get("/projects", showProjects);

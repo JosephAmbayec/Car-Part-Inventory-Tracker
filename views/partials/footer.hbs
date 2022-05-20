@@ -4,18 +4,20 @@
     <hr style="height: 0.1px;">
     <div id="footer-container">
         <div class="column-foot">
-            <h4>Home Page</h4>
-            <a href="/">Home</a>
+            <h4>{{footerData.footer_home_title}}</h4>
+            <a href="/">{{footerData.footerHomeText}}</a>
         </div>
         <div class="column-foot">
-            <h4>Who are the car guys?</h4>
-            <a href="/about">Learn more</a>
+            <h4>{{footerData.footer_whoAreWe}}</h4>
+            <a href="/about">{{footerData.footerAboutText}}</a>
         </div>
         <div class="column-foot">
-            <h4>Get access to projects</h4>
+            <h4>{{footerData.footer_getAccess}}</h4>
             <div style="text-align:center; display:flex; flex-direction:row; justify-content: center;">
-                <a href="/users/login" style="margin-right: 1.5rem;">Log In</a>
-                <a href="/users/signup">Sign Up</a>
+                <a href="/users/login" style="margin-right: 1.5rem;">
+                {{footerData.footer_logIn}}
+                </a>
+                <a href="/users/signup">{{footerData.footer_signUp}}</a>
             </div>
         </div>
     </div>

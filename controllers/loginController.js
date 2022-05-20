@@ -8,6 +8,7 @@ const userModel = require('../models/userModel');
 const logger = require('../logger');
 const session = require('./sessionController');
 const sessionModel = require('../models/sessionModel');
+const homeController = require('../controllers/homeController');
 
 /**
  * Handles the request for logging in a user and forms the appropriate response.
@@ -57,7 +58,8 @@ async function loginUser(request, response) {
                     Delete: "Delete a Car Part",
                     projects_text: "Projects",
                     about_text: "About Us",
-                    Current: "English"
+                    Current: "English",
+                    footerData: footerLangObject(lang)
                 }
             }
             else {
@@ -80,7 +82,8 @@ async function loginUser(request, response) {
                     Delete: "Supprimer une Pièce Auto",
                     projects_text: "Projets",
                     about_text: "À propos de nous",
-                    Current: "French"
+                    Current: "French",
+                    footerData: footerLangObject(lang)
                 }
             }
 
@@ -104,7 +107,8 @@ async function loginUser(request, response) {
                     showConfirmPassword: false,
                     oppositeFormAction: 'signup',
                     oppositeFormName: 'Sign up',
-                    dontHaveAccountText: "Don't have an account?"
+                    dontHaveAccountText: "Don't have an account?",
+                    footerData: footerLangObject(lang)
                 }
             }
             else {
@@ -119,7 +123,8 @@ async function loginUser(request, response) {
                     showConfirmPassword: false,
                     oppositeFormAction: 'signup',
                     oppositeFormName: 'Enregistrer',
-                    dontHaveAccountText: "Vous n'avez pas de compte?"
+                    dontHaveAccountText: "Vous n'avez pas de compte?",
+                    footerData: footerLangObject(lang)
                 }
             }
 
@@ -148,7 +153,8 @@ async function loginUser(request, response) {
                 oppositeFormName: 'Sign up',
                 dontHaveAccountText: "Don't have an account?",
                 alertMessage: "",
-                errorCode: ""
+                errorCode: "",
+                footerData: footerLangObject(lang)
             }
         }
         else {
@@ -165,7 +171,8 @@ async function loginUser(request, response) {
                 oppositeFormName: 'Enregistrer',
                 dontHaveAccountText: "Vous n'avez pas de compte?",
                 alertMessage: "",
-                errorCode: ""
+                errorCode: "",
+                footerData: footerLangObject(lang)
             }
         }
 
@@ -229,7 +236,8 @@ async function logoutUser(request, response) {
                 endpointLogInLogOut: "login",
                 usernameHeader: "Username",
                 passwordHeader: "Password",
-                about_text: "About Us"
+                about_text: "About Us",
+                footerData: footerLangObject(lang)
             }
         }
         else {
@@ -249,7 +257,8 @@ async function logoutUser(request, response) {
                 endpointLogInLogOut: "login",
                 usernameHeader: "Nom D'utilisateur",
                 passwordHeader: "Mot de Passe",
-                about_text: "À propos de nous"
+                about_text: "À propos de nous",
+                footerData: footerLangObject(lang)
             }
         }
 
@@ -280,7 +289,8 @@ async function showLogin(request, response) {
             endpointLogInLogOut: "login",
             usernameHeader: "Username",
             passwordHeader: "Password",
-            about_text: "About Us"
+            about_text: "About Us",
+            footerData: footerLangObject(lang)
         }
     }
     else {
@@ -300,7 +310,8 @@ async function showLogin(request, response) {
             endpointLogInLogOut: "login",
             usernameHeader: "Nom D'utilisateur",
             passwordHeader: "Mot de Passe",
-            about_text: "À propos de nous"
+            about_text: "À propos de nous",
+            footerData: footerLangObject(lang)
         }
     }
 
@@ -332,6 +343,43 @@ function authenticateUser(request) {
     return { sessionId, userSession }; // Successfully validated.
 }
 
+/* #region Helper */
+
+/**
+ * Helper function to display footer information in specified language.
+ * @param {*} lang The specified language.
+ * @returns Object containing the footer information.
+ */
+ function footerLangObject(lang){
+    if (!lang || lang === 'en') {
+        const footerData = {
+            footer_home_title: "Home Page",
+            footerHomeText: "Home",
+            footer_whoAreWe: "Who are the car guys?",
+            footerAboutText: "Learn more",
+            footer_getAccess: "Get access to projects",
+            footer_logIn: "Log In",
+            footer_signUp: "Sign Up"
+        }
+
+        return footerData;
+    }
+    else{
+        const footerData = {
+            footer_home_title: "Page D'accueil",
+            footerHomeText: "Accueil",
+            footer_whoAreWe: "Qui sommes nous?",
+            footerAboutText: "Apprendre plus",
+            footer_getAccess: "Accéder aux Projets",
+            footer_logIn: "Connexion",
+            footer_signUp: "Enregistrer"
+        }
+
+        return footerData;
+    }
+}
+
+/* #endregion */
 
 router.get('/users/login', showLogin)
 router.post("/users/login", loginUser)

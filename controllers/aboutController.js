@@ -6,6 +6,7 @@ const routeRoot = '/';
 const logger = require('../logger');
 const userModel = require('../models/userModel');
 const loginController = require('./loginController');
+const homeController = require('./homeController');
 
 /**
  * Renders the about page.
@@ -49,6 +50,7 @@ async function showAbout(request, response) {
             motivationText: "Our motivation for this project was the lack of free user friendly inventory management systems. There's already a fair amount of inventory trackers out there, however most of them are only available for a ridiculous monthly fee. The handful of free inventory trackers offer limited functionality or have an ugly and terribly designed interface. Our inspiration for the design was a combination of what we gathered from a few of the paid inventory tracking systems and features we came up with after group discussions.",
             loggedInUser: login,
             projects_text: "Projects",
+            footerData: footerLangObject(lang)
         }
     }
     else {
@@ -72,7 +74,8 @@ async function showAbout(request, response) {
             display_signup: signupDisplay,
             loggedInUser: login,
             logInlogOutText: logInText,
-            loggedInUser: login
+            loggedInUser: login,
+            footerData: footerLangObject(lang)
         }
 
     }
@@ -81,6 +84,44 @@ async function showAbout(request, response) {
     response.status(200).render('about.hbs', pageData);
     
 }
+
+/* #region Helper */
+
+/**
+ * Helper function to display footer information in specified language.
+ * @param {*} lang The specified language.
+ * @returns Object containing the footer information.
+ */
+ function footerLangObject(lang){
+    if (!lang || lang === 'en') {
+        const footerData = {
+            footer_home_title: "Home Page",
+            footerHomeText: "Home",
+            footer_whoAreWe: "Who are the car guys?",
+            footerAboutText: "Learn more",
+            footer_getAccess: "Get access to projects",
+            footer_logIn: "Log In",
+            footer_signUp: "Sign Up"
+        }
+
+        return footerData;
+    }
+    else{
+        const footerData = {
+            footer_home_title: "Page D'accueil",
+            footerHomeText: "Accueil",
+            footer_whoAreWe: "Qui sommes nous?",
+            footerAboutText: "Apprendre plus",
+            footer_getAccess: "Accéder aux Projets",
+            footer_logIn: "Connexion",
+            footer_signUp: "Enregistrer"
+        }
+
+        return footerData;
+    }
+}
+
+/* #endregion */
 
 router.get('/about', showAbout);
 

@@ -6,6 +6,7 @@ const router = express.Router();
 const routeRoot = '/';
 const userModel = require('../models/userModel');
 const logger = require('../logger');
+const homeController = require('../controllers/homeController');
 
 /**
  * POST method that allows the creation of a user
@@ -37,6 +38,7 @@ async function createUser(request, response){
                 oppositeFormName: 'Log in',
                 dontHaveAccountText: "Already have an account?",
                 Home: "Home",
+                footerData: footerLangObject(lang)
             }
         }
         else{
@@ -53,6 +55,7 @@ async function createUser(request, response){
                 oppositeFormName: 'Connexion',
                 dontHaveAccountText: "Vous avez déjà un compte?",
                 Home: "Accueil",
+                footerData: footerLangObject(lang)
             }
         }
 
@@ -108,7 +111,8 @@ async function createUser(request, response){
                     Delete: "Delete a Car Part",
                     projects_text: "Projects",
                     about_text: "About Us",
-                    Current: "English"
+                    Current: "English",
+                    footerData: footerLangObject(lang)
                 }
             }
             else{
@@ -131,7 +135,8 @@ async function createUser(request, response){
                     Delete: "Supprimer une Pièce Auto",
                     projects_text: "Projets",
                     about_text: "À propos de nous",
-                    Current: "French"
+                    Current: "French",
+                    footerData: footerLangObject(lang)
                 }
             }
 
@@ -162,7 +167,8 @@ async function createUser(request, response){
                     confirmPasswordHeader: "Confirm Password",
                     Home: "Home",
                     alertMessage: "",
-                    errorCode: ""
+                    errorCode: "",
+                    footerData: footerLangObject(lang)
                 }
             }
             else{
@@ -184,6 +190,7 @@ async function createUser(request, response){
                     alertMessage: "",
                     errorCode: "",
                     Home: "Accueil",
+                    footerData: footerLangObject(lang)
                 } 
             }
 
@@ -283,7 +290,8 @@ async function showSignup(request, response){
             passwordHeader: "Password",
             confirmPasswordHeader: "Confirm Password",
             Home: "Home",
-            about_text: "About Us"
+            about_text: "About Us",
+            footerData: footerLangObject(lang)
         }
     }
     else{
@@ -304,13 +312,53 @@ async function showSignup(request, response){
             passwordHeader: "Mot de Passe",
             confirmPasswordHeader: "Confirmez le Mot de Passe",
             Home: "Accueil",
-            about_text: "À propos de nous"
+            about_text: "À propos de nous",
+            footerData: footerLangObject(lang)
         }
     }
 
     logger.info(`SHOWING SIGNUP information (signup page) -- showSignup`);
     response.status(201).render('loginsignup.hbs', pageData);
 }
+
+/* #region Helper */
+
+/**
+ * Helper function to display footer information in specified language.
+ * @param {*} lang The specified language.
+ * @returns Object containing the footer information.
+ */
+ function footerLangObject(lang){
+    if (!lang || lang === 'en') {
+        const footerData = {
+            footer_home_title: "Home Page",
+            footerHomeText: "Home",
+            footer_whoAreWe: "Who are the car guys?",
+            footerAboutText: "Learn more",
+            footer_getAccess: "Get access to projects",
+            footer_logIn: "Log In",
+            footer_signUp: "Sign Up"
+        }
+
+        return footerData;
+    }
+    else{
+        const footerData = {
+            footer_home_title: "Page D'accueil",
+            footerHomeText: "Accueil",
+            footer_whoAreWe: "Qui sommes nous?",
+            footerAboutText: "Apprendre plus",
+            footer_getAccess: "Accéder aux Projets",
+            footer_logIn: "Connexion",
+            footer_signUp: "Enregistrer"
+        }
+
+        return footerData;
+    }
+}
+
+/* #endregion */
+
 
 router.get('/users', showUsers);
 router.get('/users/signup', showSignup)

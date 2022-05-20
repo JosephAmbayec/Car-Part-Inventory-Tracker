@@ -9,6 +9,7 @@ const logger = require('../logger');
 const projectModel = require('../models/projectModel');
 const loginController = require('./loginController');
 const userModel = require('../models/userModel');
+const homeController = require('./homeController');
 
 /**
  * POST controller method that allows the user to create parts via the request body
@@ -21,6 +22,7 @@ async function createPart(request, response){
     let partName = request.body.name;
     let image = request.body.image;
     let condition = request.body.addingForm;
+    const lang = request.cookies.language;
 
     // If the image is not a valid url, set image to null
     if (!validUtils.isURL(image)){
@@ -76,6 +78,7 @@ async function createPart(request, response){
 async function getPartByNumber(request, response){
     // Getting the values
     let number = request.params.partNumber;
+    const lang = request.cookies.language;
 
     try {
         let part = await sqlModel.findCarPartByNumber(number);
@@ -121,7 +124,8 @@ async function getPartByNumber(request, response){
                     alertLevel: 'danger',
                     alertLevelText: 'Danger',
                     alertHref: 'exclamation-triangle-fill',
-                inv_actions: ""
+                inv_actions: "",
+                footerData: footerLangObject(lang)
             }
 
             // If the language is english
@@ -188,7 +192,8 @@ async function getPartByNumber(request, response){
                 alertLevel: 'success',
                     alertLevelText: 'success',
                     alertHref: 'exclamation-triangle-fill',
-                inv_actions: ""
+                inv_actions: "",
+                footerData: footerLangObject(lang)
             }
 
             // If the language is english
@@ -326,7 +331,8 @@ async function getAllCarParts(request, response){
                 partCondition: "",
                 partImage: "",
                 partDelete: "",
-                allPartsText: ""
+                allPartsText: "",
+                footerData: footerLangObject(lang)
             }
 
             if (AccessProject){
@@ -358,7 +364,8 @@ async function getAllCarParts(request, response){
                     partCondition: "",
                     partImage: "",
                     partDelete: "",
-                    allPartsText: ""
+                    allPartsText: "",
+                    footerData: footerLangObject(lang)
                 }
 
             }
@@ -470,7 +477,8 @@ async function getAllCarParts(request, response){
                 partCondition: "",
                 partImage: "",
                 partDelete: "",
-                allPartsText: ""
+                allPartsText: "",
+                footerData: footerLangObject(lang)
             };
 
             if (AccessProject){
@@ -503,7 +511,8 @@ async function getAllCarParts(request, response){
                     partCondition: "",
                     partImage: "",
                     partDelete: "",
-                    allPartsText: ""
+                    allPartsText: "",
+                    footerData: footerLangObject(lang)
                 }
 
             }
@@ -599,6 +608,7 @@ async function updatePartName(request, response){
     // Getting the values
     let newName = request.body.name;
     let partNumber = request.params.partNumber;
+    const lang = request.cookies.language;
 
     try {
 
@@ -705,7 +715,8 @@ async function deleteSpecificCarPartTable(request, response){
                 partCondition: "",
                 partImage: "",
                 partDelete: "",
-                allPartsText: ""
+                allPartsText: "",
+                footerData: footerLangObject(lang)
             }
 
             if (AccessProject){
@@ -737,7 +748,8 @@ async function deleteSpecificCarPartTable(request, response){
                     partCondition: "",
                     partImage: "",
                     partDelete: "",
-                    allPartsText: ""
+                    allPartsText: "",
+                    footerData: footerLangObject(lang)
                 }
             }
 
@@ -849,7 +861,8 @@ async function deleteSpecificCarPartTable(request, response){
                 partCondition: "",
                 partImage: "",
                 partDelete: "",
-                allPartsText: ""
+                allPartsText: "",
+                footerData: footerLangObject(lang)
             };
 
             if (AccessProject){
@@ -883,7 +896,8 @@ async function deleteSpecificCarPartTable(request, response){
                     partCondition: "",
                     partImage: "",
                     partDelete: "",
-                    allPartsText: ""
+                    allPartsText: "",
+                    footerData: footerLangObject(lang)
                 }
             }
 
@@ -970,6 +984,8 @@ async function deleteSpecificCarPartTable(request, response){
 }
 
 async function addCarPartToProject(request, response){
+    const lang = request.cookies.language;
+
     try {
         // Getting the values
         let projectId = request.params.projectId;
@@ -1010,6 +1026,8 @@ async function addCarPartToProject(request, response){
  * @param {*} response 
  */
 async function deletePart(request, response){
+    const lang = request.cookies.language;
+
     try {
         // Getting the values
         let partNumber = request.params.partNumber;
@@ -1066,6 +1084,44 @@ async function deletePart(request, response){
         }
     }
 }
+
+/* #region Helper */
+
+/**
+ * Helper function to display footer information in specified language.
+ * @param {*} lang The specified language.
+ * @returns Object containing the footer information.
+ */
+ function footerLangObject(lang){
+    if (!lang || lang === 'en') {
+        const footerData = {
+            footer_home_title: "Home Page",
+            footerHomeText: "Home",
+            footer_whoAreWe: "Who are the car guys?",
+            footerAboutText: "Learn more",
+            footer_getAccess: "Get access to projects",
+            footer_logIn: "Log In",
+            footer_signUp: "Sign Up"
+        }
+
+        return footerData;
+    }
+    else{
+        const footerData = {
+            footer_home_title: "Page D'accueil",
+            footerHomeText: "Accueil",
+            footer_whoAreWe: "Qui sommes nous?",
+            footerAboutText: "Apprendre plus",
+            footer_getAccess: "Accéder aux Projets",
+            footer_logIn: "Connexion",
+            footer_signUp: "Enregistrer"
+        }
+
+        return footerData;
+    }
+}
+
+/* #endregion */
 
 
 router.post("/parts", createPart)

@@ -82,7 +82,8 @@ async function sendHome(request, response) {
                 accessProject: AccessProject,
                 accessProjectId: accessProject,
                 accessProjectName: AccessProjectName,
-                inv_actions: "Inventory Actions"
+                inv_actions: "Inventory Actions",
+                footerData: footerLangObject(lang)
             }
         }
         else{
@@ -121,7 +122,8 @@ async function sendHome(request, response) {
                 accessProject: AccessProject,
                 accessProjectId: accessProject,
                 accessProjectName: AccessProjectName,
-                inv_actions: "Actions D'inventaire"
+                inv_actions: "Actions D'inventaire",
+                footerData: footerLangObject(lang)
             }
 
             if(logInText === "Log In"){
@@ -269,7 +271,8 @@ async function showAddForm(request, response) {
             loggedInUser: login,
             projects_text: "Projects",
             about_text: "About Us",
-            inv_actions: "Inventory Actions"
+            inv_actions: "Inventory Actions",
+            footerData: footerLangObject(lang)
         }
     }
     else {
@@ -319,7 +322,8 @@ async function showAddForm(request, response) {
             loggedInUser: login,
             projects_text: "Projets",
             about_text: "À propos de nous",
-            inv_actions: "Actions D'inventaire"
+            inv_actions: "Actions D'inventaire",
+            footerData: footerLangObject(lang)
         }
 
         if(logInText === "Log In"){
@@ -386,7 +390,8 @@ async function showListOneForm(request, response) {
             loggedInUser: login,
             projects_text: "Projects",
             about_text: "About Us",
-            inv_actions: "Inventory Actions"
+            inv_actions: "Inventory Actions",
+            footerData: footerLangObject(lang)
         };
     }
     else {
@@ -429,7 +434,8 @@ async function showListOneForm(request, response) {
             loggedInUser: login,
             projects_text: "Projets",
             about_text: "À propos de nous",
-            inv_actions: "Actions D'inventaire"
+            inv_actions: "Actions D'inventaire",
+            footerData: footerLangObject(lang)
         };
 
         if(logInText === "Log In"){
@@ -497,7 +503,8 @@ async function showEditForm(request, response) {
             loggedInUser: login,
             projects_text: "Projects",
             about_text: "About Us",
-            inv_actions: "Inventory Actions"
+            inv_actions: "Inventory Actions",
+            footerData: footerLangObject(lang)
         };
     }
     else {
@@ -541,7 +548,8 @@ async function showEditForm(request, response) {
             loggedInUser: login,
             projects_text: "Projets",
             about_text: "À propos de nous",
-            inv_actions: "Actions D'inventaire"
+            inv_actions: "Actions D'inventaire",
+            footerData: footerLangObject(lang)
         };
 
         if(logInText === "Log In"){
@@ -556,6 +564,44 @@ async function showEditForm(request, response) {
     response.render('home.hbs', pageData);
 }
 
+/* #region Helper */
+
+/**
+ * Helper function to display footer information in specified language.
+ * @param {*} lang The specified language.
+ * @returns Object containing the footer information.
+ */
+function footerLangObject(lang){
+    if (!lang || lang === 'en') {
+        const footerData = {
+            footer_home_title: "Home Page",
+            footerHomeText: "Home",
+            footer_whoAreWe: "Who are the car guys?",
+            footerAboutText: "Learn more",
+            footer_getAccess: "Get access to projects",
+            footer_logIn: "Log In",
+            footer_signUp: "Sign Up"
+        }
+
+        return footerData;
+    }
+    else{
+        const footerData = {
+            footer_home_title: "Page D'accueil",
+            footerHomeText: "Accueil",
+            footer_whoAreWe: "Qui sommes nous?",
+            footerAboutText: "Apprendre plus",
+            footer_getAccess: "Accéder aux Projets",
+            footer_logIn: "Connexion",
+            footer_signUp: "Enregistrer"
+        }
+
+        return footerData;
+    }
+}
+
+/* #endregion */
+
 
 router.get('/', sendHome);
 router.post('/', showForm);
@@ -564,4 +610,5 @@ router.post('/', showForm);
 module.exports = {
     router,
     routeRoot,
+    footerLangObject
 }
