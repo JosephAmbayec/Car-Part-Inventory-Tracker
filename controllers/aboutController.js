@@ -18,13 +18,8 @@ async function showAbout(request, response) {
     let signupDisplay, endpoint, logInText;
     let role;
 
-
-
     let pageData;
     // Page data 
-
-    if (!lang || lang === 'en') {
-
         if (!lang || lang === 'en') {
             // Set the login to the username if response is not null
             if (login != null) {
@@ -101,7 +96,7 @@ async function showAbout(request, response) {
 
         logger.info(`RENDERING about page -- showAbout`);
         response.status(200).render('about.hbs', pageData);
-    }
+    
 }
 
 router.get('/about', showAbout);
