@@ -16,50 +16,38 @@ async function showAbout(request, response) {
     const lang = request.cookies.language;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
-    let role;
-
-
-
     let pageData;
-    // Page data 
 
-    if (!lang || lang === 'en') {
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
+    }
+    else{
+        signupDisplay = "block";
+        endpoint = "login";
+        logInText = "Log In";
+    }
 
-        if (!lang || lang === 'en') {
-            // Set the login to the username if response is not null
-            if (login != null) {
-                login = login.userSession.username;
-                signupDisplay = "none";
-                endpoint = "logout";
-                logInText = "Log Out";
-            }
-            else {
-                signupDisplay = "block";
-                endpoint = "login";
-                logInText = "Log In";
-            }
-
-            role = await userModel.determineRole(login);
-
-            pageData = {
-                display_signup: "block",
-                display_login: "block",
-                logInlogOutText: "Log In",
-                endpointLogInLogOut: "login",
-                projects_text: "Projects",
-                about_text: "About Us",
-                signUpText: "Sign Up",
-                Home: "Home",
-                mainTitle: "Who are The Car Guys?",
-                mainText: "We are a group of 2nd year Computer Science students with an interest in the automotive industry. Our shared interests lead us to come up with an inventory tracker so car enthusiasts alike can organize and keep track of their projects.",
-                motivationTitle: "Our motivation and inspiration",
-                motivationText: "Our motivation for this project was the lack of free user friendly inventory management systems. There's already a fair amount of inventory trackers out there, however most of them are only available for a ridiculous monthly fee. The handful of free inventory trackers offer limited functionality or have an ugly and terribly designed interface. Our inspiration for the design was a combination of what we gathered from a few of the paid inventory tracking systems and features we came up with after group discussions.",
-                projects_text: "Projects",
-                display_signup: signupDisplay,
-                loggedInUser: login,
-                logInlogOutText: logInText,
-                loggedInUser: login
-            }
+    let role = await userModel.determineRole(login);
+    
+    if (!lang || lang === 'en'){
+        pageData = {
+            display_signup: signupDisplay,
+            display_login: "block",
+            logInlogOutText: logInText,
+            endpointLogInLogOut: endpoint,
+            about_text: "About Us",
+            signUpText: "Sign Up",
+            Home: "Home",
+            mainTitle: "Who are The Car Guys?",
+            mainText:"We are a group of 2nd year Computer Science students with an interest in the automotive industry. Our shared interests lead us to come up with an inventory tracker so car enthusiasts alike can organize and keep track of their projects.",
+            motivationTitle: "Our motivation and inspiration",
+            motivationText: "Our motivation for this project was the lack of free user friendly inventory management systems. There's already a fair amount of inventory trackers out there, however most of them are only available for a ridiculous monthly fee. The handful of free inventory trackers offer limited functionality or have an ugly and terribly designed interface. Our inspiration for the design was a combination of what we gathered from a few of the paid inventory tracking systems and features we came up with after group discussions.",
+            loggedInUser: login,
+            projects_text: "Projects",
         }
         else {
 

@@ -22,89 +22,50 @@ async function createProject(request, response) {
     let description = request.body.description;
     let userId = await usersModel.getUserByName(request.cookies.username);
     const lang = request.cookies.language;
+    let pageData;
+    let login = loginController.authenticateUser(request);
+    let signupDisplay, endpoint, logInText;
 
-    // If the user id is not specified
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
+    }
+    else{
+        response.redirect('/parts');
+    }
 
     try {
-        let projectId;
-        let projs;
-        let login;
+        // If the user id is not specified
         if (userId === -1) {
             logger.error(`No user to create project -- createProject`);
-            
-            let pageData;
-
-            if (!lang || lang === 'en' || lang == undefined) {
-                pageData = {
-                    alertOccurred: true,
-                    alertMessage: "",
-                    alertLevel: 'danger',
-                    alertLevelText: 'Danger',
-                    alertHref: 'exclamation-triangle-fill',
-                    titleName: 'Create a Project',
-                    pathNameForActionForm: 'projects',
-                    projects: await projectModel.getAllProjects(),
-                    clickedNewProject: false,
-                    loggedInUser: login
-                }
-            }
-            else {
-                pageData = {
-                    alertOccurred: true,
-                    alertMessage: "",
-                    alertLevel: 'danger',
-                    alertLevelText: 'Danger',
-                    alertHref: 'exclamation-triangle-fill',
-                    titleName: 'Créer un Projet',
-                    pathNameForActionForm: 'projects',
-                    projects: await projectModel.getAllProjects(),
-                    clickedNewProject: false,
-                    loggedInUser: login
-                }
-            }
-
-                response.status(500).render('allProjects.hbs', pageData);
-                return;
-        }
-        else {
-            // Add project
-            projectId = await projectModel.addProject(name, description)
-            await projectModel.addUserToProject(projectId, userId);
-            projs = await projectModel.getAllProjects(request.cookies.username);
-            login = loginController.authenticateUser(request);
+            throw new sqlModel.DatabaseConnectionError("The project is not associated with a user");
         }
 
+        // Add project
+        let projectId = await projectModel.addProject(name, description)
+        await projectModel.addUserToProject(projectId, userId);
+        let projs = await projectModel.getAllProjects(request.cookies.username);
 
-
-        // Set the login to the username if response is not null
-        if (login != null) {
-            login = login.userSession.username;
-        }
-
-        let pageData;
 
         if (!lang || lang === 'en') {
             pageData = {
-                alertOccurred: true,
-                alertMessage: "You have successfully added a project!",
-                alertLevel: 'success',
-                alertLevelText: 'success',
-                alertHref: 'exclamation-triangle-fill',
+                alertOccurred: false,
+                showTable: true,
+                tableMessage: "You do not have any Projects.",
                 titleName: 'Create a Project',
                 pathNameForActionForm: 'projects',
-                display_signup: "none",
-                display_login: "block",
-                logInlogOutText: "Log Out",
-                signUpText: "Sign Up",
-                endpointLogInLogOut: "login",
-                projects: projs,
-                clickedNewProject: false,
+                projects: await projectModel.getAllProjects(request.cookies.username),
                 Home: "Home",
+                logInlogOutText: logInText,
                 loggedInUser: login,
-                new_project: "New Project",
-                your_projects: "Your Projects",
                 see_more: "See more",
-                last_updated: "Last updated 3 minutes ago"
+                about_text: "About Us",
+                endpointLogInLogOut: endpoint,
+                projects_text: "Projects",
+                clickedNewProject: true
             }
         }
         else {
@@ -114,8 +75,6 @@ async function createProject(request, response) {
                 alertLevel: 'success',
                 alertLevelText: 'success',
                 alertHref: 'exclamation-triangle-fill',
-                titleName: 'Créer un Projet',
-                pathNameForActionForm: 'projects',
                 display_signup: "none",
                 display_login: "block",
                 logInlogOutText: "Déconnecter",
@@ -128,19 +87,17 @@ async function createProject(request, response) {
                 new_project: "Nouveau Projet",
                 your_projects: "Vos Projets",
                 see_more: "Voir plus",
-                last_updated: "Dernière mise à jour il y a 3 minutes"
             }
         }
 
 
         logger.info(`CREATED PROJECT (Name: ${name}, Description: ${description} -- loginUser`);
         response.cookie("lastAccessedProject", projectId);
-        response.status(201).render('allProjects.hbs', pageData);
-
-    } catch (error) {
-        let pageData;
-
-        if (!lang || lang === 'en' || lang == undefined) {
+        // response.status(201).render('allProjects.hbs', pageData);
+        response.redirect('/projects');
+    } 
+    catch (error) {
+        if (!lang || lang === 'en') {
             pageData = {
                 alertOccurred: true,
                 alertMessage: "",
@@ -736,16 +693,25 @@ async function updateProject(request, response) {
 }
 
 async function deleteProject(request, response) {
-    try {
-        // Get the values
-        let projectID = request.params.projectId;
-        let login = loginController.authenticateUser(request);
+    // Get the values
+    let projectID = request.params.projectId;
+    let signupDisplay, endpoint, logInText;
+    let login = loginController.authenticateUser(request);
+    const lang = request.cookies.language;
 
-        // Set the login to the username if response is not null
-        if (login != null) {
+    // Set the login to the username if response is not null
+    if(login != null) {
             login = login.userSession.username;
-        }
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+    }
+    // Redirect to home page since a user shouldn't be viewing the project if not logged in
+    else{
+            response.redirect('/parts');
+    }
 
+    try {
         await projectModel.deleteProject(projectID);
 
         // Page data 
@@ -755,19 +721,19 @@ async function deleteProject(request, response) {
             alertLevel: 'success',
             alertLevelText: 'success',
             alertHref: 'exclamation-triangle-fill',
-            display_signup: "none",
+            display_signup: signupDisplay,
             display_login: "block",
-            logInlogOutText: "Log Out",
+            logInlogOutText: logInText,
             signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             clickedNewProject: false,
             Home: "Home",
             loggedInUser: login,
         }
 
         // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-        response.redirect(`/projects`);
-        // response.status(201).render('allProjects.hbs', pageData);
+        // response.redirect(`/projects`);
+        response.status(201).render('allProjects.hbs', pageData);
     }
     catch (error) {
 
