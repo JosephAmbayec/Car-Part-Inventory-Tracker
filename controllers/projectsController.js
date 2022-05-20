@@ -183,16 +183,16 @@ async function showProjects(request, response) {
                 titleName: 'Create a Project',
                 pathNameForActionForm: 'projects',
                 projects: await projectModel.getAllProjects(request.cookies.username),
+                about_text: "About Us",
+                endpointLogInLogOut: endpoint,
+                projects_text: "Projects",
                 Home: "Home",
                 logInlogOutText: logInText,
                 loggedInUser: login,
                 new_project: "New Project",
                 your_projects: "Your Projects",
                 see_more: "See more",
-                last_updated: "Last updated 3 minutes ago",
-                about_text: "About Us",
-                endpointLogInLogOut: endpoint,
-                projects_text: "Projects",
+                last_updated: "Last updated 3 minutes ago"
             }
         }
         else {
@@ -705,38 +705,72 @@ async function deleteProject(request, response) {
             signupDisplay = "none";
             endpoint = "logout";
             logInText = "Log Out";
+
+            try {
+                await projectModel.deleteProject(projectID);
+        
+                // Page data 
+                const pageData = {
+                    alertOccurred: true,
+                    alertMessage: `Successfully deleted project ${projectID}!`,
+                    alertLevel: 'success',
+                    alertLevelText: 'success',
+                    alertHref: 'exclamation-triangle-fill',
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    signUpText: "Sign Up",
+                    endpointLogInLogOut: endpoint,
+                    clickedNewProject: false,
+                    Home: "Home",
+                    loggedInUser: login,
+                    projects: await projectModel.getAllProjects(request.cookies.username),
+                    about_text: "About Us",
+                    endpointLogInLogOut: endpoint,
+                    projects_text: "Projects",
+                }
+        
+                // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+                // response.redirect(`/projects`);
+                response.status(201).render('allProjects.hbs', pageData);
+            }
+            catch (error) {
+                let pageData = {
+                    alertOccurred: true,
+                    alertMessage: "",
+                    alertLevel: 'danger',
+                    alertLevelText: 'Danger',
+                    alertHref: 'exclamation-triangle-fill',
+                    loggedInUser: lang,
+                    errorCode: "",
+                    alertMessage: ""
+                }
+        
+                // If the error is an instance of the DatabaseConnectionError error
+                if (error instanceof sqlModel.DatabaseConnectionError) {
+                    pageData.alertMessage = "There was an error connecting to the database.";
+                    pageData.errorCode = 500;
+                    logger.error(`DatabaseConnectionError when DELETING PROJECT ${projectID} -- deleteProject`);
+                    response.status(500).render('error.hbs', pageData);
+                }
+                // If the error is an instance of the InvalidInputError error
+                else if (error instanceof sqlModel.InvalidInputError) {
+                    pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+                    logger.error(`InvalidInputError when DELETING PROJECT ${projectID} -- deleteProject`);
+                    response.status(404).render('home.hbs', pageData);
+                }
+                // If any other error occurs
+                else {
+                    pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+                    pageData.errorCode = 500;
+                    logger.error(`OTHER error when DELETING PROJECT ${projectID} -- deleteProject`);
+                    response.status(500).render('error.hbs', pageData);
+                }
+            }
     }
     // Redirect to home page since a user shouldn't be viewing the project if not logged in
     else{
             response.redirect('/parts');
-    }
-
-    try {
-        await projectModel.deleteProject(projectID);
-
-        // Page data 
-        const pageData = {
-            alertOccurred: true,
-            alertMessage: `Successfully deleted project ${projectID}!`,
-            alertLevel: 'success',
-            alertLevelText: 'success',
-            alertHref: 'exclamation-triangle-fill',
-            display_signup: signupDisplay,
-            display_login: "block",
-            logInlogOutText: logInText,
-            signUpText: "Sign Up",
-            endpointLogInLogOut: endpoint,
-            clickedNewProject: false,
-            Home: "Home",
-            loggedInUser: login,
-        }
-
-        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-        // response.redirect(`/projects`);
-        response.status(201).render('allProjects.hbs', pageData);
-    }
-    catch (error) {
-
     }
 }
 
