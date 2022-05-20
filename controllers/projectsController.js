@@ -186,16 +186,16 @@ async function showProjects(request, response) {
                 titleName: 'Create a Project',
                 pathNameForActionForm: 'projects',
                 projects: await projectModel.getAllProjects(request.cookies.username),
+                about_text: "About Us",
+                endpointLogInLogOut: endpoint,
+                projects_text: "Projects",
                 Home: "Home",
                 logInlogOutText: logInText,
                 loggedInUser: login,
                 new_project: "New Project",
                 your_projects: "Your Projects",
                 see_more: "See more",
-                last_updated: "Last updated 3 minutes ago",
-                about_text: "About Us",
-                endpointLogInLogOut: endpoint,
-                projects_text: "Projects",
+                last_updated: "Last updated 3 minutes ago"
             }
         }
         else {
@@ -738,6 +738,10 @@ async function deleteProject(request, response) {
                     clickedNewProject: false,
                     Home: "Home",
                     loggedInUser: login,
+                    projects: await projectModel.getAllProjects(request.cookies.username),
+                    about_text: "About Us",
+                    endpointLogInLogOut: endpoint,
+                    projects_text: "Projects",
                 }
         
                 // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
