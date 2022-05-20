@@ -426,12 +426,12 @@ async function showSpecificProject(request, response) {
     let noPartsFound, name, description;
     // console.log(this.);
 
-    
-    description = theProject[0].description;
-    name = theProject[0].name;
-
     if (arrayOFCatPartsInProject.length === 0) {
         noPartsFound = true;
+    }
+    else {
+        name = theProject[0].name;
+        description = theProject[0].description;
     }
     if (projectID != 'null') {
         theProjectId = projectID;
