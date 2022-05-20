@@ -722,60 +722,157 @@ async function updatePartName(request, response){
     let newName = request.body.name;
     let partNumber = request.params.partNumber;
     const lang = request.cookies.language;
+    let signupDisplay, endpoint, logInText;
+    let login = loginController.authenticateUser(request);
 
-    try {
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
 
-        // If the car part doesn't exist in the database
-        if (!await sqlModel.verifyCarPartExists(partNumber)){
-            const data = {
-                alertMessage: `Could not find part #${partNumber}`,
-                errorCode: 404
+        try {
+            let role = await userModel.determineRole(login);
+            let parts = await sqlModel.findAllCarParts();
+
+            // If the car part doesn't exist in the database
+            if (!await sqlModel.verifyCarPartExists(partNumber)){
+                const data = {
+                    alertMessage: `Could not find part #${partNumber}`,
+                    errorCode: 404
+                }
+                logger.info(`NOT UPDATED car part ${partNumber} because car part DOESN'T exist -- updatePartName`);
+                response.status(404).render('home.hbs', data);
             }
-            logger.info(`NOT UPDATED car part ${partNumber} because car part DOESN'T exist -- updatePartName`);
-            response.status(404).render('home.hbs', data);
-        }
-        else{
-            await sqlModel.updateCarPartName(partNumber, newName)
-                .then(part => {
-                    const data = {
-                        alertMessage: `Updated part name with part number ${part.partNumber} to ${part.name}`,
-                        errorCode: 200
-                    }
-                    logger.info(`UPDATED car part ${partNumber} in database -- updatePartName`);
-                    response.status(200).render('home.hbs', data);
-                })
-        }
-    }
-    catch(error){
+            else{
+                await sqlModel.updateCarPartName(partNumber, newName)
+                    .then(part => {
         
-        // If the error is an instance of the DatabaseConnectionError error
-        if (error instanceof sqlModel.DatabaseConnectionError){
-            const data = {
-                alertMessage: "There was an error connecting to the database.",
-                errorCode: 500
+                        let output = {
+                            alertOccurred: true,
+                            alertMessage: `Updated part name with part number ${part.partNumber} to ${part.name}`,
+                            showList: true,
+                            display_signup: signupDisplay,
+                            display_login: "block",
+                            logInlogOutText: logInText,
+                            signUpText: "Sign Up",
+                            endpointLogInLogOut: endpoint,
+                            Home: "Home",
+                            Add: role === 1 ? "Add a car part" : "",
+                            Show: "Find a Car Part",
+                            List: "Show all Car Parts",
+                            Edit: role === 1 ? "Update a Car Part" : "",
+                            Delete: role === 1 ? "Delete a Car Part" : "",
+                            Current: "English",
+                            loggedInUser: login,
+                            projects_text: "Projects",
+                            about_text: "About Us",
+                            inv_actions: "",
+                            addToProjText: "",
+                            partNumText: "",
+                            partNameText: "",
+                            partCondition: "",
+                            partImage: "",
+                            partDelete: "",
+                            allPartsText: "",
+                            footerData: footerLangObject(lang),
+                            part: parts,
+                            alertLevel: 'success',
+                                alertLevelText: 'success',
+                                alertHref: 'exclamation-triangle-fill',
+                        }
+                
+                        // If the language is english
+                        if (!lang || lang === 'en') {
+                            output.signUpText = "Sign Up";
+                            output.Add = role === 1 ? "Add a car part" : "";
+                            output.Show = "Find a Car Part";
+                            output.List = "Show all Car Parts";
+                            output.Edit = role === 1 ? "Update a Car Part" : "";
+                            output.Delete = role === 1 ? "Delete a Car Part" : "";
+                            output.projects_text = "Projects";
+                            output.about_text = "About Us"
+                            output.Home = "Home";
+                            output.Current = "English";
+                            output.inv_actions = "Inventory Actions";
+                            output.addToProjText = "Add to Project";
+                            output.partNumText = "Part #";
+                            output.partNameText = "Part Name";
+                            output.partCondition = "Condition";
+                            output.partImage = "Image";
+                            output.partDelete = "Delete";
+                            output.allPartsText = "All car parts in the inventory";
+                        }
+                        // If the language is french
+                        else{
+                            output.alertMessage = `Nom de la Pièce mis à jour Avec le Numéro de Pièce ${part.partNumber} à ${part.name}`;
+                            output.signUpText = "Enregistrer";
+                            output.Add = role === 1 ? "Ajouter une Pièce Auto" : "";
+                            output.Show = "Trouver une Pièce Auto";
+                            output.List = "Afficher Toutes les Pièces de Voiture";
+                            output.Edit = role === 1 ? "Mettre à Jour une Pièce Auto" : "";
+                            output.Delete = role === 1 ? "Supprimer une Pièce Auto" : "";
+                            output.projects_text = "Projets";
+                            output.about_text = "À Propos de Nous";
+                            output.Home = "Accueil";
+                            output.Current = "French";
+                            output.inv_actions = "Actions D'inventaire";
+                            output.addToProjText = "Ajouter au Projet";
+                            output.partNumText = "Pièce #";
+                            output.partNameText = "Nom de la Pièce";
+                            output.partCondition = "État";
+                            output.partImage = "Image";
+                            output.partDelete = "Supprimer";
+                            output.allPartsText = "Toutes les Pièces Autos en Inventaire";
+                
+                            if(logInText === "Log In"){
+                                output.logInlogOutText = "Connexion";
+                            }
+                            else if(logInText === "Log Out"){
+                                output.logInlogOutText = "Se déconnecter";
+                            }
+                        }
+
+                        logger.info(`UPDATED car part ${partNumber} in database -- updatePartName`);
+                        response.status(200).render('home.hbs', output);
+                    })
             }
-            logger.error(`DatabaseConnectionError when UPDATING car part ${partNumber} -- updatePartName`);
-            response.status(500).render('error.hbs', data);
         }
-        // If the error is an instance of the InvalidInputError error
-        else if (error instanceof sqlModel.InvalidInputError){
-            const data = {
-                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
-                errorCode: 404
+        catch(error){
+            
+            // If the error is an instance of the DatabaseConnectionError error
+            if (error instanceof sqlModel.DatabaseConnectionError){
+                const data = {
+                    alertMessage: "There was an error connecting to the database.",
+                    errorCode: 500
+                }
+                logger.error(`DatabaseConnectionError when UPDATING car part ${partNumber} -- updatePartName`);
+                response.status(500).render('error.hbs', data);
             }
-            logger.error(`InvalidInputError when UPDATING car part ${partNumber} -- updatePartName`);
-            response.status(404).render('home.hbs', data);
-        }
-        // If any other error
-        else {
-            const data = {
-                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
-                errorCode: 500
+            // If the error is an instance of the InvalidInputError error
+            else if (error instanceof sqlModel.InvalidInputError){
+                const data = {
+                    alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
+                    errorCode: 404
+                }
+                logger.error(`InvalidInputError when UPDATING car part ${partNumber} -- updatePartName`);
+                response.status(404).render('home.hbs', data);
             }
-            logger.error(`OTHER error when UPDATING car part ${partNumber} -- updatePartName`);
-            response.status(500).render('error.hbs', data);
-        }
-    }   
+            // If any other error
+            else {
+                const data = {
+                    alertMessage: `Unexpected error while trying to show part: ${error.message}`,
+                    errorCode: 500
+                }
+                logger.error(`OTHER error when UPDATING car part ${partNumber} -- updatePartName`);
+                response.status(500).render('error.hbs', data);
+            }
+        }   
+    }
+    else{
+        response.redirect('/parts');
+    }
 }
 
 async function deleteSpecificCarPartTable(request, response){
