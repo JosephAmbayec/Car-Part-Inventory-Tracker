@@ -196,11 +196,57 @@ async function logoutUser(request, response) {
         return;
     }
     // Fix *****************************
-    delete session.sessions[authenticatedSession.sessionId]
+    delete sessionModel.sessions[authenticatedSession.sessionId]
     console.log("Logged out user " + authenticatedSession.userSession.username);
 
     response.cookie("sessionId", "", { expires: new Date() }); // "erase" cookie by forcing it to expire.
     response.redirect('/');
+
+    const lang = request.cookies.language;
+
+    // Page data 
+    let pageData;
+
+    if (!lang || lang === 'en') {
+        pageData = {
+            alertOccurred: false,
+            Home: 'Home',
+            titleName: 'Log In',
+            pathNameForActionForm: 'login',
+            showConfirmPassword: false,
+            oppositeFormAction: 'signup',
+            oppositeFormName: 'Sign up',
+            dontHaveAccountText: "Don't have an account?",
+            display_signup: "block",
+            display_login: "block",
+            logInlogOutText: "Log In",
+            signUpText: "Sign Up",
+            endpointLogInLogOut: "login",
+            usernameHeader: "Username",
+            passwordHeader: "Password",
+            about_text: "About Us"
+        }
+    }
+    else {
+        pageData = {
+            alertOccurred: false,
+            Home: 'Accueil',
+            titleName: 'Connexion',
+            pathNameForActionForm: 'login',
+            showConfirmPassword: false,
+            oppositeFormAction: 'signup',
+            oppositeFormName: 'Enregistrer',
+            dontHaveAccountText: "Vous n'avez pas de compte?",
+            display_signup: "block",
+            display_login: "block",
+            logInlogOutText: "Connexion",
+            signUpText: "Enregistrer",
+            endpointLogInLogOut: "login",
+            usernameHeader: "Nom D'utilisateur",
+            passwordHeader: "Mot de Passe",
+            about_text: "À propos de nous"
+        }
+    }
 
     logger.info(`SHOWING LOGIN information (login page) -- showLogin`);
     response.status(201).render('loginsignup.hbs', pageData);

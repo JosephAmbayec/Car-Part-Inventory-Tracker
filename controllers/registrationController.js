@@ -294,7 +294,6 @@ async function showSignup(request, response){
         }
     }
 
-
     logger.info(`SHOWING SIGNUP information (signup page) -- showSignup`);
     response.status(201).render('loginsignup.hbs', pageData);
 }
