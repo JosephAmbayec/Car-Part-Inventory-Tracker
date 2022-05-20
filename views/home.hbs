@@ -166,11 +166,11 @@
     {{#if showList}}
       <!--If there are no car parts-->
       {{#if noCarParts}}
-        <div style="text-align: center;">
+        <div id="noPartsHome">
           <h2 >
-            Sorry! Currently there are no car parts in the inventory!</h2>
-          <h4 >
-            Come back soon to see if car parts have been added to the inventory!</h4>
+            {{sorry_noParts}}</h2>
+          <h4 style="margin-top: 1rem;">
+            {{comeBackSoon}}</h4>
         </div>
       <!--If there are car parts-->
       {{else}}

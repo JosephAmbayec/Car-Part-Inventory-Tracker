@@ -544,7 +544,9 @@ async function getAllCarParts(request, response){
                 partImage: "",
                 partDelete: "",
                 allPartsText: "",
-                footerData: footerLangObject(lang)
+                footerData: footerLangObject(lang),
+                sorry_noParts: "Sorry! Currently there are no car parts in the inventory!",
+                comeBackSoon: "Come back soon to see if car parts have been added to the inventory!"
             }
 
             if (AccessProject){
@@ -577,7 +579,9 @@ async function getAllCarParts(request, response){
                     partImage: "",
                     partDelete: "",
                     allPartsText: "",
-                    footerData: footerLangObject(lang)
+                    footerData: footerLangObject(lang),
+                    sorry_noParts: "Sorry! Currently there are no car parts in the inventory!",
+                    comeBackSoon: "Come back soon to see if car parts have been added to the inventory!"
                 }
 
             }
@@ -623,6 +627,8 @@ async function getAllCarParts(request, response){
                 output.partImage = "Image";
                 output.partDelete = "Supprimer";
                 output.allPartsText = "Toutes les Pièces Autos en Inventaire";
+                output.sorry_noParts = "Désolé! Au moment, il n'y a pas de pièces d'autos dans l'inventaire!";
+                output.comeBackSoon = "Revenez bientôt pour voir si des pièces d'autos ont été ajoutées à l'inventaire !";
 
                 if(logInText === "Log In"){
                     output.logInlogOutText = "Connexion";
@@ -1101,7 +1107,9 @@ async function deleteSpecificCarPartTable(request, response){
                 partImage: "",
                 partDelete: "",
                 allPartsText: "",
-                footerData: footerLangObject(lang)
+                footerData: footerLangObject(lang),
+                sorry_noParts: "Sorry! Currently there are no car parts in the inventory!",
+                comeBackSoon: "Come back soon to see if car parts have been added to the inventory!"
             }
 
             if (AccessProject){
@@ -1134,7 +1142,9 @@ async function deleteSpecificCarPartTable(request, response){
                     partImage: "",
                     partDelete: "",
                     allPartsText: "",
-                    footerData: footerLangObject(lang)
+                    footerData: footerLangObject(lang),
+                    sorry_noParts: "Sorry! Currently there are no car parts in the inventory!",
+                    comeBackSoon: "Come back soon to see if car parts have been added to the inventory!"
                 }
             }
 
@@ -1179,6 +1189,8 @@ async function deleteSpecificCarPartTable(request, response){
                 output.partImage = "Image";
                 output.partDelete = "Supprimer";
                 output.allPartsText = "Toutes les Pièces Autos en Inventaire";
+                output.sorry_noParts = "Désolé! Au moment, il n'y a pas de pièces d'autos dans l'inventaire!";
+                output.comeBackSoon = "Revenez bientôt pour voir si des pièces d'autos ont été ajoutées à l'inventaire !";
 
                 if(logInText === "Log In"){
                     output.logInlogOutText = "Connexion";

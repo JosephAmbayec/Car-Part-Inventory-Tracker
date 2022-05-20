@@ -89,6 +89,7 @@ footer {
 }
 #select-inventory-action-text{
   text-align: center;
+  margin-left: 2rem;
   margin-top: 5rem;
 }
 
@@ -130,6 +131,15 @@ footer {
 #sidebar-wrapper div form button {
     background-color:  #0D6EFD;
     color: white
+}
+#noPartsHome{
+  text-align: center;
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center;
+ align-items: center; 
+ margin-left: 2rem;
+ margin-top: 4rem;
 }
 
 .modal-body {
