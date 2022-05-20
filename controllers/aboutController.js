@@ -96,9 +96,8 @@ async function showAbout(request, response) {
                 logInlogOutText: logInText,
                 loggedInUser: login
             }
+
         }
-
-
 
         logger.info(`RENDERING about page -- showAbout`);
         response.status(200).render('about.hbs', pageData);

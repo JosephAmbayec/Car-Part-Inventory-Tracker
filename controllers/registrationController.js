@@ -161,6 +161,8 @@ async function createUser(request, response){
                     passwordHeader: "Password",
                     confirmPasswordHeader: "Confirm Password",
                     Home: "Home",
+                    alertMessage: "",
+                    errorCode: ""
                 }
             }
             else{
@@ -179,16 +181,18 @@ async function createUser(request, response){
                     usernameHeader: "Nom D'utilisateur",
                     passwordHeader: "Mot de Passe",
                     confirmPasswordHeader: "Confirmez le Mot de Passe",
+                    alertMessage: "",
+                    errorCode: "",
                     Home: "Accueil",
                 } 
             }
 
-
             // If the error is an instance of the DatabaseConnectionError error
             if (error instanceof DatabaseConnectionError){
-                errorData.alertMessage = "Error while connecting to database.";
+                errorData.alertMessage = "There was an error connecting to the database.";
+                errorData.errorCode = 500;
                 logger.error(`DatabaseConnectionError when CREATING user ${username} -- createUser`);
-                response.status(500).render('users.hbs', {alertMessage: "Error while connecting to database."});
+                response.status(500).render('error.hbs', errorData);
             }
             // If the error is an instance of the UserLoginError error
             else if (error instanceof userModel.UserLoginError){
@@ -198,8 +202,10 @@ async function createUser(request, response){
             }
             // If any other error occurs
             else {
+                errorData.alertMessage = `Unexpected error while trying to register user: ${error.message}`;
+                errorData.errorCode = 500;
                 logger.error(`OTHER error when CREATING user ${username} -- createUser`);
-                response.status(500).render('error.hbs', {message: `Unexpected error while trying to register user: ${error.message}`});
+                response.status(500).render('error.hbs', errorData);
             }
         }
     }
@@ -227,16 +233,24 @@ async function createUser(request, response){
     }
     catch (error){
 
+        const data = {
+            alertMessage: "",
+            errorCode: ""
+        }
+
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof DatabaseConnectionError){
-            errorData.alertMessage = "Error while connecting to database.";
+            errorData.alertMessage = "There was an error connecting to the database.";
+            errorData.errorCode = 500;
             logger.error(`DatabaseConnectionError when RETRIEVING all users -- showUsers`);
-            response.status(500).render('users.hbs', {alertMessage: "Error while connecting to database."});
+            response.status(500).render('error.hbs', data);
         }
         // If any other error occurs
         else {
+            errorData.alertMessage = `Unexpected error while trying to register user: ${error.message}`;
+            errorData.errorCode = 500;
             logger.error(`OTHER error when RETRIEVING all users -- showUsers`);
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to register user: ${error.message}`});
+            response.status(500).render('error.hbs', data);
         }
     }
 }
