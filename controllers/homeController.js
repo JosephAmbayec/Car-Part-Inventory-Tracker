@@ -8,6 +8,7 @@ const logger = require('../logger');
 const loginController = require('./loginController');
 const projectModel = require('../models/projectModel');
 const userModel = require('../models/userModel');
+const sqlModel = require('../models/carPartModelMysql');
 
 const cookieParser = require("cookie-parser")
 router.use(cookieParser());
@@ -189,6 +190,7 @@ function showForm(request, response) {
         // Case of deleting a car part
         case 'delete':
             logger.info(`SWITCH CASE delete -- showForm`);
+            // showDeleteForm(request, response);
             response.redirect('/parts/table/delete');
             break;
 
@@ -198,6 +200,7 @@ function showForm(request, response) {
             response.render('home.hbs');
     }
 }
+
 /**
  * Displays the add car part form
  * @param {*} response 
