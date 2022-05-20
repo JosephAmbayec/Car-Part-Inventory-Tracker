@@ -121,6 +121,43 @@ async function getPartByNumber(request, response){
                     alertLevel: 'danger',
                     alertLevelText: 'Danger',
                     alertHref: 'exclamation-triangle-fill',
+                inv_actions: ""
+            }
+
+            // If the language is english
+            if (!lang || lang === 'en') {
+                output.signUpText = "Sign Up";
+                output.Add = role === 1 ? "Add a car part" : "";
+                output.Show = "Find a Car Part";
+                output.List = "Show all Car Parts";
+                output.Edit = role === 1 ? "Update a Car Part" : "";
+                output.Delete = role === 1 ? "Delete a Car Part" : "";
+                output.projects_text = "Projects";
+                output.about_text = "About Us"
+                output.Home = "Home";
+                output.Current = "English";
+                output.inv_actions = "Inventory Actions"
+            }
+            // If the language is french
+            else{
+                output.signUpText = "Enregistrer";
+                output.Add = role === 1 ? "Ajouter une Pièce Auto" : "";
+                output.Show = "Trouver une Pièce Auto";
+                output.List = "Afficher Toutes les Pièces de Voiture";
+                output.Edit = role === 1 ? "Mettre à Jour une Pièce Auto" : "";
+                output.Delete = role === 1 ? "Supprimer une Pièce Auto" : "";
+                output.projects_text = "Projets";
+                output.about_text = "À Propos de Nous";
+                output.Home = "Accueil";
+                output.Current = "French";
+                output.inv_actions = "Actions D'inventaire";
+
+                if(logInText === "Log In"){
+                    output.logInlogOutText = "Connexion";
+                }
+                else if(logInText === "Log Out"){
+                    output.logInlogOutText = "Se déconnecter";
+                }
             }
 
             logger.info(`DID NOT FIND car part by number ${number} -- getPartByNumber`);
@@ -151,6 +188,43 @@ async function getPartByNumber(request, response){
                 alertLevel: 'success',
                     alertLevelText: 'success',
                     alertHref: 'exclamation-triangle-fill',
+                inv_actions: ""
+            }
+
+            // If the language is english
+            if (!lang || lang === 'en') {
+                output.signUpText = "Sign Up";
+                output.Add = role === 1 ? "Add a car part" : "";
+                output.Show = "Find a Car Part";
+                output.List = "Show all Car Parts";
+                output.Edit = role === 1 ? "Update a Car Part" : "";
+                output.Delete = role === 1 ? "Delete a Car Part" : "";
+                output.projects_text = "Projects";
+                output.about_text = "About Us"
+                output.Home = "Home";
+                output.Current = "English";
+                output.inv_actions = "Inventory Actions"
+            }
+            // If the language is french
+            else{
+                output.signUpText = "Enregistrer";
+                output.Add = role === 1 ? "Ajouter une Pièce Auto" : "";
+                output.Show = "Trouver une Pièce Auto";
+                output.List = "Afficher Toutes les Pièces de Voiture";
+                output.Edit = role === 1 ? "Mettre à Jour une Pièce Auto" : "";
+                output.Delete = role === 1 ? "Supprimer une Pièce Auto" : "";
+                output.projects_text = "Projets";
+                output.about_text = "À Propos de Nous";
+                output.Home = "Accueil";
+                output.Current = "French";
+                output.inv_actions = "Actions D'inventaire";
+
+                if(logInText === "Log In"){
+                    output.logInlogOutText = "Connexion";
+                }
+                else if(logInText === "Log Out"){
+                    output.logInlogOutText = "Se déconnecter";
+                }
             }
 
             logger.info(`FOUND car part by number ${number} -- getPartByNumber`);
@@ -244,7 +318,15 @@ async function getAllCarParts(request, response){
                 Current: "English",
                 loggedInUser: login,
                 projects_text: "Projects",
-                about_text: "About Us"
+                about_text: "About Us",
+                inv_actions: "",
+                addToProjText: "",
+                partNumText: "",
+                partNameText: "",
+                partCondition: "",
+                partImage: "",
+                partDelete: "",
+                allPartsText: ""
             }
 
             if (AccessProject){
@@ -268,9 +350,67 @@ async function getAllCarParts(request, response){
                     accessProjectId: accessProject,
                     accessProjectName: AccessProjectName,
                     projects_text: "Projects",
-                    about_text: "À propos de nous"
+                    about_text: "À propos de nous",
+                    inv_actions: "",
+                    addToProjText: "",
+                    partNumText: "",
+                    partNameText: "",
+                    partCondition: "",
+                    partImage: "",
+                    partDelete: "",
+                    allPartsText: ""
                 }
 
+            }
+
+            // If the language is english
+            if (!lang || lang === 'en') {
+                output.signUpText = "Sign Up";
+                output.Add = role === 1 ? "Add a car part" : "";
+                output.Show = "Find a Car Part";
+                output.List = "Show all Car Parts";
+                output.Edit = role === 1 ? "Update a Car Part" : "";
+                output.Delete = role === 1 ? "Delete a Car Part" : "";
+                output.projects_text = "Projects";
+                output.about_text = "About Us"
+                output.Home = "Home";
+                output.Current = "English";
+                output.inv_actions = "Inventory Actions";
+                output.addToProjText = "Add to Project";
+                output.partNumText = "Part #";
+                output.partNameText = "Part Name";
+                output.partCondition = "Condition";
+                output.partImage = "Image";
+                output.partDelete = "Delete";
+                output.allPartsText = "All car parts in the inventory";
+            }
+            // If the language is french
+            else{
+                output.signUpText = "Enregistrer";
+                output.Add = role === 1 ? "Ajouter une Pièce Auto" : "";
+                output.Show = "Trouver une Pièce Auto";
+                output.List = "Afficher Toutes les Pièces de Voiture";
+                output.Edit = role === 1 ? "Mettre à Jour une Pièce Auto" : "";
+                output.Delete = role === 1 ? "Supprimer une Pièce Auto" : "";
+                output.projects_text = "Projets";
+                output.about_text = "À Propos de Nous";
+                output.Home = "Accueil";
+                output.Current = "French";
+                output.inv_actions = "Actions D'inventaire";
+                output.addToProjText = "Ajouter au Projet";
+                output.partNumText = "Pièce #";
+                output.partNameText = "Nom de la Pièce";
+                output.partCondition = "État";
+                output.partImage = "Image";
+                output.partDelete = "Supprimer";
+                output.allPartsText = "Toutes les Pièces Autos en Inventaire";
+
+                if(logInText === "Log In"){
+                    output.logInlogOutText = "Connexion";
+                }
+                else if(logInText === "Log Out"){
+                    output.logInlogOutText = "Se déconnecter";
+                }
             }
 
             logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
@@ -323,6 +463,14 @@ async function getAllCarParts(request, response){
                 loggedInUser: login,
                 about_text: "About Us",
                 projects_text: "Projects",
+                inv_actions: "",
+                addToProjText: "",
+                partNumText: "",
+                partNameText: "",
+                partCondition: "",
+                partImage: "",
+                partDelete: "",
+                allPartsText: ""
             };
 
             if (AccessProject){
@@ -347,7 +495,15 @@ async function getAllCarParts(request, response){
                     accessProjectId: accessProject,
                     accessProjectName: AccessProjectName,
                     projects_text: "Projects",
-                    about_text: "About Us"
+                    about_text: "About Us",
+                    inv_actions: "",
+                    addToProjText: "",
+                    partNumText: "",
+                    partNameText: "",
+                    partCondition: "",
+                    partImage: "",
+                    partDelete: "",
+                    allPartsText: ""
                 }
 
             }
@@ -361,16 +517,38 @@ async function getAllCarParts(request, response){
                 output.Edit = role === 1 ? "Update a Car Part" : "";
                 output.Delete = role === 1 ? "Delete a Car Part" : "";
                 output.projects_text = "Projects";
+                output.about_text = "About Us"
+                output.Home = "Home";
+                output.Current = "English";
+                output.inv_actions = "Inventory Actions";
+                output.addToProjText = "Add to Project";
+                output.partNumText = "Part #";
+                output.partNameText = "Part Name";
+                output.partCondition = "Condition";
+                output.partImage = "Image";
+                output.partDelete = "Delete";
+                output.allPartsText = "All car parts in the inventory";
             }
             // If the language is french
             else{
                 output.signUpText = "Enregistrer";
-                output.Add = "Ajouter une Pièce Auto";
+                output.Add = role === 1 ? "Ajouter une Pièce Auto" : "";
                 output.Show = "Trouver une Pièce Auto";
                 output.List = "Afficher Toutes les Pièces de Voiture";
-                output.Edit = "Mettre à Jour une Pièce Auto";
-                output.Delete = "Supprimer une Pièce Auto";
+                output.Edit = role === 1 ? "Mettre à Jour une Pièce Auto" : "";
+                output.Delete = role === 1 ? "Supprimer une Pièce Auto" : "";
                 output.projects_text = "Projets";
+                output.about_text = "À Propos de Nous";
+                output.Home = "Accueil";
+                output.Current = "French";
+                output.inv_actions = "Actions D'inventaire";
+                output.addToProjText = "Ajouter au Projet";
+                output.partNumText = "Pièce #";
+                output.partNameText = "Nom de la Pièce";
+                output.partCondition = "État";
+                output.partImage = "Image";
+                output.partDelete = "Supprimer";
+                output.allPartsText = "Toutes les Pièces Autos en Inventaire";
 
                 if(logInText === "Log In"){
                     output.logInlogOutText = "Connexion";
@@ -481,7 +659,8 @@ async function deleteSpecificCarPartTable(request, response){
             AccessProjectName = AccessProjectName[0].name;
         }
         else
-            AccessProject = false
+            AccessProject = false;
+
         // If no car parts were found
         if (parts.length === 0){
 
@@ -517,7 +696,16 @@ async function deleteSpecificCarPartTable(request, response){
                 Delete: role === 1 ? "Delete a Car Part" : "",
                 Current: "English",
                 loggedInUser: login,
-                projects_text: "Projects",
+                projects_text: "",
+                inv_actions: "",
+                about_text: "",
+                addToProjText: "",
+                partNumText: "",
+                partNameText: "",
+                partCondition: "",
+                partImage: "",
+                partDelete: "",
+                allPartsText: ""
             }
 
             if (AccessProject){
@@ -539,9 +727,68 @@ async function deleteSpecificCarPartTable(request, response){
                     loggedInUser: login,
                     accessProject: true,
                     accessProjectId: accessProject,
-                    accessProjectName: AccessProjectName
+                    accessProjectName: AccessProjectName,
+                    projects_text: "",
+                    inv_actions: "",
+                    about_text: "",
+                    addToProjText: "",
+                    partNumText: "",
+                    partNameText: "",
+                    partCondition: "",
+                    partImage: "",
+                    partDelete: "",
+                    allPartsText: ""
                 }
+            }
 
+            // If the language is english
+            if (!lang || lang === 'en') {
+                output.signUpText = "Sign Up";
+                output.Add = role === 1 ? "Add a car part" : "";
+                output.Show = "Find a Car Part";
+                output.List = "Show all Car Parts";
+                output.Edit = role === 1 ? "Update a Car Part" : "";
+                output.Delete = role === 1 ? "Delete a Car Part" : "";
+                output.projects_text = "Projects";
+                output.about_text = "About Us"
+                output.Home = "Home";
+                output.Current = "English";
+                output.inv_actions = "Inventory Actions";
+                output.addToProjText = "Add to Project";
+                output.partNumText = "Part #";
+                output.partNameText = "Part Name";
+                output.partCondition = "Condition";
+                output.partImage = "Image";
+                output.partDelete = "Delete";
+                output.allPartsText = "All car parts in the inventory";
+            }
+            // If the language is french
+            else{
+                output.signUpText = "Enregistrer";
+                output.Add = role === 1 ? "Ajouter une Pièce Auto" : "";
+                output.Show = "Trouver une Pièce Auto";
+                output.List = "Afficher Toutes les Pièces de Voiture";
+                output.Edit = role === 1 ? "Mettre à Jour une Pièce Auto" : "";
+                output.Delete = role === 1 ? "Supprimer une Pièce Auto" : "";
+                output.projects_text = "Projets";
+                output.about_text = "À Propos de Nous";
+                output.Home = "Accueil";
+                output.Current = "French";
+                output.inv_actions = "Actions D'inventaire";
+                output.addToProjText = "Ajouter au Projet";
+                output.partNumText = "Pièce #";
+                output.partNameText = "Nom de la Pièce";
+                output.partCondition = "État";
+                output.partImage = "Image";
+                output.partDelete = "Supprimer";
+                output.allPartsText = "Toutes les Pièces Autos en Inventaire";
+
+                if(logInText === "Log In"){
+                    output.logInlogOutText = "Connexion";
+                }
+                else if(logInText === "Log Out"){
+                    output.logInlogOutText = "Se déconnecter";
+                }
             }
 
             logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
@@ -593,7 +840,16 @@ async function deleteSpecificCarPartTable(request, response){
                 Current: "English",
                 project: projs,
                 loggedInUser: login,
-                about_text: "About Us"
+                about_text: "About Us",
+                projects_text: "",
+                inv_actions: "",
+                addToProjText: "",
+                partNumText: "",
+                partNameText: "",
+                partCondition: "",
+                partImage: "",
+                partDelete: "",
+                allPartsText: ""
             };
 
             if (AccessProject){
@@ -617,9 +873,18 @@ async function deleteSpecificCarPartTable(request, response){
                     loggedInUser: login,
                     accessProject: true,
                     accessProjectId: accessProject,
-                    accessProjectName: AccessProjectName
+                    accessProjectName: AccessProjectName,
+                    about_text: "About Us",
+                    projects_text: "",
+                    inv_actions: "",
+                    addToProjText: "",
+                    partNumText: "",
+                    partNameText: "",
+                    partCondition: "",
+                    partImage: "",
+                    partDelete: "",
+                    allPartsText: ""
                 }
-
             }
 
             // If the language is english
@@ -630,15 +895,39 @@ async function deleteSpecificCarPartTable(request, response){
                 output.List = "Show all Car Parts";
                 output.Edit = role === 1 ? "Update a Car Part" : "";
                 output.Delete = role === 1 ? "Delete a Car Part" : "";
+                output.projects_text = "Projects";
+                output.about_text = "About Us"
+                output.Home = "Home";
+                output.Current = "English";
+                output.inv_actions = "Inventory Actions";
+                output.addToProjText = "Add to Project";
+                output.partNumText = "Part #";
+                output.partNameText = "Part Name";
+                output.partCondition = "Condition";
+                output.partImage = "Image";
+                output.partDelete = "Delete";
+                output.allPartsText = "All car parts in the inventory";
             }
             // If the language is french
             else{
                 output.signUpText = "Enregistrer";
-                output.Add = "Ajouter une Pièce Auto";
+                output.Add = role === 1 ? "Ajouter une Pièce Auto" : "";
                 output.Show = "Trouver une Pièce Auto";
                 output.List = "Afficher Toutes les Pièces de Voiture";
-                output.Edit = "Mettre à Jour une Pièce Auto";
-                output.Delete = "Supprimer une Pièce Auto";
+                output.Edit = role === 1 ? "Mettre à Jour une Pièce Auto" : "";
+                output.Delete = role === 1 ? "Supprimer une Pièce Auto" : "";
+                output.projects_text = "Projets";
+                output.about_text = "À Propos de Nous";
+                output.Home = "Accueil";
+                output.Current = "French";
+                output.inv_actions = "Actions D'inventaire";
+                output.addToProjText = "Ajouter au Projet";
+                output.partNumText = "Pièce #";
+                output.partNameText = "Nom de la Pièce";
+                output.partCondition = "État";
+                output.partImage = "Image";
+                output.partDelete = "Supprimer";
+                output.allPartsText = "Toutes les Pièces Autos en Inventaire";
 
                 if(logInText === "Log In"){
                     output.logInlogOutText = "Connexion";

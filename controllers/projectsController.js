@@ -747,6 +747,7 @@ async function deleteProject(request, response) {
         
                 // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
                 // response.redirect(`/projects`);
+                response.cookie("lastAccessedProject", -1);
                 response.status(201).render('allProjects.hbs', pageData);
             }
             catch (error) {
@@ -790,42 +791,80 @@ async function deleteProject(request, response) {
 }
 
 async function deletePartFromProject(request, response) {
-    try {
-        // Get the values
-        let projectID = request.params.projectId;
-        let partNumber = request.params.partNumber;
-        let login = loginController.authenticateUser(request);
-
-        // Set the login to the username if response is not null
-        if (login != null) {
+     // Get the values
+     let projectID = request.params.projectId;
+     let partNumber = request.params.partNumber;
+     let signupDisplay, endpoint, logInText;
+     let login = loginController.authenticateUser(request);
+     
+     // Set the login to the username if response is not null
+     if (login != null) {
+        try {
             login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+
+            await projectModel.deletePartFromProject(projectID, partNumber);
+
+            // Page data 
+            const pageData = {
+                alertOccurred: true,
+                alertMessage: `Successfully deleted project ${projectID}!`,
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                signUpText: "Sign Up",
+                endpointLogInLogOut: endpoint,
+                clickedNewProject: false,
+                Home: "Home",
+                loggedInUser: login,
+            }
+
+            // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+            response.cookie("lastAccessedProject", projectID);
+            response.redirect(`/projects/${projectID}`);
+            // response.status(201).render('allProjects.hbs', pageData);
         }
+        catch (error) {
+            let pageData = {
+                alertOccurred: true,
+                alertMessage: "",
+                alertLevel: 'danger',
+                alertLevelText: 'Danger',
+                alertHref: 'exclamation-triangle-fill',
+                loggedInUser: lang,
+                errorCode: "",
+                alertMessage: ""
+            }
 
-        await projectModel.deletePartFromProject(projectID, partNumber);
-
-        // Page data 
-        const pageData = {
-            alertOccurred: true,
-            alertMessage: `Successfully deleted project ${projectID}!`,
-            alertLevel: 'success',
-            alertLevelText: 'success',
-            alertHref: 'exclamation-triangle-fill',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Log Out",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            clickedNewProject: false,
-            Home: "Home",
-            loggedInUser: login,
+            // If the error is an instance of the DatabaseConnectionError error
+            if (error instanceof sqlModel.DatabaseConnectionError) {
+                pageData.alertMessage = "There was an error connecting to the database.";
+                pageData.errorCode = 500;
+                logger.error(`DatabaseConnectionError when DELETING PROJECT ${projectID} -- deleteProject`);
+                response.status(500).render('error.hbs', pageData);
+            }
+            // If the error is an instance of the InvalidInputError error
+            else if (error instanceof sqlModel.InvalidInputError) {
+                pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+                logger.error(`InvalidInputError when DELETING PROJECT ${projectID} -- deleteProject`);
+                response.status(404).render('home.hbs', pageData);
+            }
+            // If any other error occurs
+            else {
+                pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+                pageData.errorCode = 500;
+                logger.error(`OTHER error when DELETING PROJECT ${projectID} -- deleteProject`);
+                response.status(500).render('error.hbs', pageData);
+            }
         }
-
-        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-        response.redirect(`/projects/${projectID}`);
-        // response.status(201).render('allProjects.hbs', pageData);
     }
-    catch (error) {
-
+    else{
+        response.redirect('/parts');
     }
 }
 

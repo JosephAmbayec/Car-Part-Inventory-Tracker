@@ -81,7 +81,8 @@ async function sendHome(request, response) {
                 about_text: "About Us",
                 accessProject: AccessProject,
                 accessProjectId: accessProject,
-                accessProjectName: AccessProjectName
+                accessProjectName: AccessProjectName,
+                inv_actions: "Inventory Actions"
             }
         }
         else{
@@ -119,7 +120,15 @@ async function sendHome(request, response) {
                 about_text: "À propos de nous",
                 accessProject: AccessProject,
                 accessProjectId: accessProject,
-                accessProjectName: AccessProjectName
+                accessProjectName: AccessProjectName,
+                inv_actions: "Actions D'inventaire"
+            }
+
+            if(logInText === "Log In"){
+                output.logInlogOutText = "Connexion";
+            }
+            else if(logInText === "Log Out"){
+                output.logInlogOutText = "Se déconnecter";
             }
         }
     
@@ -259,7 +268,8 @@ async function showAddForm(request, response) {
             Delete: role === 1 ? "Delete a Car Part" : "",
             loggedInUser: login,
             projects_text: "Projects",
-            about_text: "About Us"
+            about_text: "About Us",
+            inv_actions: "Inventory Actions"
         }
     }
     else {
@@ -308,7 +318,15 @@ async function showAddForm(request, response) {
             Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
             loggedInUser: login,
             projects_text: "Projets",
-            about_text: "À propos de nous"
+            about_text: "À propos de nous",
+            inv_actions: "Actions D'inventaire"
+        }
+
+        if(logInText === "Log In"){
+            output.logInlogOutText = "Connexion";
+        }
+        else if(logInText === "Log Out"){
+            output.logInlogOutText = "Se déconnecter";
         }
     }
 
@@ -367,7 +385,8 @@ async function showListOneForm(request, response) {
             Delete: role === 1 ? "Delete a Car Part" : "",
             loggedInUser: login,
             projects_text: "Projects",
-            about_text: "About Us"
+            about_text: "About Us",
+            inv_actions: "Inventory Actions"
         };
     }
     else {
@@ -409,11 +428,17 @@ async function showListOneForm(request, response) {
             Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
             loggedInUser: login,
             projects_text: "Projets",
-            about_text: "À propos de nous"
+            about_text: "À propos de nous",
+            inv_actions: "Actions D'inventaire"
         };
+
+        if(logInText === "Log In"){
+            output.logInlogOutText = "Connexion";
+        }
+        else if(logInText === "Log Out"){
+            output.logInlogOutText = "Se déconnecter";
+        }
     }
-
-
 
     logger.info(`RENDERING home page WITH FIND form -- showListOneForm`);
     response.render('home.hbs', pageData);
@@ -471,7 +496,8 @@ async function showEditForm(request, response) {
             Delete: role === 1 ? "Delete a Car Part" : "",
             loggedInUser: login,
             projects_text: "Projects",
-            about_text: "About Us"
+            about_text: "About Us",
+            inv_actions: "Inventory Actions"
         };
     }
     else {
@@ -514,8 +540,16 @@ async function showEditForm(request, response) {
             Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
             loggedInUser: login,
             projects_text: "Projets",
-            about_text: "À propos de nous"
+            about_text: "À propos de nous",
+            inv_actions: "Actions D'inventaire"
         };
+
+        if(logInText === "Log In"){
+            output.logInlogOutText = "Connexion";
+        }
+        else if(logInText === "Log Out"){
+            output.logInlogOutText = "Se déconnecter";
+        }
     }
 
     logger.info(`RENDERING home page WITH UPDATE form -- showEditForm`);

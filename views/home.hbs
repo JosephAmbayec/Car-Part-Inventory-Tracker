@@ -60,7 +60,7 @@
   <div id="aside-sidebar" class="col-2 ">
     <h4 style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.75rem"
       title="Actions you can perform as a user">
-      Inventory Actions
+      {{inv_actions}}
       </h4>
 
     {{!-- <aside class="col-2 "> --}}
@@ -176,7 +176,7 @@
       {{else}}
         <!--Legend text-->
         <div style="text-align: center; margin-right: auto; margin-left: auto; width: 70%;">
-          <legend style="width: 100%; font-weight: 1000;">All car parts in the inventory</legend>
+          <legend style="width: 100%; font-weight: 1000;">{{allPartsText}}</legend>
         </div>
 
         <div class="list-section">
@@ -187,17 +187,17 @@
               {{#if loggedInUser}}
                 {{#if isDelete}}
                 {{else}}
-                  <th>Add to Project</th>
+                  <th>{{addToProjText}}</th>
                 {{/if}}
               {{/if}}
 
-              <th>Part #</th>
-              <th>Name</th>
-              <th>Condition</th>
-              <th>Image</th>
+              <th>{{partNumText}}</th>
+              <th>{{partNameText}}</th>
+              <th>{{partCondition}}</th>
+              <th>{{partImage}}</th>
 
               {{#if isDelete}}
-                <th>Delete</th>
+                <th>{{partDelete}}</th>
               {{/if}}
             </tr>
 
