@@ -67,7 +67,9 @@ async function createProject(request, response) {
                 endpointLogInLogOut: endpoint,
                 projects_text: "Projects",
                 clickedNewProject: true,
-                footerData: footerLangObject(lang)
+                footerData: footerLangObject(lang),
+                new_project: "New Project",
+                your_projects: "Your Projects",
             }
         }
         else {

@@ -17,17 +17,18 @@ async function showAbout(request, response) {
     const lang = request.cookies.language;
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
-    let pageData;
     let role;
 
+    let pageData;
+     
     // Set the login to the username if response is not null
-    if(login != null) {
+    if (login != null) {
         login = login.userSession.username;
         signupDisplay = "none";
         endpoint = "logout";
         logInText = "Log Out";
     }
-    else{
+    else {
         signupDisplay = "block";
         endpoint = "login";
         logInText = "Log In";
@@ -54,9 +55,6 @@ async function showAbout(request, response) {
         }
     }
     else {
-
-        role = await userModel.determineRole(login);
-
         pageData = {
             display_signup: "block",
             display_login: "block",
@@ -74,14 +72,12 @@ async function showAbout(request, response) {
             display_signup: signupDisplay,
             loggedInUser: login,
             logInlogOutText: logInText,
-            loggedInUser: login,
             footerData: footerLangObject(lang)
         }
-
     }
 
-    logger.info(`RENDERING about page -- showAbout`);
-    response.status(200).render('about.hbs', pageData);
+        logger.info(`RENDERING about page -- showAbout`);
+        response.status(200).render('about.hbs', pageData);
     
 }
 
