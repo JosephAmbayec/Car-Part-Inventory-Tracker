@@ -462,7 +462,8 @@ async function addCarPart(request, response) {
                 }
         
                 response.cookie("lastAccessedProject", projectId);
-                response.status(201).render('home.hbs', pageData);
+                // response.status(201).render('home.hbs', pageData);
+                response.redirect('/parts');
             }
             catch (error) {
                 const pageData = {
@@ -514,7 +515,9 @@ async function showSpecificProject(request, response) {
     let login = loginController.authenticateUser(request);
     let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
     let noPartsFound, name, description;
+    let signupDisplay, endpoint, logInText;
 
+    // If no parts were found
     if (arrayOFCatPartsInProject.length === 0) {
         noPartsFound = true;
     }
@@ -522,145 +525,140 @@ async function showSpecificProject(request, response) {
         name = theProject[0].name;
         description = theProject[0].description;
     }
+
+    // If the project id is null
     if (projectID != 'null') {
         theProjectId = projectID;
-    }
-    // Set the login to the username if response is not null
-    if (login != null) {
-        login = login.userSession.username;
     }
 
     const lang = request.cookies.language;
     let pageData;
 
-    try {
-        let signupDisplay, endpoint, logInText;
-        let login = loginController.authenticateUser(request);
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
 
-        // Set the login to the username if response is not null
-        if(login != null) {
-            login = login.userSession.username;
-            signupDisplay = "none";
-            endpoint = "logout";
-            logInText = "Log Out";
-        }
-        // Redirect to home page since a user shouldn't be viewing the project if not logged in
-        else{
-            response.redirect('/parts');
-        }
+        try {
 
-        let projectID = request.params.projectId;
-        let theProject = await projectModel.getProjectByProjectId(projectID);
-        let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
-        let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
-        let noPartsFound;
-
-        let description = theProject[0].description;
-        let theName = theProject[0].name;
-
-        if (arrayOFCatPartsInProject.length === 0) {
-            noPartsFound = true;
-        }
-        if (projectID != 'null') {
-            theProjectId = projectID;
-        }
-
-        if (!lang || lang === 'en') {
-            //Page data
+            let projectID = request.params.projectId;
+            let theProject = await projectModel.getProjectByProjectId(projectID);
+            let allCarPartsInProject = await projectModel.getProjectCarParts(projectID);
+            let arrayOFCatPartsInProject = await partsModel.getArrayOfCarPartsInProject(allCarPartsInProject);
+            let noPartsFound;
+    
+            let description = theProject[0].description;
+            let theName = theProject[0].name;
+    
+            if (!lang || lang === 'en') {
+                //Page data
+                pageData = {
+                    alertOccurred: false,
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    signUpText: "Sign Up",
+                    endpointLogInLogOut: endpoint,
+                    clickedNewProject: false,
+                    Home: "Home",
+                    loggedInUser: login,
+                    projectName: theName,
+                    projectDescription: description,
+                    projectId: parseInt(theProjectId),
+                    projectParts: arrayOFCatPartsInProject,
+                    noParts: noPartsFound,
+                    back_button: "Return",
+                    edit: "Edit",
+                    project_name_label: "Project Name",
+                    project_description_label: "Project Description",
+                    update_button: "Update Project",
+                    noparts_message: "No car parts added in this project",
+                    parts_in_project_label: "Car Parts in Project",
+                    partNumberLabel: "Part Number",
+                    partConditionLabel: "Condition",
+                    about_text: "About Us",
+                    projects_text: "Projects",
+                    footerData: footerLangObject(lang)
+                }
+            }
+            else {
+                pageData = {
+                    alertOccurred: false,
+                    display_signup: "none",
+                    display_login: "block",
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    signUpText: "Enregistrer",
+                    endpointLogInLogOut: endpoint,
+                    clickedNewProject: false,
+                    Home: "Accueil",
+                    loggedInUser: login,
+                    projectName: theName,
+                    projectDescription: description,
+                    projectId: parseInt(theProjectId),
+                    projectParts: arrayOFCatPartsInProject,
+                    noParts: noPartsFound,
+                    back_button: "Retournez",
+                    edit: "Modifier",
+                    project_name_label: "Nom du Projet",
+                    project_description_label: "Description du Projet",
+                    update_button: "Mettre à Jour le Projet",
+                    noparts_message: "Aucune pièce de voiture ajoutée dans ce projet",
+                    parts_in_project_label: "Pièces dans le Projet",
+                    partNumberLabel: "Numéro de Pièce",
+                    partConditionLabel: "Condition",
+                    about_text: "À propos de nous",
+                    projects_text: "Projets",
+                    footerData: footerLangObject(lang)
+                }
+            }
+        
+            // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+            response.status(201).render('showProject.hbs', pageData);
+        } 
+        catch (error) {
             pageData = {
-                alertOccurred: false,
-                display_signup: signupDisplay,
-                display_login: "block",
-                logInlogOutText: logInText,
-                signUpText: "Sign Up",
-                endpointLogInLogOut: endpoint,
-                clickedNewProject: false,
-                Home: "Home",
-                loggedInUser: login,
-                projectName: theName,
-                projectDescription: description,
-                projectId: parseInt(theProjectId),
-                projectParts: arrayOFCatPartsInProject,
-                noParts: noPartsFound,
-                back_button: "Return",
-                edit: "Edit",
-                project_name_label: "Project Name",
-                project_description_label: "Project Description",
-                update_button: "Update Project",
-                noparts_message: "No car parts added in this project",
-                parts_in_project_label: "Car Parts in Project",
-                partNumberLabel: "Part Number",
-                partConditionLabel: "Condition",
-                about_text: "About Us",
-                projects_text: "Projects",
+                alertOccurred: true,
+                alertMessage: "",
+                alertLevel: 'danger',
+                alertLevelText: 'Danger',
+                alertHref: 'exclamation-triangle-fill',
+                loggedInUser: lang,
+                errorCode: "",
+                alertMessage: "",
                 footerData: footerLangObject(lang)
             }
-        }
-        else {
-            pageData = {
-                alertOccurred: false,
-                display_signup: "none",
-                display_login: "block",
-                logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
-                signUpText: "Enregistrer",
-                endpointLogInLogOut: endpoint,
-                clickedNewProject: false,
-                Home: "Accueil",
-                loggedInUser: login,
-                projectName: theName,
-                projectDescription: description,
-                projectId: parseInt(theProjectId),
-                projectParts: arrayOFCatPartsInProject,
-                noParts: noPartsFound,
-                back_button: "Retournez",
-                edit: "Modifier",
-                project_name_label: "Nom du Projet",
-                project_description_label: "Description du Projet",
-                update_button: "Mettre à Jour le Projet",
-                noparts_message: "Aucune pièce de voiture ajoutée dans ce projet",
-                parts_in_project_label: "Pièces dans le Projet",
-                partNumberLabel: "Numéro de Pièce",
-                partConditionLabel: "Condition",
-                about_text: "À propos de nous",
-                projects_text: "Projets",
-                footerData: footerLangObject(lang)
+
+            // If the error is an instance of the DatabaseConnectionError error
+            if (error instanceof sqlModel.DatabaseConnectionError) {
+                pageData.alertMessage = "There was an error connecting to the database.";
+                pageData.errorCode = 500;
+                logger.error(`DatabaseConnectionError when DELETING PROJECT ${projectID} -- deleteProject`);
+                response.status(500).render('error.hbs', pageData);
+            }
+            // If the error is an instance of the InvalidInputError error
+            else if (error instanceof sqlModel.InvalidInputError) {
+                pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+                logger.error(`InvalidInputError when DELETING PROJECT ${projectID} -- deleteProject`);
+                response.status(404).render('home.hbs', pageData);
+            }
+            // If any other error occurs
+            else {
+                pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+                pageData.errorCode = 500;
+                logger.error(`OTHER error when DELETING PROJECT ${projectID} -- deleteProject`);
+                response.status(500).render('error.hbs', pageData);
             }
         }
     
         // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-        response.status(201).render('showProject.hbs', pageData);
-    } 
-    catch (error) {
-        pageData = {
-            alertOccurred: false,
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Log Out",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            clickedNewProject: false,
-            Home: "Home",
-            loggedInUser: login,
-            projectName: name,
-            projectDescription: description,
-            projectId: parseInt(theProjectId),
-            projectParts: arrayOFCatPartsInProject,
-            noParts: noPartsFound,
-            back_button: "Return",
-            edit: "Edit",
-            project_name_label: "Project Name",
-            project_description_label: "Project Description",
-            update_button: "Update Project",
-            noparts_message: "No car parts added in this project",
-            parts_in_project_label: "Car Parts in Project",
-            partNumberLabel: "Part Number",
-            partConditionLabel: "Condition",
-            footerData: footerLangObject(lang)
-        }
+        // response.status(201).render('showProject.hbs', pageData);
     }
-
-    // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-    response.status(201).render('showProject.hbs', pageData);
+    // Redirect to home page since a user shouldn't be viewing the project if not logged in
+    else{
+        response.redirect('/parts');
+    }
 }
 
 /**
@@ -669,67 +667,101 @@ async function showSpecificProject(request, response) {
  * @param {*} response 
  */
 async function updateProject(request, response) {
-    // Get the values
-    let name = request.body.name;
-    let description = request.body.description;
-    let projectID = request.params.projectId;
-    let login = loginController.authenticateUser(request);
-
-    // Set the login to the username if response is not null
-    if (login != null) {
-        login = login.userSession.username;
-    }
-
-    await projectModel.updateProject(name, description, projectID);
-
-
-    const lang = request.cookies.language;
-    let pageData;
-
-    if (!lang || lang === 'en') {
-        // Page data 
+    try {
+        // Get the values
+        let name = request.body.name;
+        let description = request.body.description;
+        let projectID = request.params.projectId;
+        let login = loginController.authenticateUser(request);
+    
+        // Set the login to the username if response is not null
+        if (login != null) {
+            login = login.userSession.username;
+        }
+    
+        await projectModel.updateProject(name, description, projectID);
+    
+        const lang = request.cookies.language;
+        let pageData;
+    
+        if (!lang || lang === 'en') {
+            // Page data 
+            pageData = {
+                alertOccurred: true,
+                alertMessage: `Successfully updated project ${name}!`,
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Log Out",
+                signUpText: "Sign Up",
+                endpointLogInLogOut: "login",
+                clickedNewProject: false,
+                Home: "Home",
+                loggedInUser: login,
+                footerData: footerLangObject(lang)
+            }
+        }
+        else {
+            // Page data 
+            pageData = {
+                alertOccurred: true,
+                alertMessage: `Projet mis à jour avec succès ${name}!`,
+                alertLevel: 'success',
+                alertLevelText: 'success',
+                alertHref: 'exclamation-triangle-fill',
+                display_signup: "none",
+                display_login: "block",
+                logInlogOutText: "Déconnecter",
+                signUpText: "Enregistrer",
+                endpointLogInLogOut: "login",
+                clickedNewProject: false,
+                Home: "Accueil",
+                loggedInUser: login,
+                footerData: footerLangObject(lang)
+            }
+        }
+    
+        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
+        response.cookie("lastAccessedProject", projectID);
+        response.redirect(`/projects/${projectID}`);
+        response.status(201).render('showProject.hbs', pageData);
+    } 
+    catch (error) {
         pageData = {
             alertOccurred: true,
-            alertMessage: `Successfully updated project ${name}!`,
-            alertLevel: 'success',
-            alertLevelText: 'success',
+            alertMessage: "",
+            alertLevel: 'danger',
+            alertLevelText: 'Danger',
             alertHref: 'exclamation-triangle-fill',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Log Out",
-            signUpText: "Sign Up",
-            endpointLogInLogOut: "login",
-            clickedNewProject: false,
-            Home: "Home",
-            loggedInUser: login,
+            loggedInUser: lang,
+            errorCode: "",
+            alertMessage: "",
             footerData: footerLangObject(lang)
         }
-    }
-    else {
-        // Page data 
-        pageData = {
-            alertOccurred: true,
-            alertMessage: `Projet mis à jour avec succès ${name}!`,
-            alertLevel: 'success',
-            alertLevelText: 'success',
-            alertHref: 'exclamation-triangle-fill',
-            display_signup: "none",
-            display_login: "block",
-            logInlogOutText: "Déconnecter",
-            signUpText: "Enregistrer",
-            endpointLogInLogOut: "login",
-            clickedNewProject: false,
-            Home: "Accueil",
-            loggedInUser: login,
-            footerData: footerLangObject(lang)
+
+        // If the error is an instance of the DatabaseConnectionError error
+        if (error instanceof sqlModel.DatabaseConnectionError) {
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
+            logger.error(`DatabaseConnectionError when DELETING PROJECT ${projectID} -- deleteProject`);
+            response.status(500).render('error.hbs', pageData);
+        }
+        // If the error is an instance of the InvalidInputError error
+        else if (error instanceof sqlModel.InvalidInputError) {
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            logger.error(`InvalidInputError when DELETING PROJECT ${projectID} -- deleteProject`);
+            response.status(404).render('home.hbs', pageData);
+        }
+        // If any other error occurs
+        else {
+            pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+            pageData.errorCode = 500;
+            logger.error(`OTHER error when DELETING PROJECT ${projectID} -- deleteProject`);
+            response.status(500).render('error.hbs', pageData);
         }
     }
-
-
-    // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
-    response.cookie("lastAccessedProject", projectID);
-    response.redirect(`/projects/${projectID}`);
-    response.status(201).render('showProject.hbs', pageData);
 }
 
 async function deleteProject(request, response) {
@@ -816,7 +848,7 @@ async function deleteProject(request, response) {
                 // footerData: footerLangObject(lang)
                     }
                 } 
-                        
+
                 // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
                 // response.redirect(`/projects`);
                 response.cookie("lastAccessedProject", -1);
