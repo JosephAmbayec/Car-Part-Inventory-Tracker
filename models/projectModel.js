@@ -135,6 +135,12 @@ async function getAllProjects(username){
  * @param {*} partNumber 
  */
 async function addPartToProject(projectId, partNumber){
+    // Validates the partNumber of the car part
+    if (!validUtils.isPartNumber(partNumber)){
+        logger.error("PartNumber of car part to add is not valid -- addPartToProject");
+        throw new InvalidInputError();
+    }
+
     try {
         if (await projectExists(projectId) && await partModel.verifyCarPartExists(partNumber)) {
             if(!await partExistsInProject(projectId, partNumber)){
@@ -157,6 +163,12 @@ async function addPartToProject(projectId, partNumber){
 }     
 
 async function partExistsInProject(projectId, partNumber){
+    // Validates the partNumber of the car part
+    if (!validUtils.isPartNumber(partNumber)){
+        logger.error("PartNumber of car part to find is not valid -- partExistsInProject");
+        throw new InvalidInputError();
+    }
+
     try {
         let statement = `SELECT projectId FROM PartProject where projectId = ${projectId} and partNumber = ${partNumber}`;
         let result = await connection.query(statement);
@@ -263,15 +275,9 @@ async function getProjectCarParts(projectId) {
             const selectStatement = `SELECT * FROM PartProject WHERE projectId = ${projectId};`;
             let theProject = await connection.execute(selectStatement);
             return theProject[0];
-            
-            // if(theProject[0].length !== 0){
-            //     // selectStatement = ""
-            // }
-            // else{
-            //     logger.error(error);
-            //     throw new DatabaseConnectionError();
-            // }
         }
+        else
+            throw new DatabaseConnectionError();
     } 
     catch (error) {
         logger.error(error);
@@ -299,6 +305,8 @@ async function deleteProject(projectId){
             selectStatement = `DELETE FROM Project WHERE projectId = ${projectId};`;
             deletedProj = await connection.execute(selectStatement);
         }
+        else
+            throw new DatabaseConnectionError();
     } 
     catch (error) {
         logger.error(error);
@@ -319,6 +327,8 @@ async function deletePartFromProject(projectId, partNumber){
             }
             return true;
         }
+        else
+            throw new DatabaseConnectionError();
     } 
     catch (error) {
         logger.error(error);
