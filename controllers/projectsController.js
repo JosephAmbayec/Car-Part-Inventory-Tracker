@@ -816,29 +816,7 @@ async function deleteProject(request, response) {
                 // footerData: footerLangObject(lang)
                     }
                 } 
-        
-                // // Page data 
-                // const pageData = {
-                //     alertOccurred: true,
-                //     alertMessage: `Successfully deleted project ${projectID}!`,
-                //     alertLevel: 'success',
-                //     alertLevelText: 'success',
-                //     alertHref: 'exclamation-triangle-fill',
-                //     display_signup: signupDisplay,
-                //     display_login: "block",
-                //     logInlogOutText: logInText,
-                //     signUpText: "Sign Up",
-                //     endpointLogInLogOut: endpoint,
-                //     clickedNewProject: false,
-                //     Home: "Home",
-                //     loggedInUser: login,
-                //     projects: await projectModel.getAllProjects(request.cookies.username),
-                //     about_text: "About Us",
-                //     endpointLogInLogOut: endpoint,
-                //     projects_text: "Projects",
-                //     footerData: footerLangObject(lang)
-                // }
-        
+                        
                 // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
                 // response.redirect(`/projects`);
                 response.cookie("lastAccessedProject", -1);

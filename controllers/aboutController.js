@@ -58,8 +58,7 @@ async function showAbout(request, response) {
         pageData = {
             display_signup: "block",
             display_login: "block",
-            logInlogOutText: "Connexion",
-            endpointLogInLogOut: "login",
+            endpointLogInLogOut: endpoint,
             projects_text: "Projets",
             about_text: "À propos de nous",
             signUpText: "Enregistrer",
@@ -71,7 +70,7 @@ async function showAbout(request, response) {
             projects_text: "Projets",
             display_signup: signupDisplay,
             loggedInUser: login,
-            logInlogOutText: logInText,
+            logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
             footerData: footerLangObject(lang)
         }
     }
