@@ -2,7 +2,6 @@ const res = require('express/lib/response');
 const logger = require('../logger.js');
 const model = require('../models/projectModel.js');
 const users = require('../models/userModel');
-const initializer = require('../models/initializerModel')
 const partModel = require("../models/carPartModelMysql.js")
 
 
@@ -198,7 +197,7 @@ test("addProject with Part failed to add part due to inexistant project", async 
     let result = await connection.query("select name from Project");
     expect(Array.isArray(result)).toBe(true);
     expect(result[0].length).toBe(0);
-    
+
     result = await connection.query("select partNumber from PartProject")
     expect(result[0].length).toBe(0);
     

@@ -19,109 +19,139 @@ router.use(cookieParser());
  * @param {*} response 
  */
 async function sendHome(request, response) {
-    // Getting the values
-    const justRegistered = request.cookies.justRegistered;
-    const lang = request.cookies.language;
     let pageData;
-    let login = loginController.authenticateUser(request);
-    let signupDisplay, endpoint, logInText;
-    let accessProject = request.cookies.lastAccessedProject;
-    let AccessProject;
-    let AccessProjectName;
-    let role;
+    const lang = request.cookies.language;
+
+    try {
+        // Getting the values
+        const justRegistered = request.cookies.justRegistered;
+        let login = loginController.authenticateUser(request);
+        let signupDisplay, endpoint, logInText;
+        let accessProject = request.cookies.lastAccessedProject;
+        let AccessProject;
+        let AccessProjectName;
+        let role;
+        
+        if (accessProject && accessProject != '-1'){
+            AccessProject = true;
+            AccessProjectName = await projectModel.getProjectByProjectId(accessProject)
+            AccessProjectName = AccessProjectName[0].name;
+        }
     
-    if (accessProject && accessProject != '-1'){
-        AccessProject = true;
-        AccessProjectName = await projectModel.getProjectByProjectId(accessProject)
-        AccessProjectName = AccessProjectName[0].name;
-    }
-
-    // If the user just registered
-    if (justRegistered == 'true') {
-        const username = request.cookies.username;
-        response.cookie('justRegistered', 'false');
-        logger.info(`COOKIE CREATED for user ${username}, rendering home page -- sendHome`);
-    }
-
-    if (!lang || lang === 'en') {
-        // Set the login to the username if response is not null
-        if(login != null) {
-            login = login.userSession.username;
-            signupDisplay = "none";
-            endpoint = "logout";
-            logInText = "Log Out";
+        // If the user just registered
+        if (justRegistered == 'true') {
+            const username = request.cookies.username;
+            response.cookie('justRegistered', 'false');
+            logger.info(`COOKIE CREATED for user ${username}, rendering home page -- sendHome`);
+        }
+    
+        if (!lang || lang === 'en') {
+            // Set the login to the username if response is not null
+            if(login != null) {
+                login = login.userSession.username;
+                signupDisplay = "none";
+                endpoint = "logout";
+                logInText = "Log Out";
+            }
+            else{
+                signupDisplay = "block";
+                endpoint = "login";
+                logInText = "Log In";
+                AccessProject = false;
+            }
+    
+            role = await userModel.determineRole(login);
+    
+            pageData = {
+                Home: "Home",
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                endpointLogInLogOut: endpoint,
+                signUpText: "Sign Up",
+                Current: "English",
+                Add: role === 1 ? "Add a Car part" : "",
+                Show: "Find a Car Part",
+                List: "Show all Car Parts",
+                Edit: role === 1 ? "Update a Car Part" : "",
+                Delete: role === 1 ? "Delete a Car Part" : "",
+                loggedInUser: login,
+                projects_text: "Projects",
+                about_text: "About Us",
+                accessProject: AccessProject,
+                accessProjectId: accessProject,
+                accessProjectName: AccessProjectName
+            }
         }
         else{
-            signupDisplay = "block";
-            endpoint = "login";
-            logInText = "Log In";
-            AccessProject = false;
+            // Set the login to the username if response is not null
+            if(login != null) {
+                login = login.userSession.username;
+                signupDisplay = "none";
+                endpoint = "logout";
+                logInText = "Se Déconnecter";
+            }
+            else{
+                signupDisplay = "block";
+                endpoint = "login";
+                logInText = "Connexion";
+                AccessProject = false;
+            }
+    
+            role = await userModel.determineRole(login);
+    
+            pageData = {
+                Home: "Accueil",
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                endpointLogInLogOut: endpoint,
+                signUpText: "Enregistrer",
+                Current: "French",
+                Add: role === 1 ? "Ajouter une Pièce Auto" : "",
+                Show: "Trouver une Pièce Auto",
+                List: "Afficher Toutes les Pièces de Voiture",
+                Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
+                Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
+                loggedInUser: login,
+                projects_text: "Projets",
+                about_text: "À propos de nous",
+                accessProject: AccessProject,
+                accessProjectId: accessProject,
+                accessProjectName: AccessProjectName
+            }
+        }
+    
+        logger.info(`RENDERING home page -- sendHome`);
+        response.status(200).render('home.hbs', pageData);
+    } 
+    catch (error) {
+        pageData = {
+            alertOccurred: true,
+            alertMessage: "",
+            alertLevel: 'danger',
+            alertLevelText: 'Danger',
+            alertHref: 'exclamation-triangle-fill',
+            loggedInUser: lang,
+            errorCode: "",
+            alertMessage: ""
         }
 
-        role = await userModel.determineRole(login);
-
-        pageData = {
-            Home: "Home",
-            display_signup: signupDisplay,
-            display_login: "block",
-            logInlogOutText: logInText,
-            endpointLogInLogOut: endpoint,
-            signUpText: "Sign Up",
-            Current: "English",
-            Add: role === 1 ? "Add a Car part" : "",
-            Show: "Find a Car Part",
-            List: "Show all Car Parts",
-            Edit: role === 1 ? "Update a Car Part" : "",
-            Delete: role === 1 ? "Delete a Car Part" : "",
-            loggedInUser: login,
-            projects_text: "Projects",
-            about_text: "About Us",
-            accessProject: AccessProject,
-            accessProjectId: accessProject,
-            accessProjectName: AccessProjectName
+        // If the error is an instance of the DatabaseConnectionError error
+        if (error instanceof sqlModel.DatabaseConnectionError) {
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
+            logger.error(`DatabaseConnectionError when RENDERING HOME -- sendHome`);
+            response.status(500).render('error.hbs', pageData);
+        }
+        // If any other error occurs
+        else {
+            pageData.alertMessage = `Unexpected error while trying to render home: ${error.message}`;
+            pageData.errorCode = 500;
+            logger.error(`OTHER error when RENDERING HOME -- sendHome`);
+            response.status(500).render('error.hbs', pageData);
         }
     }
-    else{
-        // Set the login to the username if response is not null
-        if(login != null) {
-            login = login.userSession.username;
-            signupDisplay = "none";
-            endpoint = "logout";
-            logInText = "Se Déconnecter";
-        }
-        else{
-            signupDisplay = "block";
-            endpoint = "login";
-            logInText = "Connexion";
-            AccessProject = false;
-        }
-
-        role = await userModel.determineRole(login);
-
-        pageData = {
-            Home: "Accueil",
-            display_signup: signupDisplay,
-            display_login: "block",
-            logInlogOutText: logInText,
-            endpointLogInLogOut: endpoint,
-            signUpText: "Enregistrer",
-            Current: "French",
-            Add: role === 1 ? "Ajouter une Pièce Auto" : "",
-            Show: "Trouver une Pièce Auto",
-            List: "Afficher Toutes les Pièces de Voiture",
-            Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
-            Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
-            loggedInUser: login,
-            projects_text: "Projets",
-            about_text: "À propos de nous",
-            accessProject: AccessProject,
-            accessProjectId: accessProject,
-            accessProjectName: AccessProjectName
-        }
-    }
-
-    logger.info(`RENDERING home page -- sendHome`);
-    response.status(200).render('home.hbs', pageData);
 }
 
 /**
@@ -159,7 +189,6 @@ function showForm(request, response) {
         // Case of deleting a car part
         case 'delete':
             logger.info(`SWITCH CASE delete -- showForm`);
-            // showDeleteForm(request, response);
             response.redirect('/parts/table/delete');
             break;
 
@@ -487,107 +516,6 @@ async function showEditForm(request, response) {
     }
 
     logger.info(`RENDERING home page WITH UPDATE form -- showEditForm`);
-    response.render('home.hbs', pageData);
-}
-
-/**
- * Displays the delete car part form
- * @param {*} response 
- */
-async function showDeleteForm(request, response) {
-    let lang = request.cookies.language;
-    let login = loginController.authenticateUser(request);
-    let signupDisplay, endpoint, logInText;
-    let role;
-    
-    let pageData;
-
-    if (!lang || lang === 'en') {
-        // Set the login to the username if response is not null
-        if(login != null) {
-            login = login.userSession.username;
-            signupDisplay = "none";
-            endpoint = "logout";
-            logInText = "Log Out";
-        }
-        else{
-            signupDisplay = "block";
-            endpoint = "login";
-            logInText = "Log In";
-        }
-
-        role = await userModel.determineRole(login);
-
-        pageData = {
-            Home: "Home",
-            showForm: true,
-            endpoint: "/parts",
-            submitfn: "this.action = this.action + '/'+ this.partNumber.value",
-            method: "post",
-            methodOverride: "DELETE",
-            Current: "English",
-            legend: "Please enter the part number of the part that should be deleted:",
-            formfields: [{ field: "partNumber", pretty: "Part Number", type: "number" }],
-            Submit: "Submit",
-            display_signup: signupDisplay,
-            display_login: "block",
-            logInlogOutText: logInText,
-            signUpText: "Sign Up",
-            endpointLogInLogOut: endpoint,
-            Add: role === 1 ? "Add a car part" : "",
-            Show: "Find a Car Part",
-            List: "Show all Car Parts",
-            Edit: role === 1 ? "Update a Car Part" : "",
-            Delete: role === 1 ? "Delete a Car Part" : "",
-            loggedInUser: login,
-            projects_text: "Projects",
-            about_text: "About Us"
-        };
-    }
-    else {
-        // Set the login to the username if response is not null
-        if(login != null) {
-            login = login.userSession.username;
-            signupDisplay = "none";
-            endpoint = "logout";
-            logInText = "Se Déconnecter";
-        }
-        else{
-            signupDisplay = "block";
-            endpoint = "login";
-            logInText = "Connexion";
-        }
-
-        role = await userModel.determineRole(login);
-
-        pageData = {
-            Home: "Accueil",
-            showForm: true,
-            endpoint: "/parts",
-            submitfn: "this.action = this.action + '/'+ this.partNumber.value",
-            method: "post",
-            methodOverride: "DELETE",
-            Current: "French",
-            legend: "Veuillez entrer le numéro de pièce de la pièce à supprimer :",
-            formfields: [{ field: "partNumber", pretty: "Numéro De Pièce", type: "number" }],
-            Submit: "Soumettre",
-            display_signup: signupDisplay,
-            display_login: "block",
-            logInlogOutText: logInText,
-            signUpText: "Enregistrer",
-            endpointLogInLogOut: endpoint,
-            Add: role === 1 ? "Ajouter une Pièce Auto" : "",
-            Show: "Trouver une Pièce Auto",
-            List: "Afficher Toutes les Pièces de Voiture",
-            Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
-            Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
-            loggedInUser: login,
-            projects_text: "Projets",
-            about_text: "À propos de nous"
-        };
-    }
-
-    logger.info(`RENDERING home page WITH DELETE form -- showDeleteForm`);
     response.render('home.hbs', pageData);
 }
 
