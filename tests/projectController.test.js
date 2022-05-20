@@ -42,6 +42,10 @@ const user = {
 }
 
 test("GET /projects success case", async () => {
+    let registerResponse = await testRequest.post('/users/signup').send(user);
+    expect(registerResponse.status).toBe(201);
+    let loginResponse = await testRequest.post('/users/login').send(user);
+    expect(loginResponse.get('Set-Cookie')).toBeDefined();
     let testResponse = await testRequest.get('/projects');
     expect(testResponse.status).toBe(201);
 })
