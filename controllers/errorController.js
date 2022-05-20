@@ -13,16 +13,44 @@ const homeController = require('./homeController');
  */
 function sendError(request, response){
     const lang = request.cookies.language;
-    
-    const error = {
-        errorCode: 404,
-        alertMessage: "There was a slight error...",
-        footerData: footerLangObject(lang)
+    let pageData;
+
+    if (!lang || lang === 'en'){
+        pageData = {
+            errorCode: 404,
+            alertMessage: "There was a slight error...",
+            display_signup: signupDisplay,
+            display_login: "block",
+            logInlogOutText: logInText,
+            endpointLogInLogOut: endpoint,
+            about_text: "About Us",
+            signUpText: "Sign Up",
+            Home: "Home", 
+            loggedInUser: login,
+            projects_text: "Projects",
+            footerData: footerLangObject(lang)
+        }
+    }
+    else {
+        pageData = {
+            display_signup: "block",
+            display_login: "block",
+            endpointLogInLogOut: endpoint,
+            projects_text: "Projets",
+            about_text: "À propos de nous",
+            signUpText: "Enregistrer",
+            Home: "Accueil",
+            projects_text: "Projets",
+            display_signup: signupDisplay,
+            loggedInUser: login,
+            logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+            footerData: footerLangObject(lang)
+        }
     }
 
-    response.status(error.errorCode);
+    response.status(pageData.errorCode);
     logger.info(`RENDERING home page WITH Invalid URL ERROR -- sendError`);
-    response.render('error.hbs', error);
+    response.render('error.hbs', pageData);
 }
 
 /* #region Helper */

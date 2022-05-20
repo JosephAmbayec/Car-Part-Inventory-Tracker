@@ -140,33 +140,63 @@ async function createPart(request, response){
     
         } 
         catch(error) {
+            let pageData;
+
+            // If language is English
+            if (!lang || lang === 'en'){
+                pageData = {
+                    errorCode: 404,
+                    alertMessage: "There was a slight error...",
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    endpointLogInLogOut: endpoint,
+                    about_text: "About Us",
+                    signUpText: "Sign Up",
+                    Home: "Home", 
+                    loggedInUser: login,
+                    projects_text: "Projects",
+                    footerData: footerLangObject(lang)
+                }
+            }
+            // If language is french
+            else {
+                pageData = {
+                    display_signup: "block",
+                    display_login: "block",
+                    endpointLogInLogOut: endpoint,
+                    projects_text: "Projets",
+                    about_text: "À propos de nous",
+                    signUpText: "Enregistrer",
+                    Home: "Accueil",
+                    projects_text: "Projets",
+                    display_signup: signupDisplay,
+                    loggedInUser: login,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    footerData: footerLangObject(lang)
+                }
+            }
     
             // If the error is an instance of the DatabaseConnectionError error
             if (error instanceof sqlModel.DatabaseConnectionError){
-                const data = {
-                    alertMessage: "There was an error connecting to the database.",
-                    errorCode: 500
-                }
+                pageData.alertMessage = "There was an error connecting to the database.";
+                pageData.errorCode = 500;
                 logger.error("DatabaseConnectionError when CREATING part -- createPart");
-                response.status(500).render('error.hbs', data);
+                response.status(500).render('error.hbs', pageData);
             }
             // If the error is an instance of the InvalidInputError error
             else if (error instanceof sqlModel.InvalidInputError){
-                const data = {
-                    alertMessage: "Invalid input, check that all fields are alpha numeric where applicable. Ensure the url is a valid image url",
-                    errorCode: 404
-                }
+                pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable. Ensure the url is a valid image url";
+                pageData.errorCode = 404;
                 logger.error("InvalidInputError when CREATING part -- createPart");
-                response.status(404).render('home.hbs', data);
+                response.status(404).render('home.hbs', pageData);
             }
             // If any other error
             else {
-                const data = {
-                    alertMessage: `Unexpected error while trying to add part: ${error.message}`,
-                    errorCode: 500
-                }
+                pageData.alertMessage = `Unexpected error while trying to add part: ${error.message}`;
+                pageData.errorCode = 500;
                 logger.error("OTHER error when CREATING part -- createPart");
-                response.status(500).render('error.hbs', data);
+                response.status(500).render('error.hbs', pageData);
             }
         }
     }
@@ -184,12 +214,13 @@ async function getPartByNumber(request, response){
     // Getting the values
     let number = request.params.partNumber;
     const lang = request.cookies.language;
+    let signupDisplay, endpoint, logInText;
+    let login = loginController.authenticateUser(request);
+    let role = await userModel.determineRole(login);
 
     try {
         let part = await sqlModel.findCarPartByNumber(number);
         let output, signupDisplay, endpoint, logInText;
-        let login = loginController.authenticateUser(request);
-        let role = await userModel.determineRole(login);
 
         // Set the login to the username if response is not null
         if(login != null) {
@@ -230,7 +261,14 @@ async function getPartByNumber(request, response){
                     alertLevelText: 'Danger',
                     alertHref: 'exclamation-triangle-fill',
                 inv_actions: "",
-                footerData: footerLangObject(lang)
+                footerData: footerLangObject(lang),
+                addToProjText: "",
+                partNumText: "",
+                partNameText: "",
+                partCondition: "",
+                partImage: "",
+                partDelete: "",
+                allPartsText: ""
             }
 
             // If the language is english
@@ -245,7 +283,14 @@ async function getPartByNumber(request, response){
                 output.about_text = "About Us"
                 output.Home = "Home";
                 output.Current = "English";
-                output.inv_actions = "Inventory Actions"
+                output.inv_actions = "Inventory Actions";
+                output.addToProjText = "Add to Project";
+                output.partNumText = "Part #";
+                output.partNameText = "Part Name";
+                output.partCondition = "Condition";
+                output.partImage = "Image";
+                output.partDelete = "Delete";
+                output.allPartsText = "All car parts in the inventory";
             }
             // If the language is french
             else{
@@ -260,6 +305,13 @@ async function getPartByNumber(request, response){
                 output.Home = "Accueil";
                 output.Current = "French";
                 output.inv_actions = "Actions D'inventaire";
+                output.addToProjText = "Ajouter au Projet";
+                output.partNumText = "Pièce #";
+                output.partNameText = "Nom de la Pièce";
+                output.partCondition = "État";
+                output.partImage = "Image";
+                output.partDelete = "Supprimer";
+                output.allPartsText = "Toutes les Pièces Autos en Inventaire";
 
                 if(logInText === "Log In"){
                     output.logInlogOutText = "Connexion";
@@ -276,7 +328,7 @@ async function getPartByNumber(request, response){
         else{
             output = {
                 alertOccurred: true,
-                alertMessage: `Successfully found car part ${number}!`,
+                alertMessage: `Pièce D'auto Trouvée avec Succès ${number}!`,
                 showList: true,
                 display_signup: signupDisplay,
                 display_login: "block",
@@ -298,7 +350,14 @@ async function getPartByNumber(request, response){
                     alertLevelText: 'success',
                     alertHref: 'exclamation-triangle-fill',
                 inv_actions: "",
-                footerData: footerLangObject(lang)
+                footerData: footerLangObject(lang),
+                addToProjText: "",
+                partNumText: "",
+                partNameText: "",
+                partCondition: "",
+                partImage: "",
+                partDelete: "",
+                allPartsText: ""
             }
 
             // If the language is english
@@ -313,7 +372,14 @@ async function getPartByNumber(request, response){
                 output.about_text = "About Us"
                 output.Home = "Home";
                 output.Current = "English";
-                output.inv_actions = "Inventory Actions"
+                output.inv_actions = "Inventory Actions";
+                output.addToProjText = "Add to Project";
+                output.partNumText = "Part #";
+                output.partNameText = "Part Name";
+                output.partCondition = "Condition";
+                output.partImage = "Image";
+                output.partDelete = "Delete";
+                output.allPartsText = "All car parts in the inventory";
             }
             // If the language is french
             else{
@@ -328,6 +394,13 @@ async function getPartByNumber(request, response){
                 output.Home = "Accueil";
                 output.Current = "French";
                 output.inv_actions = "Actions D'inventaire";
+                output.addToProjText = "Ajouter au Projet";
+                output.partNumText = "Pièce #";
+                output.partNameText = "Nom de la Pièce";
+                output.partCondition = "État";
+                output.partImage = "Image";
+                output.partDelete = "Supprimer";
+                output.allPartsText = "Toutes les Pièces Autos en Inventaire";
 
                 if(logInText === "Log In"){
                     output.logInlogOutText = "Connexion";
@@ -342,33 +415,63 @@ async function getPartByNumber(request, response){
         }
     }
     catch(error){
+        let pageData;
+
+        // If language is english
+        if (!lang || lang === 'en'){
+            pageData = {
+                errorCode: 404,
+                alertMessage: "There was a slight error...",
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                endpointLogInLogOut: endpoint,
+                about_text: "About Us",
+                signUpText: "Sign Up",
+                Home: "Home", 
+                loggedInUser: login,
+                projects_text: "Projects",
+                footerData: footerLangObject(lang)
+            }
+        }
+         // If language is french
+        else {
+            pageData = {
+                display_signup: "block",
+                display_login: "block",
+                endpointLogInLogOut: endpoint,
+                projects_text: "Projets",
+                about_text: "À propos de nous",
+                signUpText: "Enregistrer",
+                Home: "Accueil",
+                projects_text: "Projets",
+                display_signup: signupDisplay,
+                loggedInUser: login,
+                logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                footerData: footerLangObject(lang)
+            }
+        }
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
-            const data = {
-                alertMessage: "There was an error connecting to the database.",
-                errorCode: 500
-            }
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
             logger.error(`DatabaseConnectionError when FINDING car part by number ${number} -- getPartByNumber`);
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
-            const data = {
-                alertMessage:  "Invalid input, check that all fields are alpha numeric where applicable.",
-                errorCode: 404
-            }
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            pageData.errorCode = 404;
             logger.error(`InvalidInputError when FINDING car part by number ${number} -- getPartByNumber`);
-            response.status(404).render('home.hbs', data);
+            response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
-            const data = {
-                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
-                errorCode: 500
-            }
+            pageData.alertMessage =`Unexpected error while trying to show part: ${error.message}`;
+            pageData.errorCode = 500;
             logger.error(`OTHER error when FINDING car part by number ${number} -- getPartByNumber`);
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
     }
 }
@@ -681,33 +784,63 @@ async function getAllCarParts(request, response){
         }  
     }
     catch(error){
+        let pageData;
+
+        // If language is english
+        if (!lang || lang === 'en'){
+            pageData = {
+                errorCode: 404,
+                alertMessage: "There was a slight error...",
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                endpointLogInLogOut: endpoint,
+                about_text: "About Us",
+                signUpText: "Sign Up",
+                Home: "Home", 
+                loggedInUser: login,
+                projects_text: "Projects",
+                footerData: footerLangObject(lang)
+            }
+        }
+         // If language is french
+        else {
+            pageData = {
+                display_signup: "block",
+                display_login: "block",
+                endpointLogInLogOut: endpoint,
+                projects_text: "Projets",
+                about_text: "À propos de nous",
+                signUpText: "Enregistrer",
+                Home: "Accueil",
+                projects_text: "Projets",
+                display_signup: signupDisplay,
+                loggedInUser: login,
+                logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                footerData: footerLangObject(lang)
+            }
+        }
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
-            const data = {
-                alertMessage: "There was an error connecting to the database.",
-                errorCode: 500
-            }
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
             logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
-            const data = {
-                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
-                errorCode: 404
-            }
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            pageData.errorCode = 404;
             logger.error("InvalidInputError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(404).render('home.hbs', data);
+            response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
-            const data = {
-                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
-                errorCode: 500
-            }
+             pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
+            pageData.errorCode = 500;
             logger.error("OTHER error when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
     }
 }
@@ -840,33 +973,63 @@ async function updatePartName(request, response){
             }
         }
         catch(error){
+            let pageData;
+
+            // If language is english
+            if (!lang || lang === 'en'){
+                pageData = {
+                    errorCode: 404,
+                    alertMessage: "There was a slight error...",
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    endpointLogInLogOut: endpoint,
+                    about_text: "About Us",
+                    signUpText: "Sign Up",
+                    Home: "Home", 
+                    loggedInUser: login,
+                    projects_text: "Projects",
+                    footerData: footerLangObject(lang)
+                }
+            }
+            // If language is french
+            else {
+                pageData = {
+                    display_signup: "block",
+                    display_login: "block",
+                    endpointLogInLogOut: endpoint,
+                    projects_text: "Projets",
+                    about_text: "À propos de nous",
+                    signUpText: "Enregistrer",
+                    Home: "Accueil",
+                    projects_text: "Projets",
+                    display_signup: signupDisplay,
+                    loggedInUser: login,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    footerData: footerLangObject(lang)
+                }
+            }
             
             // If the error is an instance of the DatabaseConnectionError error
             if (error instanceof sqlModel.DatabaseConnectionError){
-                const data = {
-                    alertMessage: "There was an error connecting to the database.",
-                    errorCode: 500
-                }
+                pageData.alertMessage = "There was an error connecting to the database.";
+                pageData.errorCode = 500;
                 logger.error(`DatabaseConnectionError when UPDATING car part ${partNumber} -- updatePartName`);
-                response.status(500).render('error.hbs', data);
+                response.status(500).render('error.hbs', pageData);
             }
             // If the error is an instance of the InvalidInputError error
             else if (error instanceof sqlModel.InvalidInputError){
-                const data = {
-                    alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
-                    errorCode: 404
-                }
+                pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+                pageData.errorCode = 404
                 logger.error(`InvalidInputError when UPDATING car part ${partNumber} -- updatePartName`);
-                response.status(404).render('home.hbs', data);
+                response.status(404).render('home.hbs', pageData);
             }
             // If any other error
             else {
-                const data = {
-                    alertMessage: `Unexpected error while trying to show part: ${error.message}`,
-                    errorCode: 500
-                }
+                pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
+                pageData.errorCode = 500;
                 logger.error(`OTHER error when UPDATING car part ${partNumber} -- updatePartName`);
-                response.status(500).render('error.hbs', data);
+                response.status(500).render('error.hbs', pageData);
             }
         }   
     }
@@ -1178,33 +1341,63 @@ async function deleteSpecificCarPartTable(request, response){
         }  
     }
     catch(error){
+            let pageData;
+
+            // If language is english
+            if (!lang || lang === 'en'){
+                pageData = {
+                    errorCode: 404,
+                    alertMessage: "There was a slight error...",
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    endpointLogInLogOut: endpoint,
+                    about_text: "About Us",
+                    signUpText: "Sign Up",
+                    Home: "Home", 
+                    loggedInUser: login,
+                    projects_text: "Projects",
+                    footerData: footerLangObject(lang)
+                }
+            }
+            // If language is french
+            else {
+                pageData = {
+                    display_signup: "block",
+                    display_login: "block",
+                    endpointLogInLogOut: endpoint,
+                    projects_text: "Projets",
+                    about_text: "À propos de nous",
+                    signUpText: "Enregistrer",
+                    Home: "Accueil",
+                    projects_text: "Projets",
+                    display_signup: signupDisplay,
+                    loggedInUser: login,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    footerData: footerLangObject(lang)
+                }
+            }
 
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
-            const data = {
-                alertMessage: "There was an error connecting to the database.",
-                errorCode: 500
-            }
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
             logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
-            const data = {
-                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
-                errorCode: 404
-            }
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            pageData.errorCode = 404;
             logger.error("InvalidInputError when RETRIEVING all car parts -- getAllCarParts");
-            response.status(404).render('home.hbs', data);
+            response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
-            const data = {
-                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
-                errorCode: 500
-            }
+            pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
+            pageData.errorCode = 500;
             logger.error("OTHER error when RETRIEVING all car parts -- getAllCarParts");
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
     }
 }
@@ -1220,32 +1413,63 @@ async function addCarPartToProject(request, response){
         console.log(result);
     } 
     catch (error) {
+        let pageData;
+
+            // If language is english
+            if (!lang || lang === 'en'){
+                pageData = {
+                    errorCode: 404,
+                    alertMessage: "There was a slight error...",
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    endpointLogInLogOut: endpoint,
+                    about_text: "About Us",
+                    signUpText: "Sign Up",
+                    Home: "Home", 
+                    loggedInUser: login,
+                    projects_text: "Projects",
+                    footerData: footerLangObject(lang)
+                }
+            }
+            // If language is french
+            else {
+                pageData = {
+                    display_signup: "block",
+                    display_login: "block",
+                    endpointLogInLogOut: endpoint,
+                    projects_text: "Projets",
+                    about_text: "À propos de nous",
+                    signUpText: "Enregistrer",
+                    Home: "Accueil",
+                    projects_text: "Projets",
+                    display_signup: signupDisplay,
+                    loggedInUser: login,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    footerData: footerLangObject(lang)
+                }
+            }
+
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
-            const data = {
-                alertMessage: "There was an error connecting to the database.",
-                errorCode: 500
-            }
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
             logger.error(`DatabaseConnectionError when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
-            const data = {
-                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
-                errorCode: 404
-            }
+            pageData.alertMessage =  "Invalid input, check that all fields are alpha numeric where applicable.";
+            pageData.errorCode = 404;
             logger.error(`InvalidInputError when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
-            response.status(404).render('home.hbs', data);
+            response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
-            const data = {
-                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
-                errorCode: 500
-            }
+            pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
+            pageData.errorCode = 500;
             logger.error(`OTHER error when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
     }
 }
@@ -1293,32 +1517,63 @@ async function deletePart(request, response){
         }
     } 
     catch (error) {
+        let pageData;
+
+            // If language is english
+            if (!lang || lang === 'en'){
+                pageData = {
+                    errorCode: 404,
+                    alertMessage: "There was a slight error...",
+                    display_signup: signupDisplay,
+                    display_login: "block",
+                    logInlogOutText: logInText,
+                    endpointLogInLogOut: endpoint,
+                    about_text: "About Us",
+                    signUpText: "Sign Up",
+                    Home: "Home", 
+                    loggedInUser: login,
+                    projects_text: "Projects",
+                    footerData: footerLangObject(lang)
+                }
+            }
+            // If language is french
+            else {
+                pageData = {
+                    display_signup: "block",
+                    display_login: "block",
+                    endpointLogInLogOut: endpoint,
+                    projects_text: "Projets",
+                    about_text: "À propos de nous",
+                    signUpText: "Enregistrer",
+                    Home: "Accueil",
+                    projects_text: "Projets",
+                    display_signup: signupDisplay,
+                    loggedInUser: login,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    footerData: footerLangObject(lang)
+                }
+            }
+
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError){
-            const data = {
-                alertMessage: "There was an error connecting to the database.",
-                errorCode: 500
-            }
+            pageData.alertMessage = "There was an error connecting to the database.";
+            pageData.errorCode = 500;
             logger.error(`DatabaseConnectionError when DELETING car part ${partNumber} -- deletePart`);
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
-            const data = {
-                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable.",
-                errorCode: 500
-            }
+            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+            pageData.errorCode = 404;
             logger.error(`InvalidInputError when DELETING car part ${partNumber} -- deletePart`);
-            response.status(404).render('home.hbs', data);
+            response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
-            const data = {
-                alertMessage: `Unexpected error while trying to show part: ${error.message}`,
-                errorCode: 500
-            }
+            pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
+            pageData.errorCode = 500;
             logger.error(`OTHER error when DELETING car part ${partNumber} -- deletePart`);
-            response.status(500).render('error.hbs', data);
+            response.status(500).render('error.hbs', pageData);
         }
     }
 }

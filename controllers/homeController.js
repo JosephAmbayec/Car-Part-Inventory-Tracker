@@ -141,15 +141,39 @@ async function sendHome(request, response) {
         response.status(200).render('home.hbs', pageData);
     } 
     catch (error) {
-        pageData = {
-            alertOccurred: true,
-            alertMessage: "",
-            alertLevel: 'danger',
-            alertLevelText: 'Danger',
-            alertHref: 'exclamation-triangle-fill',
-            loggedInUser: lang,
-            errorCode: "",
-            alertMessage: ""
+        // If language is english
+        if (!lang || lang === 'en'){
+            pageData = {
+                errorCode: 404,
+                alertMessage: "There was a slight error...",
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                endpointLogInLogOut: endpoint,
+                about_text: "About Us",
+                signUpText: "Sign Up",
+                Home: "Home", 
+                loggedInUser: login,
+                projects_text: "Projects",
+                footerData: footerLangObject(lang)
+            }
+        }
+        // If language is french
+        else {
+            pageData = {
+                display_signup: "block",
+                display_login: "block",
+                endpointLogInLogOut: endpoint,
+                projects_text: "Projets",
+                about_text: "À propos de nous",
+                signUpText: "Enregistrer",
+                Home: "Accueil",
+                projects_text: "Projets",
+                display_signup: signupDisplay,
+                loggedInUser: login,
+                logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                footerData: footerLangObject(lang)
+            }
         }
 
         // If the error is an instance of the DatabaseConnectionError error
