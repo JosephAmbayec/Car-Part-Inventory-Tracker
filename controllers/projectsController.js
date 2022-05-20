@@ -371,6 +371,8 @@ async function showCreateForm(request, response) {
 async function addCarPart(request, response) {
     let login = loginController.authenticateUser(request);
     let signupDisplay, endpoint, logInText;
+    let partNumber = request.body.partNumber;
+    let projectId = request.params.projectId;
 
         // Set the login to the username if response is not null
         if(login != null) {
@@ -378,108 +380,102 @@ async function addCarPart(request, response) {
             signupDisplay = "none";
             endpoint = "logout";
             logInText = "Log Out";
+
+            let role = await usersModel.determineRole(login);
+    
+            try {
+                await projectModel.addPartToProject(projectId, partNumber);
+        
+                const lang = request.cookies.language;
+                let pageData;
+        
+                if (!lang || lang === 'en') {
+                    pageData = {
+                        alertOccurred: true,
+                        alertMessage: "You have successfully added to a project!",
+                        alertLevel: 'success',
+                        alertLevelText: 'success',
+                        alertHref: 'exclamation-triangle-fill',
+                        display_signup: "none",
+                        display_login: "block",
+                        logInlogOutText: logInText,
+                        signUpText: "Sign Up",
+                        endpointLogInLogOut: endpoint,
+                        clickedNewProject: false,
+                        Home: "Home",
+                        loggedInUser: login,
+                        Add: role === 1 ? "Add a Car part" : "",
+                        Show: "Find a Car Part",
+                        List: "Show all Car Parts",
+                        Edit: role === 1 ? "Update a Car Part" : "",
+                        Delete: role === 1 ? "Delete a Car Part" : "",
+                        projects_text: "Projects",
+                        about_text: "About Us",
+                        Current: "English"
+                    }
+                }
+                else {
+                    pageData = {
+                        alertOccurred: true,
+                        alertMessage: "Vous avez ajouté à un projet avec succès!",
+                        alertLevel: 'success',
+                        alertLevelText: 'success',
+                        alertHref: 'exclamation-triangle-fill',
+                        display_signup: signupDisplay,
+                        display_login: "block",
+                        logInlogOutText: "Déconnecter",
+                        signUpText: "Enregistrer",
+                        endpointLogInLogOut: endpoint,
+                        clickedNewProject: false,
+                        Home: "Accueil",
+                        loggedInUser: login,
+                        Add: role === 1 ? "Ajouter une Pièce Auto" : "",
+                        Show: "Trouver une Pièce Auto",
+                        List: "Afficher Toutes les Pièces de Voiture",
+                        Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
+                        Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
+                        projects_text: "Projets",
+                        about_text: "À propos de nous",
+                        Current: "French"
+                    }
+                }
+        
+                response.cookie("lastAccessedProject", projectId);
+                response.status(201).render('home.hbs', pageData);
+            }
+            catch (error) {
+                const pageData = {
+                    alertOccurred: true,
+                    alertMessage: "",
+                    alertLevel: 'danger',
+                    alertLevelText: 'Danger',
+                    alertHref: 'exclamation-triangle-fill',
+                    loggedInUser: login
+                }
+        
+                if (error instanceof sqlModel.DatabaseConnectionError) {
+                    pageData.alertMessage = "Error connecting to database.";
+                    logger.error(`DatabaseConnectionError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
+                    response.status(500).render('home.hbs', pageData);
+                }
+                // If the error is an instance of the InvalidInputError error
+                else if (error instanceof sqlModel.InvalidInputError) {
+                    pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
+                    logger.error(`UserLoginError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
+                    response.status(404).render('home.hbs', pageData);
+                }
+                // If any other error occurs
+                else {
+                    pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
+                    logger.error(`OTHER error when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
+                    response.status(500).render('home.hbs', pageData);
+                }
+            }
         }
         // Redirect to home page since a user shouldn't be viewing the project if not logged in
         else{
-            // signupDisplay = "block";
-            // endpoint = "login";
-            // logInText = "Log In";
             response.redirect('/parts');
         }
-
-        let role = await usersModel.determineRole(login);
-    
-    try {
-        let partNumber = request.body.partNumber;
-        let projectId = request.params.projectId;
-
-        await projectModel.addPartToProject(projectId, partNumber);
-
-        const lang = request.cookies.language;
-        let pageData;
-
-        if (!lang || lang === 'en') {
-            pageData = {
-                alertOccurred: true,
-                alertMessage: "You have successfully added to a project!",
-                alertLevel: 'success',
-                alertLevelText: 'success',
-                alertHref: 'exclamation-triangle-fill',
-                display_signup: "none",
-                display_login: "block",
-                logInlogOutText: logInText,
-                signUpText: "Sign Up",
-                endpointLogInLogOut: endpoint,
-                clickedNewProject: false,
-                Home: "Home",
-                loggedInUser: login,
-                Add: role === 1 ? "Add a Car part" : "",
-                Show: "Find a Car Part",
-                List: "Show all Car Parts",
-                Edit: role === 1 ? "Update a Car Part" : "",
-                Delete: role === 1 ? "Delete a Car Part" : "",
-                projects_text: "Projects",
-                about_text: "About Us",
-                Current: "English"
-            }
-        }
-        else {
-            pageData = {
-                alertOccurred: true,
-                alertMessage: "Vous avez ajouté à un projet avec succès!",
-                alertLevel: 'success',
-                alertLevelText: 'success',
-                alertHref: 'exclamation-triangle-fill',
-                display_signup: signupDisplay,
-                display_login: "block",
-                logInlogOutText: "Déconnecter",
-                signUpText: "Enregistrer",
-                endpointLogInLogOut: endpoint,
-                clickedNewProject: false,
-                Home: "Accueil",
-                loggedInUser: login,
-                Add: role === 1 ? "Ajouter une Pièce Auto" : "",
-                Show: "Trouver une Pièce Auto",
-                List: "Afficher Toutes les Pièces de Voiture",
-                Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
-                Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
-                projects_text: "Projets",
-                about_text: "À propos de nous",
-                Current: "French"
-            }
-        }
-
-        response.cookie("lastAccessedProject", projectId);
-        response.status(201).render('home.hbs', pageData);
-    }
-    catch (error) {
-        const pageData = {
-            alertOccurred: true,
-            alertMessage: "",
-            alertLevel: 'danger',
-            alertLevelText: 'Danger',
-            alertHref: 'exclamation-triangle-fill',
-            loggedInUser: login
-        }
-
-        if (error instanceof sqlModel.DatabaseConnectionError) {
-            pageData.alertMessage = "Error connecting to database.";
-            logger.error(`DatabaseConnectionError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
-            response.status(500).render('home.hbs', pageData);
-        }
-        // If the error is an instance of the InvalidInputError error
-        else if (error instanceof sqlModel.InvalidInputError) {
-            pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-            logger.error(`UserLoginError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
-            response.status(404).render('home.hbs', pageData);
-        }
-        // If any other error occurs
-        else {
-            pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
-            logger.error(`OTHER error when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
-            response.status(500).render('home.hbs', pageData);
-        }
-    }
 }
 
 let theProjectId;
