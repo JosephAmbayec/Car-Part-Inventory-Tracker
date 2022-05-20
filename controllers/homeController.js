@@ -36,7 +36,8 @@ async function sendHome(request, response) {
         if (accessProject && accessProject != '-1'){
             AccessProject = true;
             AccessProjectName = await projectModel.getProjectByProjectId(accessProject)
-            AccessProjectName = AccessProjectName[0].name;
+            //AccessProjectName = AccessProjectName[0].name;
+            AccessProjectName = accessProject[0].name;
         }
     
         // If the user just registered
