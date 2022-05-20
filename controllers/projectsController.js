@@ -65,7 +65,9 @@ async function createProject(request, response) {
                 about_text: "About Us",
                 endpointLogInLogOut: endpoint,
                 projects_text: "Projects",
-                clickedNewProject: true
+                clickedNewProject: true,
+                new_project: "New Project",
+                your_projects: "Your Projects",
             }
         }
         else {
