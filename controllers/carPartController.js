@@ -23,6 +23,8 @@ async function createPart(request, response){
     let image = request.body.image;
     let condition = request.body.addingForm;
     const lang = request.cookies.language;
+    let signupDisplay, endpoint, logInText;
+    let login = loginController.authenticateUser(request);
 
     // If the image is not a valid url, set image to null
     if (!validUtils.isURL(image)){
@@ -35,45 +37,144 @@ async function createPart(request, response){
         condition = "unknown";
         logger.info("Setting condition to 'unknown' -- createPart");
     }
-        
-    try {
-        await sqlModel.addCarPart(number, partName, condition, image);
-        logger.info(`CREATED car part (Part #${number}, ${partName}, Condition: ${condition}) -- createPart`);
 
-        response.status(201).render('home.hbs', {alertOccurred: true, alertMessage: `Created part: Part #${number}, ${partName}, Condition: ${condition}`});
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
 
-    } 
-    catch(error) {
-
-        // If the error is an instance of the DatabaseConnectionError error
-        if (error instanceof sqlModel.DatabaseConnectionError){
-            const data = {
-                alertMessage: "There was an error connecting to the database.",
-                errorCode: 500
+        try {
+            await sqlModel.addCarPart(number, partName, condition, image);
+            logger.info(`CREATED car part (Part #${number}, ${partName}, Condition: ${condition}) -- createPart`);
+    
+            let role = await userModel.determineRole(login);
+    
+            let output = {
+                alertOccurred: true,
+                alertMessage: `Created part: Part #${number}, ${partName}, Condition: ${condition}`,
+                showList: true,
+                display_signup: signupDisplay,
+                display_login: "block",
+                logInlogOutText: logInText,
+                signUpText: "Sign Up",
+                endpointLogInLogOut: endpoint,
+                Home: "Home",
+                Add: role === 1 ? "Add a car part" : "",
+                Show: "Find a Car Part",
+                List: "Show all Car Parts",
+                Edit: role === 1 ? "Update a Car Part" : "",
+                Delete: role === 1 ? "Delete a Car Part" : "",
+                Current: "English",
+                loggedInUser: login,
+                projects_text: "Projects",
+                about_text: "About Us",
+                inv_actions: "",
+                addToProjText: "",
+                partNumText: "",
+                partNameText: "",
+                partCondition: "",
+                partImage: "",
+                partDelete: "",
+                allPartsText: "",
+                footerData: footerLangObject(lang),
+                part: await sqlModel.findAllCarParts(),
+                alertLevel: 'success',
+                    alertLevelText: 'success',
+                    alertHref: 'exclamation-triangle-fill',
             }
-            logger.error("DatabaseConnectionError when CREATING part -- createPart");
-            response.status(500).render('error.hbs', data);
-        }
-        // If the error is an instance of the InvalidInputError error
-        else if (error instanceof sqlModel.InvalidInputError){
-            const data = {
-                alertMessage: "Invalid input, check that all fields are alpha numeric where applicable. Ensure the url is a valid image url",
-                errorCode: 404
+    
+            // If the language is english
+            if (!lang || lang === 'en') {
+                output.signUpText = "Sign Up";
+                output.Add = role === 1 ? "Add a car part" : "";
+                output.Show = "Find a Car Part";
+                output.List = "Show all Car Parts";
+                output.Edit = role === 1 ? "Update a Car Part" : "";
+                output.Delete = role === 1 ? "Delete a Car Part" : "";
+                output.projects_text = "Projects";
+                output.about_text = "About Us"
+                output.Home = "Home";
+                output.Current = "English";
+                output.inv_actions = "Inventory Actions";
+                output.addToProjText = "Add to Project";
+                output.partNumText = "Part #";
+                output.partNameText = "Part Name";
+                output.partCondition = "Condition";
+                output.partImage = "Image";
+                output.partDelete = "Delete";
+                output.allPartsText = "All car parts in the inventory";
             }
-            logger.error("InvalidInputError when CREATING part -- createPart");
-            response.status(404).render('home.hbs', data);
-        }
-        // If any other error
-        else {
-            const data = {
-                alertMessage: `Unexpected error while trying to add part: ${error.message}`,
-                errorCode: 500
+            // If the language is french
+            else{
+                output.alertMessage = `Pièce D'auto Créée: Numéro ${number}, ${partName}, Condition: ${condition}`;
+                output.signUpText = "Enregistrer";
+                output.Add = role === 1 ? "Ajouter une Pièce Auto" : "";
+                output.Show = "Trouver une Pièce Auto";
+                output.List = "Afficher Toutes les Pièces de Voiture";
+                output.Edit = role === 1 ? "Mettre à Jour une Pièce Auto" : "";
+                output.Delete = role === 1 ? "Supprimer une Pièce Auto" : "";
+                output.projects_text = "Projets";
+                output.about_text = "À Propos de Nous";
+                output.Home = "Accueil";
+                output.Current = "French";
+                output.inv_actions = "Actions D'inventaire";
+                output.addToProjText = "Ajouter au Projet";
+                output.partNumText = "Pièce #";
+                output.partNameText = "Nom de la Pièce";
+                output.partCondition = "État";
+                output.partImage = "Image";
+                output.partDelete = "Supprimer";
+                output.allPartsText = "Toutes les Pièces Autos en Inventaire";
+    
+                if(logInText === "Log In"){
+                    output.logInlogOutText = "Connexion";
+                }
+                else if(logInText === "Log Out"){
+                    output.logInlogOutText = "Se déconnecter";
+                }
             }
-            logger.error("OTHER error when CREATING part -- createPart");
-            response.status(500).render('error.hbs', data);
+    
+            response.status(201).render('home.hbs', output);
+    
+        } 
+        catch(error) {
+    
+            // If the error is an instance of the DatabaseConnectionError error
+            if (error instanceof sqlModel.DatabaseConnectionError){
+                const data = {
+                    alertMessage: "There was an error connecting to the database.",
+                    errorCode: 500
+                }
+                logger.error("DatabaseConnectionError when CREATING part -- createPart");
+                response.status(500).render('error.hbs', data);
+            }
+            // If the error is an instance of the InvalidInputError error
+            else if (error instanceof sqlModel.InvalidInputError){
+                const data = {
+                    alertMessage: "Invalid input, check that all fields are alpha numeric where applicable. Ensure the url is a valid image url",
+                    errorCode: 404
+                }
+                logger.error("InvalidInputError when CREATING part -- createPart");
+                response.status(404).render('home.hbs', data);
+            }
+            // If any other error
+            else {
+                const data = {
+                    alertMessage: `Unexpected error while trying to add part: ${error.message}`,
+                    errorCode: 500
+                }
+                logger.error("OTHER error when CREATING part -- createPart");
+                response.status(500).render('error.hbs', data);
+            }
         }
     }
+    else{
+        response.redirect('/parts');
+    }
 }
+
 /**
  * GET controller method that allows the user to retrieve the part with the given part number
  * @param {*} request 
