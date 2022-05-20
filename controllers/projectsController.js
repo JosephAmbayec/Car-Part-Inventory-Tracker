@@ -178,7 +178,7 @@ async function showProjects(request, response) {
         if (!lang || lang === 'en') {
             pageData = {
                 alertOccurred: false,
-                showTable: true,
+                showList: true,
                 tableMessage: "You do not have any Projects.",
                 titleName: 'Create a Project',
                 pathNameForActionForm: 'projects',
@@ -198,7 +198,7 @@ async function showProjects(request, response) {
         else {
             pageData = {
                 alertOccurred: false,
-                showTable: true,
+                showList: true,
                 tableMessage: "Vous n'avez aucun Projet.",
                 titleName: 'Créer un Projet',
                 pathNameForActionForm: 'projects',
@@ -369,6 +369,26 @@ async function showCreateForm(request, response) {
  */
 
 async function addCarPart(request, response) {
+    let login = loginController.authenticateUser(request);
+    let signupDisplay, endpoint, logInText;
+
+        // Set the login to the username if response is not null
+        if(login != null) {
+            login = login.userSession.username;
+            signupDisplay = "none";
+            endpoint = "logout";
+            logInText = "Log Out";
+        }
+        // Redirect to home page since a user shouldn't be viewing the project if not logged in
+        else{
+            // signupDisplay = "block";
+            // endpoint = "login";
+            // logInText = "Log In";
+            response.redirect('/parts');
+        }
+
+        let role = await usersModel.determineRole(login);
+    
     try {
         let partNumber = request.body.partNumber;
         let projectId = request.params.projectId;
@@ -387,17 +407,17 @@ async function addCarPart(request, response) {
                 alertHref: 'exclamation-triangle-fill',
                 display_signup: "none",
                 display_login: "block",
-                logInlogOutText: "Log Out",
+                logInlogOutText: logInText,
                 signUpText: "Sign Up",
-                endpointLogInLogOut: "login",
+                endpointLogInLogOut: endpoint,
                 clickedNewProject: false,
                 Home: "Home",
-                loggedInUser: true,
-                Add: "Add a Car part",
+                loggedInUser: login,
+                Add: role === 1 ? "Add a Car part" : "",
                 Show: "Find a Car Part",
                 List: "Show all Car Parts",
-                Edit: "Update a Car Part",
-                Delete: "Delete a Car Part",
+                Edit: role === 1 ? "Update a Car Part" : "",
+                Delete: role === 1 ? "Delete a Car Part" : "",
                 projects_text: "Projects",
                 about_text: "About Us",
                 Current: "English"
@@ -410,25 +430,24 @@ async function addCarPart(request, response) {
                 alertLevel: 'success',
                 alertLevelText: 'success',
                 alertHref: 'exclamation-triangle-fill',
-                display_signup: "none",
+                display_signup: signupDisplay,
                 display_login: "block",
                 logInlogOutText: "Déconnecter",
                 signUpText: "Enregistrer",
-                endpointLogInLogOut: "login",
+                endpointLogInLogOut: endpoint,
                 clickedNewProject: false,
                 Home: "Accueil",
-                loggedInUser: true,
-                Add: "Ajouter une Pièce Auto",
+                loggedInUser: login,
+                Add: role === 1 ? "Ajouter une Pièce Auto" : "",
                 Show: "Trouver une Pièce Auto",
                 List: "Afficher Toutes les Pièces de Voiture",
-                Edit: "Mettre à Jour une Pièce Auto",
-                Delete: "Supprimer une Pièce Auto",
+                Edit: role === 1 ? "Mettre à Jour une Pièce Auto" : "",
+                Delete: role === 1 ? "Supprimer une Pièce Auto" : "",
                 projects_text: "Projets",
                 about_text: "À propos de nous",
                 Current: "French"
             }
         }
-
 
         response.cookie("lastAccessedProject", projectId);
         response.status(201).render('home.hbs', pageData);
@@ -440,7 +459,7 @@ async function addCarPart(request, response) {
             alertLevel: 'danger',
             alertLevelText: 'Danger',
             alertHref: 'exclamation-triangle-fill',
-            loggedInUser: LOGGED_IN_USER
+            loggedInUser: login
         }
 
         if (error instanceof sqlModel.DatabaseConnectionError) {
