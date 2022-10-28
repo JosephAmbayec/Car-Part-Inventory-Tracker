@@ -20,13 +20,23 @@ var connection;
 async function initializeUserModel(dbname, reset){
 
     try {
-        connection = await mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            port: '10000',
-            password: 'pass',
-            database: dbname
-        })
+        if (process.env.DATABASE_URL) {
+            connection = new Client({
+                connectionString: process.env.DATABASE_URL,
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            })
+        } else {
+            connection = new Client({
+                host: process.env.DB_HOST || 'localhost',
+                user: process.env.DB_USER || 'root',
+                port: process.env.DB_PORT || '10000',
+                password: process.env.DB_PASSWORD || 'pass',
+                database: dbname // assumes this was passed in as a parameter to initialize function
+            });
+        }
+
     
         // Dropping the tables if resetting them
         if (reset) {
@@ -48,7 +58,7 @@ async function resetTables(connection){
     // Dropping the Users table
     resetTable("Users");
     // let dropQuery = "DROP TABLE IF EXISTS Users";
-    // await connection.execute(dropQuery);
+    // await connection.query(dropQuery);
     // logger.info("Users table dropped");
     // .then(console.log("User table dropped")).catch((error) => { console.error(error) });
 
@@ -58,25 +68,25 @@ async function resetTables(connection){
 
 async function createTables(connection){
     const createRoleStatement = `CREATE TABLE IF NOT EXISTS Roles(roleID int, rolename VARCHAR(50), PRIMARY KEY (roleID))`;
-    await connection.execute(createRoleStatement);
+    await connection.query(createRoleStatement);
     logger.info("Roles table created/exists");
     // .then(logger.info("Role table created/exists")).catch((error) => { logger.error(error) });
 
     // Ignoring invalid data into Roles table
     let insertDefaultRoles = 'INSERT IGNORE INTO Roles(roleID, rolename) values (1, "admin");';
-    await connection.execute(insertDefaultRoles);
+    await connection.query(insertDefaultRoles);
     logger.info("Roles table created/exists");
     // .then(logger.info("Role table created/exists")).catch((error) => { logger.error(error) });
 
     // Ignoring invalid data into Roles table
     insertDefaultRoles = 'INSERT IGNORE INTO Roles(roleID, rolename) values (2, "guest");';
-    await connection.execute(insertDefaultRoles);
+    await connection.query(insertDefaultRoles);
     logger.info("Roles table created/exists");
     // .then(logger.info("Role table created/exists")).catch((error) => { logger.error(error) });
 
     // Creating the Users table
-    let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id int AUTO_INCREMENT, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
-    await connection.execute(createTableStatement);
+    let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id int SERIAL, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
+    await connection.query(createTableStatement);
     logger.info("Users table created/exists");
 }
 //#endregion
@@ -104,8 +114,8 @@ async function getConnection(){
  */
  async function resetTable(tableName){
     try {
-        const dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
-        await connection.execute(dropQuery);
+        const dropQuery = `DROP TABLE IF EXISTS $1`;
+        await connection.query(dropQuery, [tableName]);
         logger.info(`${tableName} table dropped`);
 
     } catch (error) {
@@ -118,8 +128,8 @@ async function getConnection(){
 async function getUserByName(username){
     if (username == undefined || username == null || username.length == 0)
         return -1;
-    let query = `SELECT id from Users where username = '${username}'`;
-    let result = await connection.query(query);
+    let query = `SELECT id from Users where username = '$1'`;
+    let result = await connection.query(query, [username]);
     return result[0][0].id;
 }
 /**
@@ -141,9 +151,9 @@ async function addUser(username, password) {
         if (userUtils.isValidPassword(password)){
             try {
                 let hashedPassword = await userUtils.hashPassword(password);
-                let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', '2');`
+                let insertQuery = `INSERT INTO Users(username, password, roleID) values ('$1', '$2', '2');`
 
-                await connection.execute(insertQuery);
+                await connection.query(insertQuery, [username, password]);
                 logger.info("User added successfully to the database");
             }
             catch (err) {
@@ -174,7 +184,7 @@ async function showAllUsers(){
         let userArray = await connection.query(queryStatement);
         logger.info("Successfully retrieved all users from the database");
         
-        return userArray[0];
+        return userArray.rows;
     }
     catch(error){
         logger.error(error);
@@ -190,8 +200,8 @@ async function showAllUsers(){
 async function getRole(username){
     // First checks if the user actually exists in the database
     if (await userExists(username)){
-        const queryStatement = `SELECT Users.roleID FROM Users INNER JOIN Roles on Users.roleID = Roles.roleID where username = '${username}'`;
-        let result = await connection.query(queryStatement);
+        const queryStatement = `SELECT Users.roleID FROM Users INNER JOIN Roles on Users.roleID = Roles.roleID where username = '$1'`;
+        let result = await connection.query(queryStatement, [username]);
         let toReturn = result[0];
 
         logger.info(`Successfully retrieved the role id of the user (${username})`);
@@ -214,8 +224,8 @@ async function getRole(username){
  */
  async function userExists(username){
     try {
-        const findUser = `SELECT username FROM Users where username = '${username}'`;
-        const [rows, fields] = await connection.query(findUser);
+        const findUser = `SELECT username FROM Users where username = '$1'`;
+        const [rows, fields] = await connection.query(findUser, [username]);
 
         if (rows.length != 0){
             logger.info(`User ${username} EXISTS in the database`);  
@@ -244,8 +254,8 @@ async function getRole(username){
 async function validateLogin(username, password){
     // First checks if the user actually exists in the database
     if (await userExists(username)){
-        const queryStatement = `SELECT password FROM Users where username = '${username}'`;
-        let result = await connection.query(queryStatement);
+        const queryStatement = `SELECT password FROM Users where username = '$1'`;
+        let result = await connection.query(queryStatement, [username]);
         return userUtils.validateLogin(password, result[0]);
     }
     else{

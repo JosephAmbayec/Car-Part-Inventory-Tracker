@@ -1,5 +1,5 @@
 'use strict';
-
+const {Client} = require('pg');
 const mysql = require('mysql2/promise');
 const validUtils = require('../validateUtils.js');
 const logger = require('../logger');
@@ -18,41 +18,51 @@ var connection = model.getConnection();
 async function initializeProjectModel(dbname, reset){
 
     try {
-        connection = await mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            port: '10000',
-            password: 'pass',
-            database: dbname
-        })
+        if (process.env.DATABASE_URL) {
+            connection = new Client({
+                connectionString: process.env.DATABASE_URL,
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            })
+        } else {
+            connection = new Client({
+                host: process.env.DB_HOST || 'localhost',
+                user: process.env.DB_USER || 'root',
+                port: process.env.DB_PORT || '10000',
+                password: process.env.DB_PASSWORD || 'pass',
+                database: dbname // assumes this was passed in as a parameter to initialize function
+            });
+        }
+            
     
         if (reset) {
             await resetTable("PartProject");
             await resetTable("UsersProject");
             await resetTable("Project");
         }
-        let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id int AUTO_INCREMENT, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
-        await connection.execute(createTableStatement);
+        let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id int SERIAL, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
+        await connection.query(createTableStatement);
         logger.info("Users table created/exists");
 
         createTableStatement = 'CREATE TABLE IF NOT EXISTS carPart(partNumber int, name VARCHAR(100), `condition` VARCHAR(50), image VARCHAR(2000), PRIMARY KEY (partNumber))';
-        await connection.execute(createTableStatement);
+        await connection.query(createTableStatement);
         logger.info("Car part table created/exists");
 
-        createTableStatement = 'CREATE TABLE IF NOT EXISTS Project(projectId int AUTO_INCREMENT, name VARCHAR(50), description VARCHAR(255), PRIMARY KEY (projectId))';
-        await connection.execute(createTableStatement);
+        createTableStatement = 'CREATE TABLE IF NOT EXISTS Project(projectId int SERIAL, name VARCHAR(50), description VARCHAR(255), PRIMARY KEY (projectId))';
+        await connection.query(createTableStatement);
         logger.info("Project table created/exists");
 
         createTableStatement = 'CREATE TABLE IF NOT EXISTS PartProject(projectId int, partNumber int,  FOREIGN KEY (partNumber) REFERENCES carPart(partNumber), FOREIGN KEY (projectId) REFERENCES Project(projectId), PRIMARY KEY (projectId, partNumber))';
-        await connection.execute(createTableStatement);
+        await connection.query(createTableStatement);
         logger.info("PartProject table created/exists");
 
         createTableStatement = 'CREATE TABLE IF NOT EXISTS UsersProject(projectId int, id int,  FOREIGN KEY (id) REFERENCES Users(id), FOREIGN KEY (projectId) REFERENCES Project(projectId), PRIMARY KEY (projectId, id))';
-        await connection.execute(createTableStatement);
+        await connection.query(createTableStatement);
         logger.info("UsersProject table created/exists");
 
         
-
+        connection.connect()
         return connection;
     
     } catch (err) {
@@ -73,8 +83,8 @@ async function getConnection(){
  */
  async function resetTable(tableName){
     try {
-        const dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
-        await connection.execute(dropQuery);
+        const dropQuery = `DROP TABLE IF EXISTS $1}`;
+        await connection.query(dropQuery, [tableName]);
         logger.info(`${tableName} table dropped`);
 
     } catch (error) {
@@ -91,8 +101,8 @@ async function getConnection(){
  */
  async function addProject(name, description){
     try {
-        const insertStatement = `INSERT INTO Project (name, description) values ('${name}', '${description}')`;
-        let projectId = await connection.execute(insertStatement);
+        const insertStatement = `INSERT INTO Project (name, description) values ('$1', '$2')`;
+        let projectId = await connection.query(insertStatement, [name, description]);
         return projectId[0].insertId;
     }    
     catch (error) {
@@ -107,8 +117,8 @@ async function getConnection(){
  */
 async function getAllProjects(username){
     let userId = await userModel.getUserByName(username);
-    let query = `SELECT name, description FROM Project, UsersProject as U where U.id = ${userId}`;
-    let results = await connection.query(query);
+    let query = `SELECT name, description FROM Project, UsersProject as U where U.id = $1`;
+    let results = await connection.query(query, [username]);
     return results[0];
 }
 
@@ -121,8 +131,8 @@ async function addPartToProject(projectId, partNumber){
     try {
         if (projectExists(projectId) && partModel.verifyCarPartExists(partNumber)) {
 
-            const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values (${projectId}, ${partNumber})`;
-            await connection.execute(insertStatement);
+            const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values ($1, $2})`;
+            await connection.query(insertStatement, [projectId, partNumber]);
         }
         else
             throw new DatabaseConnectionError();
@@ -142,8 +152,8 @@ async function addUserToProject(projectId, id) {
     try {
         if (projectExists(projectId) && userModel.userExists(id)) {
 
-            const insertStatement = `INSERT INTO UsersProject (projectId, id) values (${projectId}, ${id})`;
-            await connection.execute(insertStatement);
+            const insertStatement = `INSERT INTO UsersProject (projectId, id) values ($1, $2)`;
+            await connection.query(insertStatement, [projectId, id]);
         }
         else
             throw new DatabaseConnectionError();
@@ -161,8 +171,8 @@ async function addUserToProject(projectId, id) {
  */
 async function projectExists(projectId){
     try {
-        const selectStatement = `SELECT projectId from Project where projectId = ${projectId}`;
-        let projectArray = await connection.query(selectStatement);
+        const selectStatement = `SELECT projectId from Project where projectId = $1`;
+        let projectArray = await connection.query(selectStatement, [projectId]);
         if (projectArray[0].length != 0)
             return true;
         return false;

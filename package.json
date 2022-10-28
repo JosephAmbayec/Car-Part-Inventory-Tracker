@@ -9,6 +9,7 @@
   "dependencies": {
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
     "express": "^4.17.3",
     "express-handlebars": "^6.0.4",
     "jest": "^27.5.1",
@@ -16,6 +17,7 @@
     "jquery": "^3.6.0",
     "method-override": "^3.0.0",
     "mysql2": "^2.3.3",
+    "pg": "^8.8.0",
     "pino": "^7.10.0",
     "pino-caller": "^3.2.0",
     "pino-http": "^6.6.0",
@@ -26,7 +28,6 @@
     "validator": "^13.7.0"
   },
   "scripts": {
-    "test": "jest --verbose --detectOpenHandles ./tests",
     "start": "node server.js"
   },
   "jest": {
@@ -45,5 +46,6 @@
   "homepage": "https://github.com/JosephAmbayec/Web2Assignment1#readme",
   "devDependencies": {
     "jsdoc": "^3.6.10"
-  }
+  }    
 }
+

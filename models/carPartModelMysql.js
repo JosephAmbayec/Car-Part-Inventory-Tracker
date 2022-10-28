@@ -1,6 +1,6 @@
 'use strict';
 
-const mysql = require('mysql2/promise');
+const {Client} = require('pg');
 const validUtils = require('../validateUtils.js');
 const logger = require('../logger');
 const userModel = require('../models/userModel');
@@ -19,13 +19,22 @@ var connection;
 async function initialize(dbname, reset){
 
     try {
-        connection = await mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            port: '10000',
-            password: 'pass',
-            database: dbname
-        })
+        if (process.env.DATABASE_URL) {
+            connection = new Client({
+                connectionString: process.env.DATABASE_URL,
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            })
+        } else {
+            connection = new Client({
+                host: process.env.DB_HOST || 'localhost',
+                user: process.env.DB_USER || 'root',
+                port: process.env.DB_PORT || '10000',
+                password: process.env.DB_PASSWORD || 'pass',
+                database: dbname // assumes this was passed in as a parameter to initialize function
+            });
+        }          
     
         // Dropping the tables if resetting them
         if (reset){
@@ -37,9 +46,10 @@ async function initialize(dbname, reset){
 
         // Creating the carPart table
         let createTableStatement = 'CREATE TABLE IF NOT EXISTS carPart(partNumber int, name VARCHAR(100), `condition` VARCHAR(50), image VARCHAR(2000), PRIMARY KEY (partNumber))';
-        await connection.execute(createTableStatement);
+        await connection.query(createTableStatement);
         logger.info("Car part table created/exists");
 
+        connection.connect();
         return connection
     }
     catch (error){
@@ -69,8 +79,8 @@ async function getConnection(){
  */
 async function resetTable(table){
     try {
-        const dropQuery = `DROP TABLE IF EXISTS ${table}`;
-        await connection.execute(dropQuery);
+        const dropQuery = `DROP TABLE IF EXISTS $1`;
+        await connection.query(dropQuery, [table]);
         logger.info("Car part table dropped");
         // .then(logger.info("Car part table dropped")).catch((error) => { logger.error(error) });
 
@@ -105,8 +115,8 @@ async function addCarPart(partNumber, name, condition, image){
     }
 
     try {
-        const addStatement = 'INSERT INTO carPart(partNumber, name, `condition`' + `, image) values ('${partNumber}', '${name}', '${condition}', '${image}');`;
-        await connection.execute(addStatement);
+        const addStatement = 'INSERT INTO carPart(partNumber, name, `condition`' + `, image) values ('$1', '$2', '$3', '$4');`;
+        await connection.query(addStatement, [partNumber, name, condition, image]);
         logger.info(`ADDED car part (${partNumber}) to the database.`);
 
         return { "partNumber": partNumber, "name": name, "condition": condition, "image": image };           
@@ -130,11 +140,11 @@ async function findCarPartByNumber(partNumber){
     }
 
     try {
-        const queryStatement = `SELECT * FROM carPart WHERE partNumber= '${partNumber}';`;
-        let carPartArray = await connection.query(queryStatement);
+        const queryStatement = `SELECT * FROM carPart WHERE partNumber= '$1';`;
+        let carPartArray = await connection.query(queryStatement, [partNumber]);
         logger.info(`FOUND the car part (${partNumber}) in the database.`);
 
-        return carPartArray[0];
+        return carPartArray.rows[0];
     }
     catch(error){
         logger.error(error);
@@ -152,7 +162,7 @@ async function findAllCarParts(){
         let carPartArray = await connection.query(queryStatement);
         logger.info("FOUND ALL the car parts in the database.");
 
-        return carPartArray[0];
+        return carPartArray.rows[0];
     }
     catch(error){
         logger.error(error);
@@ -174,8 +184,8 @@ async function updateCarPartName(partNumber, name){
     }
     
     try {
-        const addStatement = `UPDATE carPart SET name = '${name}' WHERE partNumber = ${partNumber};`;
-        await connection.query(addStatement);
+        const addStatement = `UPDATE carPart SET name = '$1' WHERE partNumber = $2;`;
+        await connection.query(addStatement[name, partNumber]);
         logger.info(`UPDATED the car part (${partNumber}) in the database.`);
 
         return { "partNumber": partNumber, "name": name };
@@ -199,8 +209,8 @@ async function updateCarPartName(partNumber, name){
     }
 
     try {
-        const addStatement = `DELETE FROM carPart where partNumber = ${partNumber};`;
-        await connection.execute(addStatement);
+        const addStatement = `DELETE FROM carPart where partNumber = $1;`;
+        await connection.query(addStatement, [partNumber]);
         logger.info(`DELETED the car part (${partNumber}) from the database.`);
 
         return {"partNumber": partNumber }
