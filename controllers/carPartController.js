@@ -320,7 +320,7 @@ async function getPartByNumber(request, response){
         else{
             output = {
                 alertOccurred: true,
-                alertMessage: `Pièce D'auto Trouvée avec Succès ${number}!`,
+                alertMessage: `Successfully found ${number}!`,
                 showList: true,
                 display_signup: signupDisplay,
                 display_login: "block",

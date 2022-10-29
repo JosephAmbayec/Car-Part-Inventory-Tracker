@@ -56,7 +56,7 @@ function isValidPassword(password){
  * @returns Promise containing the comparison result.
  */
  async function validateLogin(plain, hash){
-    const result = await bcrypt.compare(plain, hash[0].password);
+    const result = await bcrypt.compare(plain, hash.password);
     return result;
 }
 

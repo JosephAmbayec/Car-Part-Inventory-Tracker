@@ -42,7 +42,21 @@ async function initializeUserModel(dbname, reset){
             await resetTables(connection);
         }
         
-        await createTables(connection);
+        const createRoleStatement = `CREATE TABLE IF NOT EXISTS Roles(roleID int, rolename VARCHAR(50), PRIMARY KEY (roleID))`;
+        connection.query(createRoleStatement);
+    
+        // Ignoring invalid data into Roles table
+        let insertDefaultRoles = 'INSERT INTO Roles(roleID, rolename) values (1, $1) ON CONFLICT DO NOTHING;';
+        connection.query(insertDefaultRoles, ["admin"]);
+    
+        // Ignoring invalid data into Roles table
+        insertDefaultRoles = 'INSERT INTO Roles(roleID, rolename) values (2, $1) ON CONFLICT DO NOTHING;';
+        connection.query(insertDefaultRoles, ["guest"]);
+    
+        // Creating the Users table
+        let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id SERIAL, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
+        connection.query(createTableStatement);
+
         return connection;
     
     } catch (err) {
@@ -63,26 +77,6 @@ async function resetTables(connection){
     await resetTable("Roles");
 }
 
-/**
- * Creates the specified tables.
- * @param {*} connection The connection to the database.
- */
-async function createTables(connection){
-    const createRoleStatement = `CREATE TABLE IF NOT EXISTS Roles(roleID int, rolename VARCHAR(50), PRIMARY KEY (roleID))`;
-    await connection.query(createRoleStatement);
-
-    // Ignoring invalid data into Roles table
-    let insertDefaultRoles = 'INSERT IGNORE INTO Roles(roleID, rolename) values (1, "admin");';
-    await connection.query(insertDefaultRoles);
-
-    // Ignoring invalid data into Roles table
-    insertDefaultRoles = 'INSERT IGNORE INTO Roles(roleID, rolename) values (2, "guest");';
-    await connection.query(insertDefaultRoles);
-
-    // Creating the Users table
-    let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id SERIAL, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
-    await connection.query(createTableStatement);
-}
 //#endregion
 
 
@@ -108,8 +102,8 @@ async function getConnection(){
  */
  async function resetTable(tableName){
     try {
-        const dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
-        await connection.query(dropQuery);
+        const dropQuery = `DROP TABLE IF EXISTS $1`;
+        await connection.query(dropQuery, [tableName]);
 
     } catch (error) {
         throw new DatabaseConnectionError();
@@ -120,11 +114,11 @@ async function getConnection(){
 async function getUserByName(username){
     if (username == undefined || username == null || username.length == 0)
         return -1;
-    let query = `SELECT id from Users where username = '${username}'`;
-    let result = await connection.query(query);
-    if (result[0].length == 0)
+    let query = `SELECT id from Users where username = $1`;
+    let result = await connection.query(query, [username]);
+    if (result.rows.length == 0)
         return -1;
-    return result[0][0].id;
+    return result.rows[0].id;
 }
 /**
  * Adds a user to the database with the given username and password.
@@ -147,9 +141,9 @@ async function addUser(username, password, role) {
         if (userUtils.isValidPassword(password)){
             try {
                 let hashedPassword = await userUtils.hashPassword(password);
-                let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', 1);`
+                let insertQuery = `INSERT INTO Users(username, password, roleID) values ($1, $2, $3);`
 
-                await connection.query(insertQuery);
+                await connection.query(insertQuery, [username, password, role]);
             }
             catch (err) {
                 throw new DatabaseConnectionError();
@@ -190,9 +184,9 @@ async function showAllUsers(){
 async function getRole(username){
     // First checks if the user actually exists in the database
     if (await userExists(username)){
-        const queryStatement = `SELECT Users.roleID FROM Users INNER JOIN Roles on Users.roleID = Roles.roleID where username = '${username}'`;
-        let result = await connection.query(queryStatement);
-        let toReturn = result[0];
+        const queryStatement = `SELECT Users.roleID FROM Users INNER JOIN Roles on Users.roleID = Roles.roleID where username = $1`;
+        let result = await connection.query(queryStatement, [username]);
+        let toReturn = result.rows;
 
 
         return toReturn[0].roleID;
@@ -237,10 +231,10 @@ async function getRole(username){
  */
  async function userExists(username){
     try {
-        const findUser = `SELECT username FROM Users where username = '${username}'`;
-        const [rows, fields] = await connection.query(findUser);
+        const findUser = `SELECT username FROM Users where username = $1`;
+        const result = await connection.query(findUser, [username]);
 
-        if (rows.length != 0){
+        if (result.rows.length != 0){
             return true;
         }
         else{
@@ -264,9 +258,9 @@ async function getRole(username){
 async function validateLogin(username, password){
     // First checks if the user actually exists in the database
     if (await userExists(username)){
-        const queryStatement = `SELECT password FROM Users where username = '${username}'`;
-        let result = await connection.query(queryStatement);
-        return userUtils.validateLogin(password, result[0]);
+        const queryStatement = `SELECT password FROM Users where username = $1`;
+        let result = await connection.query(queryStatement, [username]);
+        return userUtils.validateLogin(password, result.rows[0]);
     }
     else{
         // show message about username not found
@@ -301,7 +295,6 @@ module.exports = {
     validateLogin,
     getRole,
     getUserByName,
-    createTables,
     resetTables,
     determineRole
 }

@@ -34,7 +34,7 @@
             {{!-- <section id="form-container-update"> --}}
 
                 <!--Form to update the project information-->
-                <form method="POST" action="/projects/{{projectId}}/update" 
+                <form method="POST" action="/projects/{{projectid}}/update" 
                             id="form-loginsignup-update" >
                     <!-- Legend title for the current form-->
                     <legend>{{edit}} '{{projectName}}'</legend>
@@ -81,7 +81,7 @@
                         <div class="card card-show-specific">
                             <div class="card-body">
                                 <!--Form for deleting project part-->
-                                <form action="/projects/del/part/{{../projectId}}/{{partNumber}}" method="post" enctype="multipart/form-data">
+                                <form action="/projects/del/part/{{../projectid}}/{{partNumber}}" method="post" enctype="multipart/form-data">
                                     <input type="hidden" name="_method" value="{{partNumber}}" required>
 
                                     <div class="card-grid">

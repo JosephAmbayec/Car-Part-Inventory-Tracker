@@ -76,9 +76,8 @@ async function getConnection(){
  */
 async function resetTable(table){
     try {
-        const dropQuery = `DROP TABLE IF EXISTS ${table}`;
-        await connection.query(dropQuery);
-
+        const dropQuery = `DROP TABLE IF EXISTS $1`;
+        await connection.query(dropQuery, [table]);
     } catch (error) {
         throw new DatabaseConnectionError();
     }
@@ -108,8 +107,8 @@ async function addCarPart(partNumber, name, condition, image){
     }
 
     try {
-        const addStatement = 'INSERT INTO carPart(partNumber, name, `condition`' + `, image) values ('${partNumber}', '${name}', '${condition}', '${image}');`;
-        await connection.query(addStatement);
+        const addStatement = 'INSERT INTO carPart(partNumber, name, condition, image) values ($1, $2, $3, $4);'
+        await connection.query(addStatement, [partNumber, name, condition, image]);
 
         return { "partNumber": partNumber, "name": name, "condition": condition, "image": image };           
     }
@@ -130,10 +129,10 @@ async function findCarPartByNumber(partNumber){
     }
 
     try {
-        const queryStatement = `SELECT * FROM carPart WHERE partNumber= '${partNumber}';`;
-        let carPartArray = await connection.query(queryStatement);
+        const queryStatement = `SELECT * FROM carPart WHERE partNumber= $1;`;
+        let carPartArray = await connection.query(queryStatement, [partNumber]);
 
-        return carPartArray[0];
+        return carPartArray.rows;
     }
     catch(error){
         throw new DatabaseConnectionError();
@@ -146,10 +145,10 @@ async function findCarPartByNumber(partNumber){
  */
 async function findAllCarParts(){
     try {
-        const queryStatement = "SELECT partNumber, name, `condition` , image FROM carPart;";
+        const queryStatement = "SELECT partNumber, name, condition, image FROM carPart;";
         let carPartArray = await connection.query(queryStatement);
 
-        return carPartArray[0];
+        return carPartArray.rows;
     }
     catch(error){
         throw new DatabaseConnectionError();
@@ -169,8 +168,8 @@ async function updateCarPartName(partNumber, name){
     }
     
     try {
-        const addStatement = `UPDATE carPart SET name = '${name}' WHERE partNumber = ${partNumber};`;
-        await connection.query(addStatement);
+        const addStatement = `UPDATE carPart SET name = $1 WHERE partNumber = $2;`;
+        await connection.query(addStatement, [name, partNumber]);
 
         return { "partNumber": partNumber, "name": name };
     }
@@ -194,13 +193,13 @@ async function updateCarPartName(partNumber, name){
         // Delete from any project first
         let tableExists = await connection.query("SHOW TABLES LIKE 'PartProject'")
         if (tableExists[0].length != 0){
-            let sqlStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
-            await connection.query(sqlStatement);
+            let sqlStatement = `DELETE FROM PartProject WHERE partNumber = $1;`;
+            await connection.query(sqlStatement, [partNumber]);
         }
 
         // Delete from part table
-        let sqlStatement = `DELETE FROM carPart where partNumber = ${partNumber};`;
-        await connection.query(sqlStatement);
+        let sqlStatement = `DELETE FROM carPart where partNumber = $1;`;
+        await connection.query(sqlStatement, [partNumber]);
 
 
         return {"partNumber": partNumber }

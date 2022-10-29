@@ -41,7 +41,7 @@ async function loginUser(request, response) {
         if (result === true) {
 
             // Create a session object that will expire in 2 minutes
-            let sessionId = await session.createSession(username, 2);
+            let sessionId = await session.createSession(username, 20);
 
             // Save cookie that will expire.
             response.cookie("sessionId", sessionId, { expires: sessionModel.sessions[sessionId].expiresAt });

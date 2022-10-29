@@ -221,7 +221,7 @@
                               <!--Add project option to dropdown-->
                               {{#each ../project}}
                                 <!--Create form from dropdown option-->
-                                <form action="/projects/{{this.projectId}}" method="POST" onsubmit="this.action = this.action + '/'+ this.projectId.value" role="form" enctype="application/x-www-form-urlencoded">
+                                <form action="/projects/{{this.projectid}}" method="POST" onsubmit="this.action = this.action + '/'+ this.projectId.value" role="form" enctype="application/x-www-form-urlencoded">
                                   <!--To keep track of the partNumber-->
                                   <input type="hidden" name="partNumber" value="{{../partNumber}}"/>
                                   <!--Sub,it button for dropdown option-->
@@ -236,7 +236,7 @@
                     {{/if}}
                   {{/if}} 
                   
-                  <td>{{partNumber}}</td>
+                  <td>{{partnumber}}</td>
                   <td>{{name}}</td>
                   <td>{{condition}}</td>
 
