@@ -3,7 +3,6 @@
 const mysql = require('mysql2/promise');
 const validUtils = require('../validateUtils.js');
 const userUtils = require('../userUtils.js');
-const logger = require('../logger');
 //const { DatabaseConnectionError } = require('./carPartModelMysql.js'); // Was creating circular dependency
 var connection;
 
@@ -37,7 +36,6 @@ async function initializeUserModel(dbname, reset){
         return connection;
     
     } catch (err) {
-        logger.error(err);
         throw new DatabaseConnectionError();
     }
 }
@@ -62,25 +60,18 @@ async function resetTables(connection){
 async function createTables(connection){
     const createRoleStatement = `CREATE TABLE IF NOT EXISTS Roles(roleID int, rolename VARCHAR(50), PRIMARY KEY (roleID))`;
     await connection.execute(createRoleStatement);
-    logger.info("Roles table created/exists");
-    // .then(logger.info("Role table created/exists")).catch((error) => { logger.error(error) });
 
     // Ignoring invalid data into Roles table
     let insertDefaultRoles = 'INSERT IGNORE INTO Roles(roleID, rolename) values (1, "admin");';
     await connection.execute(insertDefaultRoles);
-    logger.info("Roles table created/exists");
-    // .then(logger.info("Role table created/exists")).catch((error) => { logger.error(error) });
 
     // Ignoring invalid data into Roles table
     insertDefaultRoles = 'INSERT IGNORE INTO Roles(roleID, rolename) values (2, "guest");';
     await connection.execute(insertDefaultRoles);
-    logger.info("Roles table created/exists");
-    // .then(logger.info("Role table created/exists")).catch((error) => { logger.error(error) });
 
     // Creating the Users table
     let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id int AUTO_INCREMENT, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
     await connection.execute(createTableStatement);
-    logger.info("Users table created/exists");
 }
 //#endregion
 
@@ -109,10 +100,8 @@ async function getConnection(){
     try {
         const dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
         await connection.execute(dropQuery);
-        logger.info(`${tableName} table dropped`);
 
     } catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -136,7 +125,6 @@ async function addUser(username, password, role) {
 
     // Checks if the user already exists in the database
     if (await userExists(username)){
-        logger.error("User NOT ADDED due to already existing in database");
         throw new UserLoginError("Username already exists.");
     }
 
@@ -152,22 +140,18 @@ async function addUser(username, password, role) {
                 let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', 1);`
 
                 await connection.execute(insertQuery);
-                logger.info("User added successfully to the database");
             }
             catch (err) {
-                logger.error(err)
                 throw new DatabaseConnectionError();
             }
         }
         // Invalid password
         else{
-            logger.error("User NOT ADDED due to invalid password");
             throw new UserLoginError("Password must be 8 or more characters and include an uppercase character, lowercase character, number and symbol.");
         }
     }
     // Invalid username
     else{
-        logger.error("User NOT ADDED due to invalid username");
         throw new UserLoginError("Username must be between 6 and 15 characters");
     }
 }
@@ -180,12 +164,10 @@ async function showAllUsers(){
     try {
         const queryStatement = "SELECT username, rolename FROM Users INNER JOIN Roles ON Users.roleID = Roles.roleID;";
         let userArray = await connection.query(queryStatement);
-        logger.info("Successfully retrieved all users from the database");
         
         return userArray[0];
     }
     catch(error){
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -202,12 +184,10 @@ async function getRole(username){
         let result = await connection.query(queryStatement);
         let toReturn = result[0];
 
-        logger.info(`Successfully retrieved the role id of the user (${username})`);
 
         return toReturn[0].roleID;
     }
     else{
-        logger.warn(`User doesn't exist - 'Failed to retrieve the role id of the user (${username}) -- getRole`);
         // todo
     }
 }
@@ -251,16 +231,13 @@ async function getRole(username){
         const [rows, fields] = await connection.query(findUser);
 
         if (rows.length != 0){
-            logger.info(`User ${username} EXISTS in the database`);  
             return true;
         }
         else{
-            logger.info(`User ${username} DOES NOT EXIST in the database`);   
             return false;
         }
     }
     catch (err){
-        logger.error(err)
         throw new DatabaseConnectionError();
     }
 }
@@ -283,7 +260,6 @@ async function validateLogin(username, password){
     }
     else{
         // show message about username not found
-        logger.warn(`User doesn't exist - Failed to validate user (${username}) input -- validateLogin`);
         return false;
     }
 }

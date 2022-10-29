@@ -1,4 +1,3 @@
-const logger = require('../logger');
 const model = require('../models/sessionModel');
 const { DatabaseConnectionError } = require('../models/carPartModelMysql');
 const express = require('express')();
@@ -13,7 +12,6 @@ const app = express;
 async function createSession(username, numMinutes) {
     try{
         let sessionId = await model.createSession(username, numMinutes)  
-        logger.info(`CREATED sessionId for user ${username} -- createUser`);      
         return sessionId;
     }
     catch(error){
@@ -22,7 +20,6 @@ async function createSession(username, numMinutes) {
             errorCode: 500
         }
         errorData.alertMessage = data.message;
-        logger.error(`error when CREATING sessionId for user ${username} -- createUser`);
         app.get('/'), (request, response)=>{
             response.status(500).render('error.hbs', data);
         }

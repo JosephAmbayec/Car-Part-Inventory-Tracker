@@ -3,7 +3,6 @@
 const express = require('express');
 const router = express.Router();
 const routeRoot = '/';
-const logger = require('../logger');
 const sqlModel = require('../models/carPartModelMysql.js');
 const validUtils = require('../validateUtils.js');
 const partsModel = require('../models/carPartModelMysql');
@@ -41,7 +40,6 @@ async function createProject(request, response) {
     try {
         // If the user id is not specified
         if (userId === -1) {
-            logger.error(`No user to create project -- createProject`);
             throw new sqlModel.DatabaseConnectionError("The project is not associated with a user");
         }
 
@@ -96,7 +94,6 @@ async function createProject(request, response) {
         }
 
 
-        logger.info(`CREATED PROJECT (Name: ${name}, Description: ${description} -- loginUser`);
         response.cookie("lastAccessedProject", projectId);
         // response.status(201).render('allProjects.hbs', pageData);
         response.redirect('/projects');
@@ -136,19 +133,16 @@ async function createProject(request, response) {
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof sqlModel.DatabaseConnectionError) {
             pageData.alertMessage = "Error connecting to database.";
-            logger.error(`DatabaseConnectionError when CREATING PROJECT ${name} -- createProject`);
             response.status(500).render('allProjects.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError) {
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-            logger.error(`UserLoginError when CREATING PROJECT ${name} -- createProject`);
             response.status(404).render('allProjects.hbs', pageData);
         }
         // If any other error occurs
         else {
             pageData.alertMessage = `Unexpected error while trying to create project: ${error.message}`;
-            logger.error(`OTHER error when CREATING PROJECT ${name} -- createProject`);
             response.status(500).render('allProjects.hbs', pageData);
         }
     }
@@ -228,11 +222,9 @@ async function showProjects(request, response) {
 
             // If there's no projects
             if (pageData.projects.length == 0) {
-                logger.info(`CANNOT SHOW PROJECTS TABLE due to there being no projects created -- showProjects`);
                 pageData.showTable = false;
             }
 
-            logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
             response.status(201).render('allProjects.hbs', pageData);
         }
         catch (error) {
@@ -275,25 +267,21 @@ async function showProjects(request, response) {
             if (error instanceof sqlModel.DatabaseConnectionError) {
                 pageData.alertMessage = "There was an error connecting to the database.";
                 pageData.errorCode = 500;
-                logger.error(`DatabaseConnectionError when SHOWING PROJECTS -- showProjects`);
                 response.status(500).render('error.hbs', pageData);
             }
             // If any other error occurs
             else {
                 pageData.alertMessage = `Unexpected error while trying to show projects: ${error.message}`;
                 pageData.errorCode = 500;
-                logger.error(`OTHER error when SHOWING PROJECTS -- showProjects`);
                 response.status(500).render('error.hbs', pageData);
             }
     }
 
     // If there's no projects
     if (pageData.projects.length == 0) {
-        logger.info(`CANNOT SHOW PROJECTS TABLE due to there being no projects created -- showProjects`);
         pageData.showTable = false;
     }
 
-    logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
     response.status(201).render('allProjects.hbs', pageData);
     }
     // Redirect to home page since a user shouldn't be viewing the project if not logged in
@@ -374,7 +362,6 @@ async function showCreateForm(request, response) {
     }
 
 
-    // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
     response.status(201).render('allProjects.hbs', pageData);
 }
 /**
@@ -482,19 +469,16 @@ async function addCarPart(request, response) {
         
                 if (error instanceof sqlModel.DatabaseConnectionError) {
                     pageData.alertMessage = "Error connecting to database.";
-                    logger.error(`DatabaseConnectionError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
                     response.status(500).render('home.hbs', pageData);
                 }
                 // If the error is an instance of the InvalidInputError error
                 else if (error instanceof sqlModel.InvalidInputError) {
                     pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-                    logger.error(`UserLoginError when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
                     response.status(404).render('home.hbs', pageData);
                 }
                 // If any other error occurs
                 else {
                     pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
-                    logger.error(`OTHER error when ADDING CAR PAR to PROJECT ${partNumber} -- addCarPart`);
                     response.status(500).render('home.hbs', pageData);
                 }
             }
@@ -620,7 +604,6 @@ async function showSpecificProject(request, response) {
                 }
             }
         
-            // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
             response.status(201).render('showProject.hbs', pageData);
         } 
         catch (error) {
@@ -640,25 +623,21 @@ async function showSpecificProject(request, response) {
             if (error instanceof sqlModel.DatabaseConnectionError) {
                 pageData.alertMessage = "There was an error connecting to the database.";
                 pageData.errorCode = 500;
-                logger.error(`DatabaseConnectionError when DELETING PROJECT ${projectID} -- deleteProject`);
                 response.status(500).render('error.hbs', pageData);
             }
             // If the error is an instance of the InvalidInputError error
             else if (error instanceof sqlModel.InvalidInputError) {
                 pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-                logger.error(`InvalidInputError when DELETING PROJECT ${projectID} -- deleteProject`);
                 response.status(404).render('home.hbs', pageData);
             }
             // If any other error occurs
             else {
                 pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
                 pageData.errorCode = 500;
-                logger.error(`OTHER error when DELETING PROJECT ${projectID} -- deleteProject`);
                 response.status(500).render('error.hbs', pageData);
             }
         }
     
-        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
         // response.status(201).render('showProject.hbs', pageData);
     }
     // Redirect to home page since a user shouldn't be viewing the project if not logged in
@@ -729,7 +708,6 @@ async function updateProject(request, response) {
             }
         }
     
-        // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
         response.cookie("lastAccessedProject", projectID);
         response.redirect(`/projects/${projectID}`);
         response.status(201).render('showProject.hbs', pageData);
@@ -751,20 +729,17 @@ async function updateProject(request, response) {
         if (error instanceof sqlModel.DatabaseConnectionError) {
             pageData.alertMessage = "There was an error connecting to the database.";
             pageData.errorCode = 500;
-            logger.error(`DatabaseConnectionError when DELETING PROJECT ${projectID} -- deleteProject`);
             response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError) {
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-            logger.error(`InvalidInputError when DELETING PROJECT ${projectID} -- deleteProject`);
             response.status(404).render('home.hbs', pageData);
         }
         // If any other error occurs
         else {
             pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
             pageData.errorCode = 500;
-            logger.error(`OTHER error when DELETING PROJECT ${projectID} -- deleteProject`);
             response.status(500).render('error.hbs', pageData);
         }
     }
@@ -855,7 +830,6 @@ async function deleteProject(request, response) {
                     }
                 } 
 
-                // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
                 // response.redirect(`/projects`);
                 response.cookie("lastAccessedProject", -1);
                 response.status(201).render('allProjects.hbs', pageData);
@@ -877,20 +851,17 @@ async function deleteProject(request, response) {
                 if (error instanceof sqlModel.DatabaseConnectionError) {
                     pageData.alertMessage = "There was an error connecting to the database.";
                     pageData.errorCode = 500;
-                    logger.error(`DatabaseConnectionError when DELETING PROJECT ${projectID} -- deleteProject`);
                     response.status(500).render('error.hbs', pageData);
                 }
                 // If the error is an instance of the InvalidInputError error
                 else if (error instanceof sqlModel.InvalidInputError) {
                     pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-                    logger.error(`InvalidInputError when DELETING PROJECT ${projectID} -- deleteProject`);
                     response.status(404).render('home.hbs', pageData);
                 }
                 // If any other error occurs
                 else {
                     pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
                     pageData.errorCode = 500;
-                    logger.error(`OTHER error when DELETING PROJECT ${projectID} -- deleteProject`);
                     response.status(500).render('error.hbs', pageData);
                 }
             }
@@ -937,7 +908,6 @@ async function deletePartFromProject(request, response) {
                 footerData: footerLangObject(lang)
             }
 
-            // logger.info(`SHOWING ALL PROJECTS  -- showProjects`);
             response.cookie("lastAccessedProject", projectID);
             response.redirect(`/projects/${projectID}`);
             // response.status(201).render('allProjects.hbs', pageData);
@@ -959,20 +929,17 @@ async function deletePartFromProject(request, response) {
             if (error instanceof sqlModel.DatabaseConnectionError) {
                 pageData.alertMessage = "There was an error connecting to the database.";
                 pageData.errorCode = 500;
-                logger.error(`DatabaseConnectionError when DELETING PROJECT ${projectID} -- deleteProject`);
                 response.status(500).render('error.hbs', pageData);
             }
             // If the error is an instance of the InvalidInputError error
             else if (error instanceof sqlModel.InvalidInputError) {
                 pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
-                logger.error(`InvalidInputError when DELETING PROJECT ${projectID} -- deleteProject`);
                 response.status(404).render('home.hbs', pageData);
             }
             // If any other error occurs
             else {
                 pageData.alertMessage = `Unexpected error while trying to adding part: ${error.message}`;
                 pageData.errorCode = 500;
-                logger.error(`OTHER error when DELETING PROJECT ${projectID} -- deleteProject`);
                 response.status(500).render('error.hbs', pageData);
             }
         }

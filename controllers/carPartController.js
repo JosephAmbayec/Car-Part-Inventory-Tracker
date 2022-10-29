@@ -5,7 +5,6 @@ const router = express.Router();
 const routeRoot = '/';
 const sqlModel = require('../models/carPartModelMysql.js');
 const validUtils = require('../validateUtils.js');
-const logger = require('../logger');
 const projectModel = require('../models/projectModel');
 const loginController = require('./loginController');
 const userModel = require('../models/userModel');
@@ -29,13 +28,11 @@ async function createPart(request, response){
     // If the image is not a valid url, set image to null
     if (!validUtils.isURL(image)){
         image = null;
-        logger.info("Setting image to null -- createPart");
     }
     
     // If the condition is not valid, set the condition to 'unknown'
     if (validUtils.stringIsEmpty(condition)){
         condition = "unknown";
-        logger.info("Setting condition to 'unknown' -- createPart");
     }
 
     // Set the login to the username if response is not null
@@ -47,7 +44,6 @@ async function createPart(request, response){
 
         try {
             await sqlModel.addCarPart(number, partName, condition, image);
-            logger.info(`CREATED car part (Part #${number}, ${partName}, Condition: ${condition}) -- createPart`);
     
             let role = await userModel.determineRole(login);
     
@@ -181,21 +177,18 @@ async function createPart(request, response){
             if (error instanceof sqlModel.DatabaseConnectionError){
                 pageData.alertMessage = "There was an error connecting to the database.";
                 pageData.errorCode = 500;
-                logger.error("DatabaseConnectionError when CREATING part -- createPart");
                 response.status(500).render('error.hbs', pageData);
             }
             // If the error is an instance of the InvalidInputError error
             else if (error instanceof sqlModel.InvalidInputError){
                 pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable. Ensure the url is a valid image url";
                 pageData.errorCode = 404;
-                logger.error("InvalidInputError when CREATING part -- createPart");
                 response.status(404).render('home.hbs', pageData);
             }
             // If any other error
             else {
                 pageData.alertMessage = `Unexpected error while trying to add part: ${error.message}`;
                 pageData.errorCode = 500;
-                logger.error("OTHER error when CREATING part -- createPart");
                 response.status(500).render('error.hbs', pageData);
             }
         }
@@ -321,7 +314,6 @@ async function getPartByNumber(request, response){
                 }
             }
 
-            logger.info(`DID NOT FIND car part by number ${number} -- getPartByNumber`);
             response.status(404).render('home.hbs', output);
         }
         // If the part was found
@@ -410,7 +402,6 @@ async function getPartByNumber(request, response){
                 }
             }
 
-            logger.info(`FOUND car part by number ${number} -- getPartByNumber`);
             response.status(200).render('home.hbs', output);
         }
     }
@@ -456,21 +447,18 @@ async function getPartByNumber(request, response){
         if (error instanceof sqlModel.DatabaseConnectionError){
             pageData.alertMessage = "There was an error connecting to the database.";
             pageData.errorCode = 500;
-            logger.error(`DatabaseConnectionError when FINDING car part by number ${number} -- getPartByNumber`);
             response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
             pageData.errorCode = 404;
-            logger.error(`InvalidInputError when FINDING car part by number ${number} -- getPartByNumber`);
             response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
             pageData.alertMessage =`Unexpected error while trying to show part: ${error.message}`;
             pageData.errorCode = 500;
-            logger.error(`OTHER error when FINDING car part by number ${number} -- getPartByNumber`);
             response.status(500).render('error.hbs', pageData);
         }
     }
@@ -638,7 +626,6 @@ async function getAllCarParts(request, response){
                 }
             }
 
-            logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
             response.status(201).render('home.hbs', output);
         }
         // If car parts were found
@@ -785,7 +772,6 @@ async function getAllCarParts(request, response){
                 }
             }
 
-            logger.info(`RETRIEVED ALL car parts from database -- getAllCarParts`);
             response.status(200).render('home.hbs', output)
         }  
     }
@@ -850,21 +836,18 @@ async function getAllCarParts(request, response){
         if (error instanceof sqlModel.DatabaseConnectionError){
             pageData.alertMessage = "There was an error connecting to the database.";
             pageData.errorCode = 500;
-            logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
             response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
             pageData.errorCode = 404;
-            logger.error("InvalidInputError when RETRIEVING all car parts -- getAllCarParts");
             response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
              pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
             pageData.errorCode = 500;
-            logger.error("OTHER error when RETRIEVING all car parts -- getAllCarParts");
             response.status(500).render('error.hbs', pageData);
         }
     }
@@ -900,7 +883,6 @@ async function updatePartName(request, response){
                     alertMessage: `Could not find part #${partNumber}`,
                     errorCode: 404
                 }
-                logger.info(`NOT UPDATED car part ${partNumber} because car part DOESN'T exist -- updatePartName`);
                 response.status(404).render('home.hbs', data);
             }
             else{
@@ -992,7 +974,6 @@ async function updatePartName(request, response){
                             }
                         }
 
-                        logger.info(`UPDATED car part ${partNumber} in database -- updatePartName`);
                         response.status(200).render('home.hbs', output);
                     })
             }
@@ -1039,21 +1020,18 @@ async function updatePartName(request, response){
             if (error instanceof sqlModel.DatabaseConnectionError){
                 pageData.alertMessage = "There was an error connecting to the database.";
                 pageData.errorCode = 500;
-                logger.error(`DatabaseConnectionError when UPDATING car part ${partNumber} -- updatePartName`);
                 response.status(500).render('error.hbs', pageData);
             }
             // If the error is an instance of the InvalidInputError error
             else if (error instanceof sqlModel.InvalidInputError){
                 pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
                 pageData.errorCode = 404
-                logger.error(`InvalidInputError when UPDATING car part ${partNumber} -- updatePartName`);
                 response.status(404).render('home.hbs', pageData);
             }
             // If any other error
             else {
                 pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
                 pageData.errorCode = 500;
-                logger.error(`OTHER error when UPDATING car part ${partNumber} -- updatePartName`);
                 response.status(500).render('error.hbs', pageData);
             }
         }   
@@ -1219,7 +1197,6 @@ async function deleteSpecificCarPartTable(request, response){
                 }
             }
 
-            logger.info(`NOT RETRIEVED all car parts from database -- getAllCarParts`);
             response.status(201).render('home.hbs', output);
         }
         // If car parts were found
@@ -1367,7 +1344,6 @@ async function deleteSpecificCarPartTable(request, response){
                 }
             }
 
-            logger.info(`RETRIEVED ALL car parts from database -- getAllCarParts`);
             response.status(200).render('home.hbs', output)
         }  
     }
@@ -1413,21 +1389,18 @@ async function deleteSpecificCarPartTable(request, response){
         if (error instanceof sqlModel.DatabaseConnectionError){
             pageData.alertMessage = "There was an error connecting to the database.";
             pageData.errorCode = 500;
-            logger.error("DatabaseConnectionError when RETRIEVING all car parts -- getAllCarParts");
             response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
             pageData.errorCode = 404;
-            logger.error("InvalidInputError when RETRIEVING all car parts -- getAllCarParts");
             response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
             pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
             pageData.errorCode = 500;
-            logger.error("OTHER error when RETRIEVING all car parts -- getAllCarParts");
             response.status(500).render('error.hbs', pageData);
         }
     }
@@ -1485,21 +1458,18 @@ async function addCarPartToProject(request, response){
         if (error instanceof sqlModel.DatabaseConnectionError){
             pageData.alertMessage = "There was an error connecting to the database.";
             pageData.errorCode = 500;
-            logger.error(`DatabaseConnectionError when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
             response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
             pageData.alertMessage =  "Invalid input, check that all fields are alpha numeric where applicable.";
             pageData.errorCode = 404;
-            logger.error(`InvalidInputError when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
             response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
             pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
             pageData.errorCode = 500;
-            logger.error(`OTHER error when ADDING car part to PROJECT ${partNumber} -- addCarPartToProject`);
             response.status(500).render('error.hbs', pageData);
         }
     }
@@ -1526,11 +1496,9 @@ async function deletePart(request, response){
 
             if(deletedPartProject && deletedPart){
                 response.status(200);
-                logger.info(`DELETING car part ${partNumber} controller -- deletePart`);
             }
             else{
                 response.status(404);
-                logger.info(`DELETING car part ${partNumber} failed -- deletePart`);
             }
 
             // response.status(202).render('home.hbs', {message: `Deleted part with part number ${part.partNumber}`});
@@ -1543,7 +1511,6 @@ async function deletePart(request, response){
                 alertMessage: `Could not find part #${partNumber}`,
                 errorCode: 404
             }
-            logger.info(`NOT DELETING car part ${partNumber} in database -- deletePart`);
             response.status(404).render('home.hbs', data);
         }
     } 
@@ -1589,21 +1556,18 @@ async function deletePart(request, response){
         if (error instanceof sqlModel.DatabaseConnectionError){
             pageData.alertMessage = "There was an error connecting to the database.";
             pageData.errorCode = 500;
-            logger.error(`DatabaseConnectionError when DELETING car part ${partNumber} -- deletePart`);
             response.status(500).render('error.hbs', pageData);
         }
         // If the error is an instance of the InvalidInputError error
         else if (error instanceof sqlModel.InvalidInputError){
             pageData.alertMessage = "Invalid input, check that all fields are alpha numeric where applicable.";
             pageData.errorCode = 404;
-            logger.error(`InvalidInputError when DELETING car part ${partNumber} -- deletePart`);
             response.status(404).render('home.hbs', pageData);
         }
         // If any other error
         else {
             pageData.alertMessage = `Unexpected error while trying to show part: ${error.message}`;
             pageData.errorCode = 500;
-            logger.error(`OTHER error when DELETING car part ${partNumber} -- deletePart`);
             response.status(500).render('error.hbs', pageData);
         }
     }

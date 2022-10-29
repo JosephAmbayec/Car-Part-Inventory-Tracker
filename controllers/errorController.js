@@ -3,7 +3,6 @@
 const express = require('express');
 const router = express.Router();
 const routeRoot = '/';
-const logger = require('../logger');
 const loginController = require('./loginController');
 
 /**
@@ -66,7 +65,6 @@ function sendError(request, response){
     }
 
     response.status(pageData.errorCode);
-    logger.info(`RENDERING home page WITH Invalid URL ERROR -- sendError`);
     response.render('error.hbs', pageData);
 }
 

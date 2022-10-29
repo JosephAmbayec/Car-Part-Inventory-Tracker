@@ -4,7 +4,6 @@ const express = require('express');
 const router = express.Router();
 const routeRoot = '/';
 const partController = require('./carPartController');
-const logger = require('../logger');
 const loginController = require('./loginController');
 const projectModel = require('../models/projectModel');
 const userModel = require('../models/userModel');
@@ -44,7 +43,6 @@ async function sendHome(request, response) {
         if (justRegistered == 'true') {
             const username = request.cookies.username;
             response.cookie('justRegistered', 'false');
-            logger.info(`COOKIE CREATED for user ${username}, rendering home page -- sendHome`);
         }
     
         if (!lang || lang === 'en') {
@@ -137,7 +135,6 @@ async function sendHome(request, response) {
             }
         }
     
-        logger.info(`RENDERING home page -- sendHome`);
         response.status(200).render('home.hbs', pageData);
     } 
     catch (error) {
@@ -180,14 +177,12 @@ async function sendHome(request, response) {
         if (error instanceof sqlModel.DatabaseConnectionError) {
             pageData.alertMessage = "There was an error connecting to the database.";
             pageData.errorCode = 500;
-            logger.error(`DatabaseConnectionError when RENDERING HOME -- sendHome`);
             response.status(500).render('error.hbs', pageData);
         }
         // If any other error occurs
         else {
             pageData.alertMessage = `Unexpected error while trying to render home: ${error.message}`;
             pageData.errorCode = 500;
-            logger.error(`OTHER error when RENDERING HOME -- sendHome`);
             response.status(500).render('error.hbs', pageData);
         }
     }
@@ -203,38 +198,32 @@ function showForm(request, response) {
     switch (request.body.choice) {
         // Case of adding a car part
         case 'add':
-            logger.info(`SWITCH CASE add -- showForm`);
             showAddForm(request, response);
             break;
 
         // Case of finding a car part
         case 'show':
-            logger.info(`SWITCH CASE show (find) -- showForm`);
             showListOneForm(request, response);
             break;
 
         // Case of getting all car parts
         case 'list':
-            logger.info(`SWITCH CASE list (all) -- showForm`);
             response.redirect('/parts');
             break;
 
         // Case of updating a car part
         case 'edit':
-            logger.info(`SWITCH CASE update -- showForm`);
             showEditForm(request, response);
             break;
 
         // Case of deleting a car part
         case 'delete':
-            logger.info(`SWITCH CASE delete -- showForm`);
             // showDeleteForm(request, response);
             response.redirect('/parts/table/delete');
             break;
 
         // Default case
         default:
-            logger.info(`SWITCH CASE default -- showForm`);
             response.render('home.hbs');
     }
 }
@@ -361,7 +350,6 @@ async function showAddForm(request, response) {
         }
     }
 
-    logger.info(`RENDERING home page WITH ADDING form -- showAddForm`);
     response.render('home.hbs', pageData);
 }
 
@@ -473,7 +461,6 @@ async function showListOneForm(request, response) {
         }
     }
 
-    logger.info(`RENDERING home page WITH FIND form -- showListOneForm`);
     response.render('home.hbs', pageData);
 }
 
@@ -587,7 +574,6 @@ async function showEditForm(request, response) {
         }
     }
 
-    logger.info(`RENDERING home page WITH UPDATE form -- showEditForm`);
     response.render('home.hbs', pageData);
 }
 

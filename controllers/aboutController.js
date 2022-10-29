@@ -3,7 +3,6 @@
 const express = require('express');
 const router = express.Router();
 const routeRoot = '/';
-const logger = require('../logger');
 const userModel = require('../models/userModel');
 const loginController = require('./loginController');
 const homeController = require('./homeController');
@@ -76,7 +75,6 @@ async function showAbout(request, response) {
             }
         }
     
-            logger.info(`RENDERING about page -- showAbout`);
             response.status(200).render('about.hbs', pageData);
     }
     catch (err) {

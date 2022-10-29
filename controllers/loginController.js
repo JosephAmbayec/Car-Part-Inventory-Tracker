@@ -5,7 +5,6 @@ const { DatabaseConnectionError } = require('../models/carPartModelMysql');
 const router = express.Router();
 const routeRoot = '/';
 const userModel = require('../models/userModel');
-const logger = require('../logger');
 const session = require('./sessionController');
 const sessionModel = require('../models/sessionModel');
 const homeController = require('../controllers/homeController');
@@ -104,7 +103,6 @@ async function loginUser(request, response) {
                 }
             }
 
-            logger.info(`LOGGED IN user ${username} -- loginUser`);
             response.status(201).redirect('/parts');
         }
         else {
@@ -161,7 +159,6 @@ async function loginUser(request, response) {
             }
 
 
-            logger.info(`DID NOT LOG IN user ${username} because of validation failure -- loginUser`);
             response.status(404).render('loginsignup.hbs', errorData);
         }
 
@@ -217,20 +214,17 @@ async function loginUser(request, response) {
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof DatabaseConnectionError) {
             errorData.alertMessage = "There was an error connecting to the database."
-            logger.error(`DatabaseConnectionError when LOGGING IN user ${username} -- loginUser`);
             response.status(500).render('error.hbs', errorData);
         }
         // If the error is an instance of the UserLoginError error
         else if (error instanceof userModel.UserLoginError) {
             errorData.alertMessage = error.message;
-            logger.error(`UserLoginError when LOGGING IN user ${username} -- loginUser`);
             response.status(404).render('loginsignup.hbs', errorData);
         }
         // If any other error occurs
         else {
             errorData.alertMessage = `Unexpected error while trying to log in user: ${error.message}`,
             errorData.errorCode = 500;
-            logger.error(`OTHER error when LOGGING IN user ${username} -- loginUser`);
             response.status(500).render('error.hbs', errorData);
         }
     }
@@ -247,8 +241,6 @@ async function logoutUser(request, response) {
     // If valid access
     else{
         delete sessionModel.sessions[authenticatedSession.sessionId]
-        logger.info("Logged out user " + authenticatedSession.userSession.username);
-        logger.info(`SHOWING LOGIN information (login page) -- showLogin`);
         response.cookie("sessionId", "", { expires: new Date() }); // "erase" cookie by forcing it to expire.
         response.redirect('/parts');
 

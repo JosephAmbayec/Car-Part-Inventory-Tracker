@@ -2,7 +2,6 @@
 
 const mysql = require('mysql2/promise');
 const validUtils = require('../validateUtils.js');
-const logger = require('../logger');
 const userModel = require('../models/userModel');
 var connection;
 
@@ -38,12 +37,10 @@ async function initialize(dbname, reset){
         // Creating the carPart table
         let createTableStatement = 'CREATE TABLE IF NOT EXISTS carPart(partNumber int, name VARCHAR(100), `condition` VARCHAR(50), image VARCHAR(2000), PRIMARY KEY (partNumber))';
         await connection.execute(createTableStatement);
-        logger.info("Car part table created/exists");
 
         return connection
     }
     catch (error){
-        logger.error(error.message);
         throw new DatabaseConnectionError();
     }
 }
@@ -71,11 +68,8 @@ async function resetTable(table){
     try {
         const dropQuery = `DROP TABLE IF EXISTS ${table}`;
         await connection.execute(dropQuery);
-        logger.info("Car part table dropped");
-        // .then(logger.info("Car part table dropped")).catch((error) => { logger.error(error) });
 
     } catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -100,19 +94,16 @@ async function resetTable(table){
 async function addCarPart(partNumber, name, condition, image){ 
     // Validates the name and partNumber of the car part
     if (!validUtils.isValid(name) || !validUtils.isPartNumber(partNumber)) {
-        logger.error("Name or partNumber of car part to be added is not valid -- addCarPart");
         throw new InvalidInputError();
     }
 
     try {
         const addStatement = 'INSERT INTO carPart(partNumber, name, `condition`' + `, image) values ('${partNumber}', '${name}', '${condition}', '${image}');`;
         await connection.execute(addStatement);
-        logger.info(`ADDED car part (${partNumber}) to the database.`);
 
         return { "partNumber": partNumber, "name": name, "condition": condition, "image": image };           
     }
     catch(error){
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -125,19 +116,16 @@ async function addCarPart(partNumber, name, condition, image){
 async function findCarPartByNumber(partNumber){
     // Validates the partNumber of the car part
     if (!validUtils.isPartNumber(partNumber)){
-        logger.error("PartNumber of car part to find is not valid -- findCarPartByNumber");
         throw new InvalidInputError();
     }
 
     try {
         const queryStatement = `SELECT * FROM carPart WHERE partNumber= '${partNumber}';`;
         let carPartArray = await connection.execute(queryStatement);
-        logger.info(`FOUND the car part (${partNumber}) in the database.`);
 
         return carPartArray[0];
     }
     catch(error){
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -150,12 +138,10 @@ async function findAllCarParts(){
     try {
         const queryStatement = "SELECT partNumber, name, `condition` , image FROM carPart;";
         let carPartArray = await connection.query(queryStatement);
-        logger.info("FOUND ALL the car parts in the database.");
 
         return carPartArray[0];
     }
     catch(error){
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -169,19 +155,16 @@ async function findAllCarParts(){
 async function updateCarPartName(partNumber, name){
     // Validates the name and partNumber of the car part
     if (!validUtils.isValid(name) || !validUtils.isPartNumber(partNumber)) {
-        logger.error("Name or partNumber of car part to be updated is not valid -- updateCarPartName");
         throw new InvalidInputError();
     }
     
     try {
         const addStatement = `UPDATE carPart SET name = '${name}' WHERE partNumber = ${partNumber};`;
         await connection.query(addStatement);
-        logger.info(`UPDATED the car part (${partNumber}) in the database.`);
 
         return { "partNumber": partNumber, "name": name };
     }
     catch(error){
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -194,7 +177,6 @@ async function updateCarPartName(partNumber, name){
  async function deleteCarPart(partNumber){
     // Validates the partNumber of the car part
     if (!validUtils.isPartNumber(partNumber)){
-        logger.error("PartNumber of car part to be deleted is not valid -- deleteCarPart");
         throw new InvalidInputError();
     }
 
@@ -210,12 +192,10 @@ async function updateCarPartName(partNumber, name){
         let sqlStatement = `DELETE FROM carPart where partNumber = ${partNumber};`;
         await connection.execute(sqlStatement);
 
-        logger.info(`DELETED the car part (${partNumber}) from the database.`);
 
         return {"partNumber": partNumber }
     }
     catch(error){
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -232,7 +212,6 @@ async function updateCarPartName(partNumber, name){
  async function verifyCarPartExists(partNumber){
     // Validates the partNumber of the car part
     if (!validUtils.isPartNumber(partNumber)){
-        logger.error("PartNumber of car part to verify if exists is not valid -- verifyCarPartExists");
         throw new InvalidInputError();
     }
 
@@ -241,16 +220,13 @@ async function updateCarPartName(partNumber, name){
 
         // Checks if the array length of the found car part is not 0
         if(carPart.length != 0){
-            logger.info("Car part EXISTS - Verify that the car part exists -- verifyCarPartExists");
             return true;
         }
     }
     catch(error){
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 
-    logger.info("Car part DOES NOT EXISTS - Verify that the car part exists -- verifyCarPartExists");
     return false;
 }
 
@@ -263,11 +239,9 @@ function checkConnection(res){
     // Checking if the connection is closed
     if (connection.connection._closing){
         res.status(500);
-        logger.info("NOT OPEN - Connection to the database -- checkConnection");
         return false;
     }
 
-    logger.info("OPEN - Connection to the database -- checkConnection");
     return true;
 }
 
@@ -295,7 +269,6 @@ async function getArrayOfCarPartsInProject(allCarPartsInProject){
                 throw new DatabaseConnectionError();
         } 
         catch (error) {
-            logger.error(error);
             throw new DatabaseConnectionError();
         }
     }

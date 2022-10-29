@@ -2,7 +2,6 @@
 
 const mysql = require('mysql2/promise');
 const validUtils = require('../validateUtils.js');
-const logger = require('../logger');
 const model = require('../models/carPartModelMysql');
 const userModel = require('../models/userModel');
 const partModel = require('../models/carPartModelMysql');
@@ -35,33 +34,27 @@ async function initializeProjectModel(dbname, reset){
         // Creating the Users table
         let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id int AUTO_INCREMENT, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
         await connection.execute(createTableStatement);
-        logger.info("Users table created/exists");
 
         // Creating the car part table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS carPart(partNumber int, name VARCHAR(100), `condition` VARCHAR(50), image VARCHAR(2000), PRIMARY KEY (partNumber))';
         await connection.execute(createTableStatement);
-        logger.info("Car part table created/exists");
 
         // Creating the project table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS Project(projectId int AUTO_INCREMENT, name VARCHAR(50), description VARCHAR(255), PRIMARY KEY (projectId))';
         await connection.execute(createTableStatement);
-        logger.info("Project table created/exists");
 
         // Creating the part project table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS PartProject(projectId int, partNumber int,  FOREIGN KEY (partNumber) REFERENCES carPart(partNumber), FOREIGN KEY (projectId) REFERENCES Project(projectId), PRIMARY KEY (projectId, partNumber))';
         await connection.execute(createTableStatement);
-        logger.info("PartProject table created/exists");
 
         // Creating the users projects table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS UsersProject(projectId int, id int,  FOREIGN KEY (id) REFERENCES Users(id), FOREIGN KEY (projectId) REFERENCES Project(projectId), PRIMARY KEY (projectId, id))';
         await connection.execute(createTableStatement);
-        logger.info("UsersProject table created/exists");
 
         return connection;
     
     } 
     catch (err) {
-        logger.error(err);
         throw new DatabaseConnectionError();
     }
 }
@@ -84,10 +77,8 @@ async function getConnection(){
     try {
         const dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
         await connection.execute(dropQuery);
-        logger.info(`${tableName} table dropped`);
 
     } catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -106,7 +97,6 @@ async function getConnection(){
         return projectId[0].insertId;
     }    
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -123,7 +113,6 @@ async function getAllProjects(username){
         return results[0];
     } 
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -136,7 +125,6 @@ async function getAllProjects(username){
 async function addPartToProject(projectId, partNumber){
     // Validates the partNumber of the car part
     if (!validUtils.isPartNumber(partNumber)){
-        logger.error("PartNumber of car part to add is not valid -- addPartToProject");
         throw new InvalidInputError();
     }
 
@@ -156,7 +144,6 @@ async function addPartToProject(projectId, partNumber){
             throw new DatabaseConnectionError();
     }
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }     
@@ -164,7 +151,6 @@ async function addPartToProject(projectId, partNumber){
 async function partExistsInProject(projectId, partNumber){
     // Validates the partNumber of the car part
     if (!validUtils.isPartNumber(partNumber)){
-        logger.error("PartNumber of car part to find is not valid -- partExistsInProject");
         throw new InvalidInputError();
     }
 
@@ -176,7 +162,6 @@ async function partExistsInProject(projectId, partNumber){
         return false;
     }
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -197,7 +182,6 @@ async function addUserToProject(projectId, id) {
             throw new DatabaseConnectionError();
     }
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -216,7 +200,6 @@ async function projectExists(projectId){
         return false;
     }
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -238,7 +221,6 @@ async function getProjectByProjectId(projectId){
             throw new DatabaseConnectionError();
     } 
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -262,7 +244,6 @@ async function updateProject(newName, newDescription, projectId){
             throw new DatabaseConnectionError();
     } 
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -279,7 +260,6 @@ async function getProjectCarParts(projectId) {
             throw new DatabaseConnectionError();
     } 
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -308,7 +288,6 @@ async function deleteProject(projectId){
             throw new DatabaseConnectionError();
     } 
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -330,7 +309,6 @@ async function deletePartFromProject(projectId, partNumber){
             throw new DatabaseConnectionError();
     } 
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
@@ -347,7 +325,6 @@ async function deletePartFromProjectWithNumber(partNumber){
         return true;
     } 
     catch (error) {
-        logger.error(error);
         throw new DatabaseConnectionError();
     }
 }
