@@ -43,19 +43,19 @@ async function initializeUserModel(dbname, reset){
         }
         
         const createRoleStatement = `CREATE TABLE IF NOT EXISTS Roles(roleID int, rolename VARCHAR(50), PRIMARY KEY (roleID))`;
-        await connection.query(createRoleStatement);
+        connection.query(createRoleStatement);
     
         // Ignoring invalid data into Roles table
         let insertDefaultRoles = 'INSERT INTO Roles(roleID, rolename) values (1, $1) ON CONFLICT DO NOTHING;';
-        await connection.query(insertDefaultRoles, ["admin"]);
+        connection.query(insertDefaultRoles, ["admin"]);
     
         // Ignoring invalid data into Roles table
         insertDefaultRoles = 'INSERT INTO Roles(roleID, rolename) values (2, $1) ON CONFLICT DO NOTHING;';
-        await connection.query(insertDefaultRoles, ["guest"]);
+        connection.query(insertDefaultRoles, ["guest"]);
     
         // Creating the Users table
         let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id SERIAL, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
-        await connection.query(createTableStatement);
+        connection.query(createTableStatement);
 
         return connection;
     
