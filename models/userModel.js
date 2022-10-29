@@ -149,7 +149,7 @@ async function addUser(username, password, role) {
         if (userUtils.isValidPassword(password)){
             try {
                 let hashedPassword = await userUtils.hashPassword(password);
-                let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', '${role}');`
+                let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', 1);`
 
                 await connection.execute(insertQuery);
                 logger.info("User added successfully to the database");

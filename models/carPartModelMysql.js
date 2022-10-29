@@ -148,7 +148,7 @@ async function findCarPartByNumber(partNumber){
  */
 async function findAllCarParts(){
     try {
-        const queryStatement = "SELECT partNumber, name, `condition`, image FROM carPart;";
+        const queryStatement = "SELECT partNumber, name, `condition` , image FROM carPart;";
         let carPartArray = await connection.query(queryStatement);
         logger.info("FOUND ALL the car parts in the database.");
 

@@ -790,7 +790,26 @@ async function getAllCarParts(request, response){
         }  
     }
     catch(error){
+        let number = request.params.partNumber;
+        const lang = request.cookies.language;
+        let signupDisplay, endpoint, logInText;
+        let login = loginController.authenticateUser(request);
+        let role = await userModel.determineRole(login);
+        let AccessProject;
         let pageData;
+            // Set the login to the username if response is not null
+            if(login != null) {
+                login = login.userSession.username;
+                signupDisplay = "none";
+                endpoint = "logout";
+                logInText = "Log Out";
+            }
+            else{
+                signupDisplay = "block";
+                endpoint = "login";
+                logInText = "Log In";
+                AccessProject = false;
+            }
 
         // If language is english
         if (!lang || lang === 'en'){
