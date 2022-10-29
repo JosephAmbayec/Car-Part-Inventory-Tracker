@@ -5,6 +5,6 @@ setup:
       as: carPart_db
 build:
   docker:
-    web: Dockerfile
+    web: carpartdeploy
 run:
   web: bundle exec puma -C config/puma.rb
