@@ -1,6 +1,6 @@
 'use strict';
 
-const mysql = require('mysql2/promise');
+const {Client} = require('pg');
 const validUtils = require('../validateUtils.js');
 const userModel = require('../models/userModel');
 var connection;
@@ -18,14 +18,24 @@ var connection;
 async function initialize(dbname, reset){
 
     try {
-        connection = await mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            port: '10000',
-            password: 'pass',
-            database: dbname
-        })
+        if (process.env.DATABASE_URL) {
+            connection = new Client({
+                connectionString: process.env.DATABASE_URL,
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            })
+        } else {
+            connection = new Client({
+                host: process.env.DB_HOST || 'localhost',
+                user: process.env.DB_USER || 'root',
+                port: process.env.DB_PORT || '10000',
+                password: process.env.DB_PASSWORD || 'pass',
+                database: dbname // assumes this was passed in as a parameter to initialize function
+            });
+        }
     
+        connection.connect();
         // Dropping the tables if resetting them
         if (reset){
             resetTable("PartProject");
@@ -35,8 +45,8 @@ async function initialize(dbname, reset){
         }
 
         // Creating the carPart table
-        let createTableStatement = 'CREATE TABLE IF NOT EXISTS carPart(partNumber int, name VARCHAR(100), `condition` VARCHAR(50), image VARCHAR(2000), PRIMARY KEY (partNumber))';
-        await connection.execute(createTableStatement);
+        let createTableStatement = 'CREATE TABLE IF NOT EXISTS carPart(partNumber int, name VARCHAR(100), condition VARCHAR(50), image VARCHAR(2000), PRIMARY KEY (partNumber))';
+        connection.query(createTableStatement);
 
         return connection
     }
@@ -67,7 +77,7 @@ async function getConnection(){
 async function resetTable(table){
     try {
         const dropQuery = `DROP TABLE IF EXISTS ${table}`;
-        await connection.execute(dropQuery);
+        await connection.query(dropQuery);
 
     } catch (error) {
         throw new DatabaseConnectionError();
@@ -99,7 +109,7 @@ async function addCarPart(partNumber, name, condition, image){
 
     try {
         const addStatement = 'INSERT INTO carPart(partNumber, name, `condition`' + `, image) values ('${partNumber}', '${name}', '${condition}', '${image}');`;
-        await connection.execute(addStatement);
+        await connection.query(addStatement);
 
         return { "partNumber": partNumber, "name": name, "condition": condition, "image": image };           
     }
@@ -121,7 +131,7 @@ async function findCarPartByNumber(partNumber){
 
     try {
         const queryStatement = `SELECT * FROM carPart WHERE partNumber= '${partNumber}';`;
-        let carPartArray = await connection.execute(queryStatement);
+        let carPartArray = await connection.query(queryStatement);
 
         return carPartArray[0];
     }
@@ -185,12 +195,12 @@ async function updateCarPartName(partNumber, name){
         let tableExists = await connection.query("SHOW TABLES LIKE 'PartProject'")
         if (tableExists[0].length != 0){
             let sqlStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
-            await connection.execute(sqlStatement);
+            await connection.query(sqlStatement);
         }
 
         // Delete from part table
         let sqlStatement = `DELETE FROM carPart where partNumber = ${partNumber};`;
-        await connection.execute(sqlStatement);
+        await connection.query(sqlStatement);
 
 
         return {"partNumber": partNumber }

@@ -1,6 +1,6 @@
 'use strict';
 
-const mysql = require('mysql2/promise');
+const {Client} = require('pg');
 const validUtils = require('../validateUtils.js');
 const model = require('../models/carPartModelMysql');
 const userModel = require('../models/userModel');
@@ -16,14 +16,24 @@ var connection;
 async function initializeProjectModel(dbname, reset){
 
     try {
-        connection = await mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            port: '10000',
-            password: 'pass',
-            database: dbname
-        })
-    
+        if (process.env.DATABASE_URL) {
+            connection = new Client({
+                connectionString: process.env.DATABASE_URL,
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            })
+        } else {
+            connection = new Client({
+                host: process.env.DB_HOST || 'localhost',
+                user: process.env.DB_USER || 'root',
+                port: process.env.DB_PORT || '10000',
+                password: process.env.DB_PASSWORD || 'pass',
+                database: dbname // assumes this was passed in as a parameter to initialize function
+            });
+        }
+        
+        connection.connect();
          // Dropping the tables if resetting them
         if (reset) {
             await resetTable("PartProject");
@@ -32,24 +42,24 @@ async function initializeProjectModel(dbname, reset){
         }
 
         // Creating the Users table
-        let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id int AUTO_INCREMENT, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
-        await connection.execute(createTableStatement);
+        let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id SERIAL, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
+        await connection.query(createTableStatement);
 
         // Creating the car part table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS carPart(partNumber int, name VARCHAR(100), `condition` VARCHAR(50), image VARCHAR(2000), PRIMARY KEY (partNumber))';
-        await connection.execute(createTableStatement);
+        await connection.query(createTableStatement);
 
         // Creating the project table
-        createTableStatement = 'CREATE TABLE IF NOT EXISTS Project(projectId int AUTO_INCREMENT, name VARCHAR(50), description VARCHAR(255), PRIMARY KEY (projectId))';
-        await connection.execute(createTableStatement);
+        createTableStatement = 'CREATE TABLE IF NOT EXISTS Project(projectId SERIAL, name VARCHAR(50), description VARCHAR(255), PRIMARY KEY (projectId))';
+        await connection.query(createTableStatement);
 
         // Creating the part project table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS PartProject(projectId int, partNumber int,  FOREIGN KEY (partNumber) REFERENCES carPart(partNumber), FOREIGN KEY (projectId) REFERENCES Project(projectId), PRIMARY KEY (projectId, partNumber))';
-        await connection.execute(createTableStatement);
+        await connection.query(createTableStatement);
 
         // Creating the users projects table
         createTableStatement = 'CREATE TABLE IF NOT EXISTS UsersProject(projectId int, id int,  FOREIGN KEY (id) REFERENCES Users(id), FOREIGN KEY (projectId) REFERENCES Project(projectId), PRIMARY KEY (projectId, id))';
-        await connection.execute(createTableStatement);
+        await connection.query(createTableStatement);
 
         return connection;
     
@@ -76,7 +86,7 @@ async function getConnection(){
  async function resetTable(tableName){
     try {
         const dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
-        await connection.execute(dropQuery);
+        await connection.query(dropQuery);
 
     } catch (error) {
         throw new DatabaseConnectionError();
@@ -93,7 +103,7 @@ async function getConnection(){
  async function addProject(name, description){
     try {
         const insertStatement = `INSERT INTO Project (name, description) values ('${name}', '${description}')`;
-        let projectId = await connection.execute(insertStatement);
+        let projectId = await connection.query(insertStatement);
         return projectId[0].insertId;
     }    
     catch (error) {
@@ -132,7 +142,7 @@ async function addPartToProject(projectId, partNumber){
         if (await projectExists(projectId) && await partModel.verifyCarPartExists(partNumber)) {
             if(!await partExistsInProject(projectId, partNumber)){
                 const insertStatement = `INSERT INTO PartProject (projectId, partNumber) values (${projectId}, ${partNumber})`;
-                let results = await connection.execute(insertStatement);
+                let results = await connection.query(insertStatement);
 
                 if(results[0].length === 0){
                     return false;
@@ -176,7 +186,7 @@ async function addUserToProject(projectId, id) {
         if (projectExists(projectId) && userModel.userExists(id)) {
 
             const insertStatement = `INSERT INTO UsersProject (projectId, id) values (${projectId}, ${id})`;
-            await connection.execute(insertStatement);
+            await connection.query(insertStatement);
         }
         else
             throw new DatabaseConnectionError();
@@ -237,7 +247,7 @@ async function updateProject(newName, newDescription, projectId){
         // Checks if the project exists first
         if(await projectExists(projectId)){
             const selectStatement = `UPDATE Project SET name = '${newName}', description = '${newDescription}' WHERE projectId = '${projectId}';`;
-            let updateProj = await connection.execute(selectStatement);
+            let updateProj = await connection.query(selectStatement);
             return updateProj[0];
         }
         else
@@ -253,7 +263,7 @@ async function getProjectCarParts(projectId) {
         // Checks if the project exists first
         if(projectExists(projectId)){
             const selectStatement = `SELECT * FROM PartProject WHERE projectId = ${projectId};`;
-            let theProject = await connection.execute(selectStatement);
+            let theProject = await connection.query(selectStatement);
             return theProject[0];
         }
         else
@@ -274,15 +284,15 @@ async function deleteProject(projectId){
         if(projectExists(projectId)){
             // Delete from the PartsProject table first (clears all parts associated with this project)
             let selectStatement = `DELETE FROM PartProject WHERE projectId = ${projectId};`;
-            let deletedProj = await connection.execute(selectStatement);
+            let deletedProj = await connection.query(selectStatement);
 
             // Delete from the UsersProject table (no foreign key constraints)
             selectStatement = `DELETE FROM UsersProject WHERE projectId = ${projectId};`;
-            deletedProj = await connection.execute(selectStatement);
+            deletedProj = await connection.query(selectStatement);
 
             // Delete the actual Project 
             selectStatement = `DELETE FROM Project WHERE projectId = ${projectId};`;
-            deletedProj = await connection.execute(selectStatement);
+            deletedProj = await connection.query(selectStatement);
         }
         else
             throw new DatabaseConnectionError();
@@ -298,7 +308,7 @@ async function deletePartFromProject(projectId, partNumber){
         if(projectExists(projectId)){
             // Delete from the PartsProject table first (clears all parts associated with this project)
             let selectStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
-            let results = await connection.execute(selectStatement);
+            let results = await connection.query(selectStatement);
 
             if(results[0].rowsAffected === 0){
                 return false;
@@ -317,7 +327,7 @@ async function deletePartFromProjectWithNumber(partNumber){
     try {
         // Delete from the PartsProject table first (clears all parts associated with this project)
         let selectStatement = `DELETE FROM PartProject WHERE partNumber = ${partNumber};`;
-        let results = await connection.execute(selectStatement);
+        let results = await connection.query(selectStatement);
 
         if(results[0].rowsAffected === 0){
             return false;

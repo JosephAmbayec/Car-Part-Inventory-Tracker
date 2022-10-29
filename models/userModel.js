@@ -1,6 +1,6 @@
 'use strict';
 
-const mysql = require('mysql2/promise');
+const {Client} = require('pg');
 const validUtils = require('../validateUtils.js');
 const userUtils = require('../userUtils.js');
 //const { DatabaseConnectionError } = require('./carPartModelMysql.js'); // Was creating circular dependency
@@ -19,14 +19,24 @@ var connection;
 async function initializeUserModel(dbname, reset){
 
     try {
-        connection = await mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            port: '10000',
-            password: 'pass',
-            database: dbname
-        })
-    
+        if (process.env.DATABASE_URL) {
+            connection = new Client({
+                connectionString: process.env.DATABASE_URL,
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            })
+        } else {
+            connection = new Client({
+                host: process.env.DB_HOST || 'localhost',
+                user: process.env.DB_USER || 'root',
+                port: process.env.DB_PORT || '10000',
+                password: process.env.DB_PASSWORD || 'pass',
+                database: dbname // assumes this was passed in as a parameter to initialize function
+            });
+        }
+        
+        connection.connect();
         // Dropping the tables if resetting them
         if (reset) {
             await resetTables(connection);
@@ -59,19 +69,19 @@ async function resetTables(connection){
  */
 async function createTables(connection){
     const createRoleStatement = `CREATE TABLE IF NOT EXISTS Roles(roleID int, rolename VARCHAR(50), PRIMARY KEY (roleID))`;
-    await connection.execute(createRoleStatement);
+    await connection.query(createRoleStatement);
 
     // Ignoring invalid data into Roles table
     let insertDefaultRoles = 'INSERT IGNORE INTO Roles(roleID, rolename) values (1, "admin");';
-    await connection.execute(insertDefaultRoles);
+    await connection.query(insertDefaultRoles);
 
     // Ignoring invalid data into Roles table
     insertDefaultRoles = 'INSERT IGNORE INTO Roles(roleID, rolename) values (2, "guest");';
-    await connection.execute(insertDefaultRoles);
+    await connection.query(insertDefaultRoles);
 
     // Creating the Users table
-    let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id int AUTO_INCREMENT, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
-    await connection.execute(createTableStatement);
+    let createTableStatement = `CREATE TABLE IF NOT EXISTS Users(id SERIAL, username VARCHAR(15), password varchar(128), roleID int, PRIMARY KEY (id), FOREIGN KEY (roleID) REFERENCES Roles(roleID))`;
+    await connection.query(createTableStatement);
 }
 //#endregion
 
@@ -99,7 +109,7 @@ async function getConnection(){
  async function resetTable(tableName){
     try {
         const dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
-        await connection.execute(dropQuery);
+        await connection.query(dropQuery);
 
     } catch (error) {
         throw new DatabaseConnectionError();
@@ -139,7 +149,7 @@ async function addUser(username, password, role) {
                 let hashedPassword = await userUtils.hashPassword(password);
                 let insertQuery = `INSERT INTO Users(username, password, roleID) values ('${username}', '${hashedPassword}', 1);`
 
-                await connection.execute(insertQuery);
+                await connection.query(insertQuery);
             }
             catch (err) {
                 throw new DatabaseConnectionError();
