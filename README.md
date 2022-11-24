@@ -4,7 +4,7 @@
 
 Visit https://carparts.josephambayec.dev/ or https://carpartmanager.herokuapp.com/ to access the site.
 
-NOTE: After November 28th 2022, the links above will be depreciated. I currently looking to host the site somewhere else...
+NOTE: After November 28th 2022, the links above will be depreciated. I currently looking to host the site somewhere else - Joseph
 _______________________________
 
 Car Parts Tracker by The Car Guys is an inventory management application for auto parts. Featured on the home/landing page are 5 buttons.
