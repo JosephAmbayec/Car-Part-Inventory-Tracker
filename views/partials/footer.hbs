@@ -1,3 +1,26 @@
-<footer style="text-align:center">
-    <p>©2022 The Car Guys</p>
+
+
+<footer>
+    <hr style="height: 0.1px;">
+    <div id="footer-container">
+        <div class="column-foot">
+            <h4>{{footerData.footer_home_title}}</h4>
+            <a href="/">{{footerData.footerHomeText}}</a>
+        </div>
+        <div class="column-foot">
+            <h4>{{footerData.footer_whoAreWe}}</h4>
+            <a href="/about">{{footerData.footerAboutText}}</a>
+        </div>
+        <div class="column-foot">
+            <h4>{{footerData.footer_getAccess}}</h4>
+            <div style="text-align:center; display:flex; flex-direction:row; justify-content: center;">
+                <a href="/users/login" style="margin-right: 1.5rem;">
+                {{footerData.footer_logIn}}
+                </a>
+                <a href="/users/signup">{{footerData.footer_signUp}}</a>
+            </div>
+        </div>
+    </div>
+    
+    <p id="copyright">©2022 The Car Guys</p>
 </footer> 

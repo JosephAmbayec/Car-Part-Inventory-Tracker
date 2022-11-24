@@ -1,5 +1,4 @@
 const uuid = require('uuid');
-const logger = require('../logger');
 
 const sessions = {};
 
@@ -16,7 +15,6 @@ class Session {
         this.username = username
         this.expiresAt = expiresAt
 
-        logger.info(`SESSION constructor for username ${username} with expiry date ${expiresAt}`);
     }
 
     /**
@@ -36,7 +34,6 @@ class Session {
 function createSession(username, numMinutes) {
     // Generate a random UUID as the sessionId
     const sessionId = uuid.v4()
-
     // Set the expiry time as numMinutes (in milliseconds) after the current time
     const expiresAt = new Date(Date.now() + numMinutes * 60000);
     // Create a session object containing information about the user and expiry time
@@ -44,7 +41,6 @@ function createSession(username, numMinutes) {
     // Add the session information to the sessions map, using sessionId as the key
     sessions[sessionId] = thisSession;
 
-    logger.info(`CREATED SESSION for username ${username} with expiry date ${expiresAt}`);
 
     return sessionId;
 }

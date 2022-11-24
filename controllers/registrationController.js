@@ -5,7 +5,8 @@ const { DatabaseConnectionError } = require('../models/carPartModelMysql');
 const router = express.Router();
 const routeRoot = '/';
 const userModel = require('../models/userModel');
-const logger = require('../logger');
+const homeController = require('../controllers/homeController');
+const loginController = require('./loginController');
 
 /**
  * POST method that allows the creation of a user
@@ -19,6 +20,22 @@ async function createUser(request, response){
     let confirmPassword = request.body.confirmPassword;
     const lang = request.cookies.language;
     let errorData;
+
+    let signupDisplay, endpoint, logInText;
+    let login = loginController.authenticateUser(request);
+
+    // Set the login to the username if response is not null
+    if(login != null) {
+        login = login.userSession.username;
+        signupDisplay = "none";
+        endpoint = "logout";
+        logInText = "Log Out";
+    }
+    else{
+        signupDisplay = "block";
+        endpoint = "login";
+        logInText = "Log In";
+    }
 
     // Making sure the password and confirmed password match
     if (password != confirmPassword){
@@ -37,6 +54,7 @@ async function createUser(request, response){
                 oppositeFormName: 'Log in',
                 dontHaveAccountText: "Already have an account?",
                 Home: "Home",
+                footerData: footerLangObject(lang)
             }
         }
         else{
@@ -52,28 +70,43 @@ async function createUser(request, response){
                 oppositeFormAction: 'login',
                 oppositeFormName: 'Connexion',
                 dontHaveAccountText: "Vous avez déjà un compte?",
-                Home: "Retournez",
+                footerData: footerLangObject(lang),
+                endpointLogInLogOut: endpoint,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    loggedInUser: login,
+                    projects_text: "Projets",
+                    about_text: "À Propos de Nous",
+                    Home : "Accueil",
+                    Current: "French",
+                    signUpText: "Enregistrer",
             }
         }
 
         
-        logger.info(`DID NOT CREATE user ${username} because of passwords NOT matching -- createUser`);
         response.status(404).render('loginsignup.hbs', errorData);
     }
     // If both passwords match
     else{
         try {
-            await userModel.addUser(username, password);
+            let role;
+
+            // Admins are only the creators of the website
+            if(username === 'Braeden' || username === 'Jayden' || username === 'Joseph'){
+                role = 1;
+            }
+            // If it's a guest on the website
+            else{
+                role = 2;
+            }
+
+            await userModel.addUser(username, password, role);
 
             // Save cookie that will expire.
             response.cookie("username", username);
-            logger.info(`CREATED cookie username ${username} -- createUser`);
 
             response.cookie("justRegistered", "true");
-            logger.info(`JUST REGISTERED user ${username} -- createUser`);
                 // .redirect('/')// Need cookie or session to pass this message to /
 
-            logger.info(`CREATED user ${username} in database -- createUser`);
 
             let pageData;
 
@@ -90,6 +123,15 @@ async function createUser(request, response){
                     endpointLogInLogOut: "login",
                     loggedInUser: username,
                     Home: "Home",
+                    Add: "Add a Car part",
+                    Show: "Find a Car Part",
+                    List: "Show all Car Parts",
+                    Edit: "Update a Car Part",
+                    Delete: "Delete a Car Part",
+                    projects_text: "Projects",
+                    about_text: "About Us",
+                    Current: "English",
+                    footerData: footerLangObject(lang)
                 }
             }
             else{
@@ -101,10 +143,20 @@ async function createUser(request, response){
                     alertHref: 'check-circle-fill',
                     display_signup: "none",
                     display_login: "block",
-                    logInlogOutText: "Déconnecter",
                     endpointLogInLogOut: "login",
-                    loggedInUser: username,
-                    Home: "Home",
+                    Home: "Accueil",
+                    Add: "Ajouter une Pièce Auto",
+                    Show: "Trouver une Pièce Auto",
+                    List: "Afficher Toutes les Pièces de Voiture",
+                    Edit: "Mettre à Jour une Pièce Auto",
+                    Delete: "Supprimer une Pièce Auto",
+                    Current: "French",
+                    footerData: footerLangObject(lang),
+                    endpointLogInLogOut: endpoint,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    loggedInUser: login,
+                    signUpText: "Enregistrer",
+                    about_text: "À propos de nous",
                 }
             }
 
@@ -134,6 +186,9 @@ async function createUser(request, response){
                     passwordHeader: "Password",
                     confirmPasswordHeader: "Confirm Password",
                     Home: "Home",
+                    alertMessage: "",
+                    errorCode: "",
+                    footerData: footerLangObject(lang)
                 }
             }
             else{
@@ -152,27 +207,35 @@ async function createUser(request, response){
                     usernameHeader: "Nom D'utilisateur",
                     passwordHeader: "Mot de Passe",
                     confirmPasswordHeader: "Confirmez le Mot de Passe",
-                    Home: "Retournez",
+                    alertMessage: "",
+                    errorCode: "",
+                    Home: "Accueil",
+                    Current: "French",
+                    footerData: footerLangObject(lang),
+                    endpointLogInLogOut: endpoint,
+                    logInlogOutText: logInText === "Log In" ? "Connexion" : logInText === "Log Out" ? "Déconnecter" : "",
+                    loggedInUser: login,
+                    signUpText: "Enregistrer",
+                    about_text: "À propos de nous",
                 } 
             }
 
-
             // If the error is an instance of the DatabaseConnectionError error
             if (error instanceof DatabaseConnectionError){
-                errorData.alertMessage = "Error while connecting to database.";
-                logger.error(`DatabaseConnectionError when CREATING user ${username} -- createUser`);
-                response.status(500).render('users.hbs', {alertMessage: "Error while connecting to database."});
+                errorData.alertMessage = "There was an error connecting to the database.";
+                errorData.errorCode = 500;
+                response.status(500).render('error.hbs', errorData);
             }
             // If the error is an instance of the UserLoginError error
             else if (error instanceof userModel.UserLoginError){
                 errorData.alertMessage = error.message;
-                logger.error(`UserLoginError when CREATING user ${username} -- createUser`);
                 response.status(404).render('loginsignup.hbs', errorData);
             }
             // If any other error occurs
             else {
-                logger.error(`OTHER error when CREATING user ${username} -- createUser`);
-                response.status(500).render('error.hbs', {message: `Unexpected error while trying to register user: ${error.message}`});
+                errorData.alertMessage = `Unexpected error while trying to register user: ${error.message}`;
+                errorData.errorCode = 500;
+                response.status(500).render('error.hbs', errorData);
             }
         }
     }
@@ -188,28 +251,32 @@ async function createUser(request, response){
         await userModel.showAllUsers()
             .then(users => {
                 if (users.length == 0){
-                    logger.info(`NOT RETRIEVED all users in database -- showUsers`);
                     response.status(404).render('users.hbs', {alertMessage: "No results"});
                 }
                 else{
                     let output = {users};
-                    logger.info(`RETRIEVED all users in database -- showUsers`);
                     response.status(200).render('users.hbs', output)
                 }  
             })
     }
     catch (error){
 
+        const data = {
+            alertMessage: "",
+            errorCode: ""
+        }
+
         // If the error is an instance of the DatabaseConnectionError error
         if (error instanceof DatabaseConnectionError){
-            errorData.alertMessage = "Error while connecting to database.";
-            logger.error(`DatabaseConnectionError when RETRIEVING all users -- showUsers`);
-            response.status(500).render('users.hbs', {alertMessage: "Error while connecting to database."});
+            errorData.alertMessage = "There was an error connecting to the database.";
+            errorData.errorCode = 500;
+            response.status(500).render('error.hbs', data);
         }
         // If any other error occurs
         else {
-            logger.error(`OTHER error when RETRIEVING all users -- showUsers`);
-            response.status(500).render('error.hbs', {message: `Unexpected error while trying to register user: ${error.message}`});
+            errorData.alertMessage = `Unexpected error while trying to register user: ${error.message}`;
+            errorData.errorCode = 500;
+            response.status(500).render('error.hbs', data);
         }
     }
 }
@@ -242,6 +309,8 @@ async function showSignup(request, response){
             passwordHeader: "Password",
             confirmPasswordHeader: "Confirm Password",
             Home: "Home",
+            about_text: "About Us",
+            footerData: footerLangObject(lang)
         }
     }
     else{
@@ -261,14 +330,53 @@ async function showSignup(request, response){
             usernameHeader: "Nom D'utilisateur",
             passwordHeader: "Mot de Passe",
             confirmPasswordHeader: "Confirmez le Mot de Passe",
-            Home: "Retournez",
+            Home: "Accueil",
+            about_text: "À propos de nous",
+            footerData: footerLangObject(lang)
         }
     }
 
-
-    logger.info(`SHOWING SIGNUP information (signup page) -- showSignup`);
     response.status(201).render('loginsignup.hbs', pageData);
 }
+
+/* #region Helper */
+
+/**
+ * Helper function to display footer information in specified language.
+ * @param {*} lang The specified language.
+ * @returns Object containing the footer information.
+ */
+ function footerLangObject(lang){
+    if (!lang || lang === 'en') {
+        const footerData = {
+            footer_home_title: "Home Page",
+            footerHomeText: "Home",
+            footer_whoAreWe: "Who are the car guys?",
+            footerAboutText: "Learn more",
+            footer_getAccess: "Get access to projects",
+            footer_logIn: "Log In",
+            footer_signUp: "Sign Up"
+        }
+
+        return footerData;
+    }
+    else{
+        const footerData = {
+            footer_home_title: "Page D'accueil",
+            footerHomeText: "Accueil",
+            footer_whoAreWe: "Qui sommes nous?",
+            footerAboutText: "Apprendre plus",
+            footer_getAccess: "Accéder aux Projets",
+            footer_logIn: "Connexion",
+            footer_signUp: "Enregistrer"
+        }
+
+        return footerData;
+    }
+}
+
+/* #endregion */
+
 
 router.get('/users', showUsers);
 router.get('/users/signup', showSignup)

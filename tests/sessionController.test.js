@@ -1,4 +1,4 @@
-const model = require('../models/sessionModel');
+let controller = require('../controllers/sessionController');
 
 const userData = [
     { username: 'username1', password: 'P@ssW0rd!'},
@@ -9,12 +9,10 @@ const userData = [
     { username: 'username6', password: 'H3||oW0rld'},
 ]
 
-test("createSession successfully returns sessionId", async () => {
+test("createSession success case", async () => {
     let username = userData.at(Math.random() * 6).username;
     let numMinutes = Math.random() * 20
 
-    let result = await model.createSession(username, numMinutes)
-
-    expect(result.length).toEqual(36);
+    let testResponse = await controller.createSession(username, numMinutes);
+    expect(testResponse.length).toEqual(36);
 });
-

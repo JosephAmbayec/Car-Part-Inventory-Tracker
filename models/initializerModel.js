@@ -11,9 +11,9 @@ const projects = require('./projectModel');
  * @param {*} app The app module.
  * @param {*} port The port of the website (for localhost).
  */
-function initialize(dbname, reset, app, port){
+async function initialize(dbname, reset, app, port){
     // Initialize the model
-    users.initializeUserModel(dbname, reset)
+    return await users.initializeUserModel(dbname, reset)
         // Then initialize the model for the users
         .then(model.initialize(dbname, reset))
         // Then initialize the project

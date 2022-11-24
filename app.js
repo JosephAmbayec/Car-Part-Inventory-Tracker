@@ -5,7 +5,6 @@ const app = express();
 const {engine} = require('express-handlebars');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
-const logger = require('./logger');
 const pinohttp = require('pino-http');
 var cookies = require("cookie-parser");
 
@@ -20,10 +19,6 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static('public'))
 
-const httpLogger = pinohttp({
-  logger: logger
-});
-app.use(httpLogger);
 
 // Make sure errorController is last!
 const controllers = ['homeController', 'aboutController', 'carPartController', 'registrationController', 'loginController', 'projectsController', 'languageController', 'errorController'];
